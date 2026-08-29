@@ -2,16 +2,17 @@ import os
 import json
 import urllib.request
 import urllib.parse
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, session, redirect, url_for
+from werkzeug.security import generate_password_hash, check_password_hash
 import psycopg2
 from google import genai
 
 template_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'templates'))
 app = Flask(__name__, template_folder=template_dir)
+app.secret_key = os.environ.get("SECRET_KEY", "ecotrade-secret-session-key-2026")
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
-# Default test secret key always yields 'success: true' during development
 TURNSTILE_SECRET_KEY = os.environ.get("TURNSTILE_SECRET_KEY", "1x0000000000000000000000000000000AA")
 
 def get_db_connection():
@@ -40,8 +41,22 @@ def verify_turnstile(token, ip):
 def home():
     return render_template("index.html")
 
+@app.route("/login")
+def login_page():
+    if "user_id" in session:
+        return redirect(url_for("account_page"))
+    return render_template("login.html")
+
+@app.route("/signup")
+def signup_page():
+    if "user_id" in session:
+        return redirect(url_for("account_page"))
+    return render_template("signup.html")
+
 @app.route("/contribute")
 def contribute_page():
+    if "user_id" not in session:
+        return redirect(url_for("login_page"))
     return render_template("contribute.html")
 
 @app.route("/admin")
@@ -54,9 +69,79 @@ def chat_page():
 
 @app.route("/account")
 def account_page():
+    if "user_id" not in session:
+        return redirect(url_for("login_page"))
     return render_template("account.html")
 
-# --- API ENDPOINTS ---
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login_page"))
+
+# --- AUTH API ENDPOINTS ---
+
+@app.route("/api/signup", methods=["POST"])
+def api_signup():
+    try:
+        data = request.json
+        full_name = data.get("full_name", "").strip()
+        email = data.get("email", "").strip().lower()
+        password = data.get("password", "")
+        role = data.get("role", "public")
+        school_name = data.get("school_name", "").strip() or None
+
+        if not full_name or not email or not password:
+            return jsonify({"status": "error", "message": "All required fields must be filled."}), 400
+
+        pw_hash = generate_password_hash(password)
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO users (full_name, email, password_hash, role, school_name) VALUES (%s, %s, %s, %s, %s) RETURNING id;",
+            (full_name, email, pw_hash, role, school_name)
+        )
+        user_id = cursor.fetchone()[0]
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        session["user_id"] = user_id
+        session["user_name"] = full_name
+        session["user_role"] = role
+
+        return jsonify({"status": "success", "message": "Account created successfully!"})
+    except psycopg2.IntegrityError:
+        return jsonify({"status": "error", "message": "An account with this email already exists."}), 400
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route("/api/login", methods=["POST"])
+def api_login():
+    try:
+        data = request.json
+        email = data.get("email", "").strip().lower()
+        password = data.get("password", "")
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, full_name, password_hash, role FROM users WHERE email = %s;", (email,))
+        user = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        if not user or not check_password_hash(user[2], password):
+            return jsonify({"status": "error", "message": "Invalid email or password."}), 401
+
+        session["user_id"] = user[0]
+        session["user_name"] = user[1]
+        session["user_role"] = user[3]
+
+        return jsonify({"status": "success", "message": "Login successful!"})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+# --- OTHER API ENDPOINTS ---
 
 @app.route("/api/hubs", methods=["GET"])
 def get_hubs():
@@ -104,14 +189,16 @@ def get_materials():
 
 @app.route("/api/contribute", methods=["POST"])
 def add_contribution():
+    if "user_id" not in session:
+        return jsonify({"status": "error", "message": "You must be logged in to submit a contribution."}), 401
+
     try:
         data = request.json
         token = data.get("cf_turnstile_response")
         remote_ip = request.remote_addr
 
-        # Verify Cloudflare Turnstile anti-bot token
         if not verify_turnstile(token, remote_ip):
-            return jsonify({"status": "error", "message": "Anti-bot verification failed. Please check the CAPTCHA."}), 400
+            return jsonify({"status": "error", "message": "Anti-bot verification failed."}), 400
 
         material_name = data.get("material_name")
         weight = float(data.get("weight", 0))
@@ -127,7 +214,7 @@ def add_contribution():
 
         cursor.execute(
             "INSERT INTO contributions (user_id, material_id, hub_id, weight_kg, calculated_payout, status) VALUES (%s, %s, %s, %s, %s, %s) RETURNING id;",
-            (2, material_id, hub_id, weight, payout, 'pending')
+            (session["user_id"], material_id, hub_id, weight, payout, 'pending')
         )
         conn.commit()
         cursor.close()
@@ -170,7 +257,7 @@ def chat_ai():
         conn.close()
 
         client = genai.Client(api_key=GEMINI_API_KEY)
-        full_prompt = f"""You are an eco-recycling assistant for high school students in Malaysia.
+        full_prompt = f"""You are an eco-recycling assistant in Malaysia.
         Use this current database context to answer:
         Database Material Prices: {db_context}
         
