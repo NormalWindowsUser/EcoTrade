@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center py-3">
+    <div class="col-md-6 col-lg-5">
+        <div class="card-custom p-4">
+            <h4 class="fw-bold text-success mb-1 text-center"><i class="bi bi-person-plus"></i> Create Account</h4>
+            <p class="text-secondary small text-center mb-4">Join EcoTrade to submit recycling batches and receive rewards.</p>
+            
+            <form id="signupForm">
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold text-light">Full Name</label>
+                    <input type="text" id="signupName" class="form-control bg-dark text-light border-secondary" placeholder="e.g. John Doe" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold text-light">Email Address</label>
+                    <input type="email" id="signupEmail" class="form-control bg-dark text-light border-secondary" placeholder="name@example.com" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold text-light">Password</label>
+                    <input type="password" id="signupPassword" class="form-control bg-dark text-light border-secondary" placeholder="At least 6 characters" minlength="6" required>
+                </div>
+                
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <label class="form-label small fw-semibold text-light">Account Role</label>
+                        <select id="signupRole" class="form-select bg-dark text-light border-secondary">
+                            <option value="public" selected>General Public</option>
+                            <option value="student">Student</option>
+                        </select>
+                    </div>
+                    <div class="col-6" id="schoolFieldWrapper" style="display: none;">
+                        <label class="form-label small fw-semibold text-light">School Name</label>
+                        <input type="text" id="signupSchool" class="form-control bg-dark text-light border-secondary" placeholder="e.g. SMK Victoria">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-success w-100 fw-bold py-2 mb-3">Register Account</button>
+            </form>
+
+            <div id="signupMsg"></div>
+
+            <div class="text-center pt-2 border-top border-secondary mt-3">
+                <span class="small text-secondary">Already have an account?</span>
+                <a href="/login" class="small text-success fw-bold text-decoration-none ms-1">Log In</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('signupRole').addEventListener('change', (e) => {
+        const schoolWrapper = document.getElementById('schoolFieldWrapper');
+        schoolWrapper.style.display = (e.target.value === 'student') ? 'block' : 'none';
+    });
+
+    document.getElementById('signupForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const msgDiv = document.getElementById('signupMsg');
+        msgDiv.innerHTML = '';
+
+        try {
+            const res = await fetch('/api/signup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    full_name: document.getElementById('signupName').value,
+                    email: document.getElementById('signupEmail').value,
+                    password: document.getElementById('signupPassword').value,
+                    role: document.getElementById('signupRole').value,
+                    school_name: document.getElementById('signupSchool').value
+                })
+            });
+            const data = await res.json();
+            if (data.status === 'success') {
+                msgDiv.innerHTML = `<div class="alert alert-success py-2 small">Account created! Redirecting to account dashboard...</div>`;
+                setTimeout(() => window.location.href = '/account', 800);
+            } else {
+                msgDiv.innerHTML = `<div class="alert alert-danger py-2 small">${data.message}</div>`;
+            }
+        } catch (err) {
+            msgDiv.innerHTML = `<div class="alert alert-danger py-2 small">Connection error. Please try again.</div>`;
+        }
+    });
+</script>
+{% endblock %}
