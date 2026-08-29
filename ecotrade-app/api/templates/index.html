@@ -151,9 +151,17 @@
         font-weight: normal;
     }
 
+    .filter-bar {
+        background: var(--card-bg);
+        padding: 1rem;
+        border-radius: 10px;
+        border: 1px solid var(--border-color);
+        margin-bottom: 1.5rem;
+    }
+
     .grid-container {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
         gap: 1rem;
         margin-bottom: 2rem;
     }
@@ -163,6 +171,9 @@
         border-radius: 10px;
         padding: 1.1rem;
         border: 1px solid var(--border-color);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
     }
 
     .info-card h4 {
@@ -188,6 +199,14 @@
         border-radius: 6px;
         margin-top: 0.4rem;
         border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    .payout-estimate-box {
+        margin-top: 0.6rem;
+        padding: 0.5rem 0.75rem;
+        background: rgba(16, 185, 129, 0.05);
+        border-radius: 6px;
+        border: 1px dashed rgba(16, 185, 129, 0.3);
     }
 </style>
 
@@ -243,9 +262,31 @@
     </div>
 </section>
 
+<!-- Filter and Calculator Section -->
+<div class="filter-bar">
+    <div class="row g-3 align-items-center">
+        <div class="col-md-4">
+            <label for="filter-city" class="form-label small text-muted mb-1 fw-bold">Select City / Area</label>
+            <select id="filter-city" class="form-select bg-dark text-light border-secondary form-select-sm">
+                <option value="">All Cities / Areas</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label for="filter-hub" class="form-label small text-muted mb-1 fw-bold">Select Recycling Hub</label>
+            <select id="filter-hub" class="form-select bg-dark text-light border-secondary form-select-sm">
+                <option value="">All Partner Hubs</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label for="calc-weight" class="form-label small text-muted mb-1 fw-bold">Estimated Weight (kg)</label>
+            <input type="number" id="calc-weight" class="form-control bg-dark text-light border-secondary form-control-sm" value="1.0" min="0.1" step="0.5">
+        </div>
+    </div>
+</div>
+
 <div class="section-title">
-    <span>Accepted Materials & Live Rates</span>
-    <span class="sub-text">Updated Daily</span>
+    <span>Accepted Materials & User-Reported Live Rates</span>
+    <span class="sub-text" id="rate-summary-tag">Based on community reports</span>
 </div>
 <div class="grid-container" id="materials-list">
     <p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); font-size: 0.85rem;">Loading material rates...</p>
@@ -264,6 +305,8 @@
 </footer>
 
 <script>
+    let currentMaterialsData = [];
+
     async function fetchStats() {
         try {
             const res = await fetch('/api/stats');
@@ -280,46 +323,53 @@
         }
     }
 
-    async function fetchMaterials() {
+    async function fetchHubs(city = '') {
         try {
-            const res = await fetch('/api/materials');
+            const url = city ? `/api/hubs?city=${encodeURIComponent(city)}` : '/api/hubs';
+            const res = await fetch(url);
             const data = await res.json();
-            const container = document.getElementById('materials-list');
-            if (data.status === 'success' && data.data.length > 0) {
-                container.innerHTML = data.data.map(m => `
-                    <div class="info-card">
-                        <h4>${m.name}</h4>
-                        <p><strong>Category:</strong> ${m.category}</p>
-                        <p>${m.tips || 'Clean and prepare materials prior to drop-off.'}</p>
-                        <span class="price-badge">RM ${m.price_per_kg.toFixed(2)} / kg</span>
-                    </div>
-                `).join('');
-            } else {
-                container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; font-size: 0.85rem;">No active materials found.</p>';
+            
+            // Populate City filter options if empty
+            const citySelect = document.getElementById('filter-city');
+            if (citySelect.options.length <= 1 && data.cities) {
+                data.cities.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c;
+                    opt.textContent = c;
+                    citySelect.appendChild(opt);
+                });
             }
-        } catch (err) {
-            console.error("Failed to fetch materials:", err);
-            document.getElementById('materials-list').innerHTML = '<p style="grid-column: 1/-1; text-align: center; font-size: 0.85rem;">Unable to load materials.</p>';
-        }
-    }
 
-    async function fetchHubs() {
-        try {
-            const res = await fetch('/api/hubs');
-            const data = await res.json();
+            // Populate Hub select dropdown
+            const hubSelect = document.getElementById('filter-hub');
+            const previousHubValue = hubSelect.value;
+            hubSelect.innerHTML = '<option value="">All Partner Hubs</option>';
+            if (data.status === 'success' && data.data) {
+                data.data.forEach(h => {
+                    const opt = document.createElement('option');
+                    opt.value = h.id;
+                    opt.textContent = `${h.name} (${h.city})`;
+                    hubSelect.appendChild(opt);
+                });
+                if (previousHubValue) hubSelect.value = previousHubValue;
+            }
+
+            // Render Hub list cards
             const container = document.getElementById('hubs-list');
             if (data.status === 'success' && data.data.length > 0) {
                 container.innerHTML = data.data.map(h => `
                     <div class="info-card">
-                        <h4>${h.name}</h4>
-                        <p><strong>City:</strong> ${h.city}</p>
-                        <p><strong>Address:</strong> ${h.address}</p>
-                        <p><strong>Hours:</strong> ${h.hours || 'N/A'}</p>
-                        <p><strong>Contact:</strong> ${h.phone || 'N/A'}</p>
+                        <div>
+                            <h4>${h.name}</h4>
+                            <p><strong>City:</strong> ${h.city}</p>
+                            <p><strong>Address:</strong> ${h.address}</p>
+                            <p><strong>Hours:</strong> ${h.hours || 'N/A'}</p>
+                            <p><strong>Contact:</strong> ${h.phone || 'N/A'}</p>
+                        </div>
                     </div>
                 `).join('');
             } else {
-                container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; font-size: 0.85rem;">No active recycling hubs available.</p>';
+                container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; font-size: 0.85rem;">No recycling hubs found for selected filters.</p>';
             }
         } catch (err) {
             console.error("Failed to fetch hubs:", err);
@@ -327,10 +377,82 @@
         }
     }
 
+    async function fetchMaterials() {
+        const city = document.getElementById('filter-city').value;
+        const hubId = document.getElementById('filter-hub').value;
+        
+        try {
+            const queryParams = new URLSearchParams();
+            if (city) queryParams.append('city', city);
+            if (hubId) queryParams.append('hub_id', hubId);
+
+            const res = await fetch(`/api/materials?${queryParams.toString()}`);
+            const data = await res.json();
+            
+            if (data.status === 'success' && data.data) {
+                currentMaterialsData = data.data;
+                renderMaterials();
+            } else {
+                document.getElementById('materials-list').innerHTML = '<p style="grid-column: 1/-1; text-align: center; font-size: 0.85rem;">No active materials found.</p>';
+            }
+        } catch (err) {
+            console.error("Failed to fetch materials:", err);
+            document.getElementById('materials-list').innerHTML = '<p style="grid-column: 1/-1; text-align: center; font-size: 0.85rem;">Unable to load materials.</p>';
+        }
+    }
+
+    function renderMaterials() {
+        const container = document.getElementById('materials-list');
+        const weightInput = parseFloat(document.getElementById('calc-weight').value) || 0;
+
+        if (currentMaterialsData.length > 0) {
+            container.innerHTML = currentMaterialsData.map(m => {
+                const estimatedPayout = (m.avg_reported_rate * weightInput).toFixed(2);
+                const reportBadge = m.report_count > 0 
+                    ? `<span class="badge bg-secondary ms-1">${m.report_count} user report${m.report_count > 1 ? 's' : ''}</span>`
+                    : `<span class="badge bg-dark border border-secondary text-secondary ms-1">Base Rate</span>`;
+
+                return `
+                    <div class="info-card">
+                        <div>
+                            <h4>${m.name}</h4>
+                            <p><strong>Category:</strong> ${m.category}</p>
+                            <p>${m.tips || 'Clean and prepare materials prior to drop-off.'}</p>
+                        </div>
+                        <div>
+                            <div class="price-badge">
+                                RM ${m.avg_reported_rate.toFixed(2)} / kg ${reportBadge}
+                            </div>
+                            <div class="payout-estimate-box">
+                                <small class="text-muted d-block">Estimated Payout for <strong>${weightInput} kg</strong>:</small>
+                                <span class="fw-bold text-success fs-6">RM ${estimatedPayout}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        } else {
+            container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; font-size: 0.85rem;">No active materials found.</p>';
+        }
+    }
+
+    document.getElementById('filter-city').addEventListener('change', async () => {
+        await fetchHubs(document.getElementById('filter-city').value);
+        fetchMaterials();
+    });
+
+    document.getElementById('filter-hub').addEventListener('change', () => {
+        fetchMaterials();
+    });
+
+    document.getElementById('calc-weight').addEventListener('input', () => {
+        renderMaterials();
+    });
+
     document.addEventListener('DOMContentLoaded', () => {
         fetchStats();
-        fetchMaterials();
         fetchHubs();
+        fetchMaterials();
     });
 </script>
 {% endblock %}
