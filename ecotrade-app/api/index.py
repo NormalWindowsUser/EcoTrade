@@ -3,7 +3,8 @@ from flask import Flask, render_template, jsonify, request
 import psycopg2
 from google import genai
 
-app = Flask(__name__, template_folder='../templates')
+# Default to current directory templates/
+app = Flask(__name__)
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
@@ -106,7 +107,7 @@ def chat_ai():
         
         response = client.models.generate_content(
             model="gemini-2.5-flash",
-            content=full_prompt
+            contents=full_prompt
         )
         return jsonify({"status": "success", "reply": response.text})
     except Exception as e:
