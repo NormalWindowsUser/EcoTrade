@@ -1,340 +1,342 @@
-import os
-import json
-import urllib.request
-import urllib.parse
-from flask import Flask, render_template, jsonify, request, session, redirect, url_for
-from werkzeug.security import generate_password_hash, check_password_hash
-import psycopg2
-from google import genai
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoTrade - Recycle & Earn</title>
+    <style>
+        :root {
+            --primary: #2e7d32;
+            --primary-hover: #1b5e20;
+            --bg-light: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-dark: #2c3e50;
+            --text-muted: #607d8b;
+        }
 
-app = Flask(__name__, template_folder="templates")
-app.secret_key = os.environ.get("SECRET_KEY", "ecotrade-secret-session-key-2026")
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
 
-DATABASE_URL = os.environ.get("DATABASE_URL")
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
-TURNSTILE_SECRET_KEY = os.environ.get("TURNSTILE_SECRET_KEY", "1x0000000000000000000000000000000AA")
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
 
-def get_db_connection():
-    db_url = DATABASE_URL
-    if not db_url:
-        raise ValueError("DATABASE_URL environment variable is not configured.")
-    if "sslmode=" not in db_url:
-        separator = "&" if "?" in db_url else "?"
-        db_url += f"{separator}sslmode=require"
-    return psycopg2.connect(db_url, connect_timeout=10)
+        header {
+            background: var(--card-bg);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
 
-def verify_turnstile(token, ip):
-    if not token:
-        return False
-    url = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
-    payload = urllib.parse.urlencode({
-        'secret': TURNSTILE_SECRET_KEY,
-        'response': token,
-        'remoteip': ip
-    }).encode('utf-8')
-    req = urllib.request.Request(url, data=payload, headers={'Content-Type': 'application/x-www-form-urlencoded'})
-    try:
-        with urllib.request.urlopen(req) as res:
-            result = json.loads(res.read().decode('utf-8'))
-            return result.get('success', False)
-    except Exception:
-        return False
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+        }
 
-# --- PAGE ROUTES ---
+        nav {
+            display: flex;
+            gap: 1.2rem;
+            align-items: center;
+        }
 
-@app.route("/")
-def home():
-    return render_template("index.html")
+        nav a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 500;
+            transition: color 0.2s;
+        }
 
-@app.route("/login")
-def login_page():
-    if "user_id" in session:
-        return redirect(url_for("account_page"))
-    return render_template("login.html")
+        nav a:hover {
+            color: var(--primary);
+        }
 
-@app.route("/signup")
-def signup_page():
-    if "user_id" in session:
-        return redirect(url_for("account_page"))
-    return render_template("signup.html")
+        .nav-btn {
+            background-color: var(--primary);
+            color: white !important;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
 
-@app.route("/contribute")
-def contribute_page():
-    if "user_id" not in session:
-        return redirect(url_for("login_page"))
-    return render_template("contribute.html")
+        .nav-btn:hover {
+            background-color: var(--primary-hover);
+        }
 
-@app.route("/admin")
-def admin_page():
-    return render_template("admin.html")
+        main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 3rem 1rem;
+        }
 
-@app.route("/chat")
-def chat_page():
-    return render_template("chat.html")
+        .hero {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 4rem 2rem;
+            text-align: center;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+            margin-bottom: 3rem;
+        }
 
-@app.route("/account")
-def account_page():
-    if "user_id" not in session:
-        return redirect(url_for("login_page"))
-    return render_template("account.html")
+        .hero h1 {
+            font-size: 2.8rem;
+            color: var(--primary-hover);
+            margin-bottom: 1rem;
+        }
 
-@app.route("/logout")
-def logout():
-    session.clear()
-    return redirect(url_for("login_page"))
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 650px;
+            margin: 0 auto 2rem;
+        }
 
-# --- AUTH API ENDPOINTS ---
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
 
-@app.route("/api/signup", methods=["POST"])
-def api_signup():
-    data = request.get_json(silent=True) or {}
-    full_name = data.get("full_name", "").strip()
-    email = data.get("email", "").strip().lower()
-    password = data.get("password", "")
-    role = data.get("role", "public")
-    school_name = data.get("school_name", "").strip() or None
+        .btn {
+            padding: 0.8rem 1.8rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            transition: transform 0.1s, background 0.2s;
+        }
 
-    if not full_name or not email or not password:
-        return jsonify({"status": "error", "message": "All required fields must be filled."}), 400
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
 
-    conn = None
-    cursor = None
-    try:
-        pw_hash = generate_password_hash(password)
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute(
-            "INSERT INTO users (full_name, email, password_hash, role, school_name) VALUES (%s, %s, %s, %s, %s) RETURNING id;",
-            (full_name, email, pw_hash, role, school_name)
-        )
-        user_id = cursor.fetchone()[0]
-        conn.commit()
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
 
-        session["user_id"] = user_id
-        session["user_name"] = full_name
-        session["user_role"] = role
+        .btn-secondary {
+            background-color: #e8f5e9;
+            color: var(--primary);
+        }
 
-        return jsonify({"status": "success", "message": "Account created successfully!"})
-    except psycopg2.IntegrityError:
-        if conn:
-            conn.rollback()
-        return jsonify({"status": "error", "message": "An account with this email already exists."}), 400
-    except Exception as e:
-        if conn:
-            conn.rollback()
-        return jsonify({"status": "error", "message": str(e)}), 500
-    finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
+        .btn-secondary:hover {
+            background-color: #c8e6c9;
+        }
 
-@app.route("/api/login", methods=["POST"])
-def api_login():
-    data = request.get_json(silent=True) or {}
-    email = data.get("email", "").strip().lower()
-    password = data.get("password", "")
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
 
-    if not email or not password:
-        return jsonify({"status": "error", "message": "Please provide both email and password."}), 400
+        .stat-card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
 
-    conn = None
-    cursor = None
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT id, full_name, password_hash, role FROM users WHERE email = %s;", (email,))
-        user = cursor.fetchone()
+        .stat-card h3 {
+            font-size: 2.2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
 
-        if not user or not user[2] or not check_password_hash(user[2], password):
-            return jsonify({"status": "error", "message": "Invalid email or password."}), 401
+        .stat-card p {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
 
-        session["user_id"] = user[0]
-        session["user_name"] = user[1]
-        session["user_role"] = user[3]
+        .section-title {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-dark);
+        }
 
-        return jsonify({"status": "success", "message": "Login successful!"})
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
-    finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
 
-# --- OTHER API ENDPOINTS ---
+        .info-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
 
-@app.route("/api/hubs", methods=["GET"])
-def get_hubs():
-    conn = None
-    cursor = None
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT id, hub_name, address, city, operating_hours, contact_phone FROM recycling_hubs WHERE is_active = TRUE ORDER BY hub_name ASC;")
-        rows = cursor.fetchall()
+        .info-card h4 {
+            font-size: 1.2rem;
+            color: var(--primary-hover);
+            margin-bottom: 0.5rem;
+        }
 
-        hubs = [{
-            "id": r[0],
-            "name": r[1],
-            "address": r[2],
-            "city": r[3],
-            "hours": r[4],
-            "phone": r[5]
-        } for r in rows]
-        return jsonify({"status": "success", "data": hubs})
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
-    finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
+        .info-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 0.3rem;
+        }
 
-@app.route("/api/materials", methods=["GET"])
-def get_materials():
-    conn = None
-    cursor = None
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT id, name, category, price_per_kg, preparation_tips, eco_impact_desc FROM materials WHERE is_active = TRUE;")
-        rows = cursor.fetchall()
+        .price-badge {
+            display: inline-block;
+            background: #e8f5e9;
+            color: var(--primary);
+            font-weight: bold;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            margin-top: 0.5rem;
+        }
 
-        materials = [{
-            "id": r[0],
-            "name": r[1],
-            "category": r[2],
-            "price_per_kg": float(r[3]),
-            "tips": r[4],
-            "impact": r[5]
-        } for r in rows]
-        return jsonify({"status": "success", "data": materials})
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
-    finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            border-top: 1px solid #e0e0e0;
+            background: var(--card-bg);
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
 
-@app.route("/api/contribute", methods=["POST"])
-def add_contribution():
-    if "user_id" not in session:
-        return jsonify({"status": "error", "message": "You must be logged in to submit a contribution."}), 401
+    <header>
+        <a href="/" class="logo">EcoTrade</a>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/contribute">Contribute</a>
+            <a href="/chat">AI Assistant</a>
+            <a href="/account">Account</a>
+            <a href="/login">Login</a>
+            <a href="/signup" class="nav-btn">Sign Up</a>
+        </nav>
+    </header>
 
-    data = request.get_json(silent=True) or {}
-    token = data.get("cf_turnstile_response")
-    remote_ip = request.remote_addr
+    <main>
+        <section class="hero">
+            <h1>Recycle Smarter, Earn Rewards</h1>
+            <p>Turn your recyclable waste into earnings while reducing carbon emissions across Malaysia.</p>
+            <div class="cta-buttons">
+                <a href="/contribute" class="btn btn-primary">Submit Recycling</a>
+                <a href="/chat" class="btn btn-secondary">Ask AI Assistant</a>
+            </div>
+        </section>
 
-    if not verify_turnstile(token, remote_ip):
-        return jsonify({"status": "error", "message": "Anti-bot verification failed."}), 400
+        <section class="stats-grid">
+            <div class="stat-card">
+                <h3 id="stat-weight">0.0 kg</h3>
+                <p>Total Recycled Weight</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="stat-earnings">RM 0.00</h3>
+                <p>Total Payouts Distributed</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="stat-hubs">0</h3>
+                <p>Active Recycling Hubs</p>
+            </div>
+        </section>
 
-    try:
-        weight = float(data.get("weight", 0))
-        price = float(data.get("price", 0))
-    except (ValueError, TypeError):
-        return jsonify({"status": "error", "message": "Invalid weight or price format."}), 400
+        <h2 class="section-title">Accepted Materials & Rates</h2>
+        <div class="grid-container" id="materials-list">
+            <p style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">Loading material rates...</p>
+        </div>
 
-    material_name = data.get("material_name")
-    hub_id = data.get("hub_id")
-    payout = weight * price
+        <h2 class="section-title">Recycling Hub Locations</h2>
+        <div class="grid-container" id="hubs-list">
+            <p style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">Loading hub locations...</p>
+        </div>
+    </main>
 
-    conn = None
-    cursor = None
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT id FROM materials WHERE name = %s LIMIT 1;", (material_name,))
-        mat_row = cursor.fetchone()
-        material_id = mat_row[0] if mat_row else 1
+    <footer>
+        <p>&copy; 2026 EcoTrade Malaysia. Empowering Sustainable Recycling.</p>
+    </footer>
 
-        cursor.execute(
-            "INSERT INTO contributions (user_id, material_id, hub_id, weight_kg, calculated_payout, status) VALUES (%s, %s, %s, %s, %s, %s) RETURNING id;",
-            (session["user_id"], material_id, hub_id, weight, payout, 'pending')
-        )
-        conn.commit()
-        return jsonify({"status": "success", "payout": payout})
-    except Exception as e:
-        if conn:
-            conn.rollback()
-        return jsonify({"status": "error", "message": str(e)}), 500
-    finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
+    <script>
+        async function fetchStats() {
+            try {
+                const res = await fetch('/api/stats');
+                const data = await res.json();
+                if (data.status === 'success') {
+                    document.getElementById('stat-weight').innerText = `${data.total_weight.toFixed(1)} kg`;
+                    document.getElementById('stat-earnings').innerText = `RM ${data.total_earnings.toFixed(2)}`;
+                    document.getElementById('stat-hubs').innerText = data.active_hubs;
+                }
+            } catch (err) {
+                console.error("Failed to fetch statistics:", err);
+            }
+        }
 
-@app.route("/api/stats", methods=["GET"])
-def get_stats():
-    conn = None
-    cursor = None
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT COALESCE(SUM(weight_kg), 0), COALESCE(SUM(calculated_payout), 0) FROM contributions;")
-        row = cursor.fetchone()
-        cursor.execute("SELECT COUNT(*) FROM recycling_hubs WHERE is_active = TRUE;")
-        hubs_count = cursor.fetchone()[0]
+        async function fetchMaterials() {
+            try {
+                const res = await fetch('/api/materials');
+                const data = await res.json();
+                const container = document.getElementById('materials-list');
+                if (data.status === 'success' && data.data.length > 0) {
+                    container.innerHTML = data.data.map(m => `
+                        <div class="info-card">
+                            <h4>${m.name}</h4>
+                            <p><strong>Category:</strong> ${m.category}</p>
+                            <p>${m.tips || 'Clean and prepare materials prior to drop-off.'}</p>
+                            <span class="price-badge">RM ${m.price_per_kg.toFixed(2)} / kg</span>
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">No active materials found.</p>';
+                }
+            } catch (err) {
+                console.error("Failed to fetch materials:", err);
+                document.getElementById('materials-list').innerHTML = '<p style="grid-column: 1/-1; text-align: center;">Unable to load materials.</p>';
+            }
+        }
 
-        return jsonify({
-            "status": "success",
-            "total_weight": float(row[0]),
-            "total_earnings": float(row[1]),
-            "active_hubs": int(hubs_count)
-        })
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
-    finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
+        async function fetchHubs() {
+            try {
+                const res = await fetch('/api/hubs');
+                const data = await res.json();
+                const container = document.getElementById('hubs-list');
+                if (data.status === 'success' && data.data.length > 0) {
+                    container.innerHTML = data.data.map(h => `
+                        <div class="info-card">
+                            <h4>${h.name}</h4>
+                            <p><strong>City:</strong> ${h.city}</p>
+                            <p><strong>Address:</strong> ${h.address}</p>
+                            <p><strong>Operating Hours:</strong> ${h.hours || 'N/A'}</p>
+                            <p><strong>Contact:</strong> ${h.phone || 'N/A'}</p>
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">No active recycling hubs available.</p>';
+                }
+            } catch (err) {
+                console.error("Failed to fetch hubs:", err);
+                document.getElementById('hubs-list').innerHTML = '<p style="grid-column: 1/-1; text-align: center;">Unable to load hub locations.</p>';
+            }
+        }
 
-@app.route("/api/chat", methods=["POST"])
-def chat_ai():
-    data = request.get_json(silent=True) or {}
-    user_prompt = data.get("prompt", "").strip()
-
-    if not user_prompt:
-        return jsonify({"status": "error", "reply": "Please enter a question."}), 400
-
-    conn = None
-    cursor = None
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT name, price_per_kg FROM materials WHERE is_active = TRUE;")
-        db_context = cursor.fetchall()
-    except Exception as e:
-        db_context = []
-    finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
-
-    try:
-        client = genai.Client(api_key=GEMINI_API_KEY)
-        full_prompt = f"""You are an eco-recycling assistant in Malaysia.
-        Use this current database context to answer:
-        Database Material Prices: {db_context}
-        
-        User Question: {user_prompt}"""
-
-        response = client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=full_prompt
-        )
-        return jsonify({"status": "success", "reply": response.text})
-    except Exception as e:
-        return jsonify({"status": "error", "reply": f"AI service error: {str(e)}"}), 500
-
-if __name__ == "__main__":
-    app.run()
-```[cite: 1]
-
----
-
-### Key Updates Applied
-* Replaced `template_dir = os.path.abspath(...)` with `app = Flask(__name__, template_folder="templates")`[cite: 1]. This ensures Vercel's Linux container environment correctly resolves template files without path mismatch bugs.
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchStats();
+            fetchMaterials();
+            fetchHubs();
+        });
+    </script>
+</body>
+</html>
