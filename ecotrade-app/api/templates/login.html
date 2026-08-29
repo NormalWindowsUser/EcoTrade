@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
+<!-- Cloudflare Turnstile API Script -->
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
 <div class="row justify-content-center py-4">
     <div class="col-md-5 col-lg-4">
         <div class="card-custom p-4">
@@ -16,6 +19,12 @@
                     <label class="form-label small fw-semibold text-light">Password</label>
                     <input type="password" id="loginPassword" class="form-control bg-dark text-light border-secondary" placeholder="••••••••" required>
                 </div>
+
+                <!-- Cloudflare Turnstile Anti-Bot Widget -->
+                <div class="mb-3 text-center">
+                    <div class="cf-turnstile" data-sitekey="1x00000000000000000000AA"></div>
+                </div>
+
                 <button type="submit" class="btn btn-success w-100 fw-bold py-2 mb-3">Log In</button>
             </form>
 
@@ -35,11 +44,18 @@
         const msgDiv = document.getElementById('loginMsg');
         msgDiv.innerHTML = '';
 
+        const turnstileResponse = turnstile.getResponse();
+        if (!turnstileResponse) {
+            msgDiv.innerHTML = `<div class="alert alert-warning py-2 small">Please complete the anti-bot verification.</div>`;
+            return;
+        }
+
         try {
             const res = await fetch('/api/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
+                    cf_turnstile_response: turnstileResponse,
                     email: document.getElementById('loginEmail').value,
                     password: document.getElementById('loginPassword').value
                 })
@@ -50,9 +66,11 @@
                 setTimeout(() => window.location.href = '/account', 800);
             } else {
                 msgDiv.innerHTML = `<div class="alert alert-danger py-2 small">${data.message}</div>`;
+                turnstile.reset();
             }
         } catch (err) {
             msgDiv.innerHTML = `<div class="alert alert-danger py-2 small">Connection error. Please try again.</div>`;
+            turnstile.reset();
         }
     });
 </script>
