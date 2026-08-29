@@ -17,23 +17,37 @@
 </div>
 
 <script>
-    document.getElementById('sendBtn').addEventListener('click', async () => {
+    async function sendMessage() {
         const input = document.getElementById('chatInput');
         const box = document.getElementById('chatBox');
-        if(!input.value.trim()) return;
+        if (!input.value.trim()) return;
 
-        const userMsg = input.value;
+        const userMsg = input.value.trim();
         box.innerHTML += `<p><strong>You:</strong> ${userMsg}</p>`;
         input.value = '';
-
-        const res = await fetch('/api/chat', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ prompt: userMsg })
-        });
-        const data = await res.json();
-        box.innerHTML += `<p class="text-success"><strong>Eco AI:</strong> ${data.reply}</p>`;
         box.scrollTop = box.scrollHeight;
+
+        try {
+            const res = await fetch('/api/chat', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ prompt: userMsg })
+            });
+            const data = await res.json();
+            box.innerHTML += `<p class="text-success"><strong>Eco AI:</strong> ${data.reply}</p>`;
+        } catch (err) {
+            box.innerHTML += `<p class="text-danger"><strong>System:</strong> Failed to reach AI service.</p>`;
+        }
+        box.scrollTop = box.scrollHeight;
+    }
+
+    document.getElementById('sendBtn').addEventListener('click', sendMessage);
+
+    document.getElementById('chatInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            sendMessage();
+        }
     });
 </script>
 {% endblock %}
