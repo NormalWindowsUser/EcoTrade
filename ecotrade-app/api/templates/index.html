@@ -12,6 +12,7 @@
             --card-bg: #ffffff;
             --text-dark: #2c3e50;
             --text-muted: #607d8b;
+            --border: #e0e6ed;
         }
 
         * {
@@ -24,23 +25,23 @@
         body {
             background-color: var(--bg-light);
             color: var(--text-dark);
-            line-height: 1.6;
+            line-height: 1.5;
         }
 
         header {
             background: var(--card-bg);
-            padding: 1rem 2rem;
+            padding: 0.75rem 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
             position: sticky;
             top: 0;
             z-index: 100;
         }
 
         .logo {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             font-weight: 700;
             color: var(--primary);
             text-decoration: none;
@@ -48,13 +49,14 @@
 
         nav {
             display: flex;
-            gap: 1.2rem;
+            gap: 1rem;
             align-items: center;
         }
 
         nav a {
             text-decoration: none;
             color: var(--text-dark);
+            font-size: 0.9rem;
             font-weight: 500;
             transition: color 0.2s;
         }
@@ -66,8 +68,9 @@
         .nav-btn {
             background-color: var(--primary);
             color: white !important;
-            padding: 0.5rem 1rem;
+            padding: 0.4rem 0.85rem;
             border-radius: 6px;
+            font-size: 0.85rem;
             transition: background 0.2s;
         }
 
@@ -78,45 +81,47 @@
         main {
             max-width: 1100px;
             margin: 0 auto;
-            padding: 3rem 1rem;
+            padding: 1.5rem 1rem;
         }
 
+        /* Compact Hero */
         .hero {
             background: var(--card-bg);
-            border-radius: 16px;
-            padding: 4rem 2rem;
+            border-radius: 12px;
+            padding: 1.75rem 1.5rem;
             text-align: center;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.04);
-            margin-bottom: 3rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+            margin-bottom: 1.25rem;
+            border: 1px solid var(--border);
         }
 
         .hero h1 {
-            font-size: 2.8rem;
+            font-size: 1.8rem;
             color: var(--primary-hover);
-            margin-bottom: 1rem;
+            margin-bottom: 0.4rem;
         }
 
         .hero p {
-            font-size: 1.2rem;
+            font-size: 0.95rem;
             color: var(--text-muted);
-            max-width: 650px;
-            margin: 0 auto 2rem;
+            max-width: 600px;
+            margin: 0 auto 1.2rem;
         }
 
         .cta-buttons {
             display: flex;
             justify-content: center;
-            gap: 1rem;
-            flex-wrap: wrap;
+            gap: 0.75rem;
         }
 
         .btn {
-            padding: 0.8rem 1.8rem;
-            border-radius: 8px;
+            padding: 0.5rem 1.25rem;
+            border-radius: 6px;
             text-decoration: none;
             font-weight: 600;
+            font-size: 0.88rem;
             display: inline-block;
-            transition: transform 0.1s, background 0.2s;
+            transition: background 0.2s;
         }
 
         .btn-primary {
@@ -126,7 +131,6 @@
 
         .btn-primary:hover {
             background-color: var(--primary-hover);
-            transform: translateY(-1px);
         }
 
         .btn-secondary {
@@ -138,62 +142,117 @@
             background-color: #c8e6c9;
         }
 
+        /* Compact Stats Grid */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 3rem;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.25rem;
         }
 
         .stat-card {
             background: var(--card-bg);
-            padding: 2rem;
-            border-radius: 12px;
+            padding: 1rem;
+            border-radius: 8px;
             text-align: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.02);
         }
 
         .stat-card h3 {
-            font-size: 2.2rem;
+            font-size: 1.5rem;
             color: var(--primary);
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.2rem;
         }
 
         .stat-card p {
             color: var(--text-muted);
+            font-size: 0.82rem;
             font-weight: 500;
         }
 
-        .section-title {
-            font-size: 1.8rem;
+        /* How It Works Section */
+        .how-it-works {
+            background: #e8f5e9;
+            border: 1px solid #c8e6c9;
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
             margin-bottom: 1.5rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .step-number {
+            background: var(--primary);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .step-text h5 {
+            font-size: 0.9rem;
+            color: var(--primary-hover);
+        }
+
+        .step-text p {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
             color: var(--text-dark);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-title span {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: normal;
         }
 
         .grid-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 3rem;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         .info-card {
             background: var(--card-bg);
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            border-radius: 8px;
+            padding: 1rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.02);
         }
 
         .info-card h4 {
-            font-size: 1.2rem;
+            font-size: 1rem;
             color: var(--primary-hover);
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.3rem;
         }
 
         .info-card p {
             color: var(--text-muted);
-            font-size: 0.95rem;
-            margin-bottom: 0.3rem;
+            font-size: 0.82rem;
+            margin-bottom: 0.2rem;
         }
 
         .price-badge {
@@ -201,18 +260,20 @@
             background: #e8f5e9;
             color: var(--primary);
             font-weight: bold;
-            padding: 0.3rem 0.6rem;
+            font-size: 0.82rem;
+            padding: 0.2rem 0.5rem;
             border-radius: 4px;
-            margin-top: 0.5rem;
+            margin-top: 0.4rem;
         }
 
         footer {
             text-align: center;
-            padding: 2rem;
+            padding: 1.25rem;
+            font-size: 0.82rem;
             color: var(--text-muted);
-            border-top: 1px solid #e0e0e0;
+            border-top: 1px solid var(--border);
             background: var(--card-bg);
-            margin-top: 3rem;
+            margin-top: 2rem;
         }
     </style>
 </head>
@@ -231,38 +292,77 @@
     </header>
 
     <main>
+        <!-- Compact Hero Banner -->
         <section class="hero">
             <h1>Recycle Smarter, Earn Rewards</h1>
-            <p>Turn your recyclable waste into earnings while reducing carbon emissions across Malaysia.</p>
+            <p>Convert household recyclables into payouts while lowering carbon emissions in Malaysia.</p>
             <div class="cta-buttons">
                 <a href="/contribute" class="btn btn-primary">Submit Recycling</a>
                 <a href="/chat" class="btn btn-secondary">Ask AI Assistant</a>
             </div>
         </section>
 
+        <!-- Dynamic Live Stats -->
         <section class="stats-grid">
             <div class="stat-card">
                 <h3 id="stat-weight">0.0 kg</h3>
-                <p>Total Recycled Weight</p>
+                <p>Total Recycled</p>
             </div>
             <div class="stat-card">
                 <h3 id="stat-earnings">RM 0.00</h3>
-                <p>Total Payouts Distributed</p>
+                <p>Payouts Distributed</p>
             </div>
             <div class="stat-card">
                 <h3 id="stat-hubs">0</h3>
-                <p>Active Recycling Hubs</p>
+                <p>Active Hubs</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="stat-co2">0.0 kg</h3>
+                <p>Estimated CO₂ Offset</p>
             </div>
         </section>
 
-        <h2 class="section-title">Accepted Materials & Rates</h2>
+        <!-- Quick 3-Step Process -->
+        <section class="how-it-works">
+            <div class="step-item">
+                <div class="step-number">1</div>
+                <div class="step-text">
+                    <h5>Collect & Prepare</h5>
+                    <p>Clean and categorize your paper, plastic, aluminum, or glass.</p>
+                </div>
+            </div>
+            <div class="step-item">
+                <div class="step-number">2</div>
+                <div class="step-text">
+                    <h5>Drop Off at Hub</h5>
+                    <p>Bring materials to any of our registered partner locations.</p>
+                </div>
+            </div>
+            <div class="step-item">
+                <div class="step-number">3</div>
+                <div class="step-text">
+                    <h5>Get Paid</h5>
+                    <p>Submit your log to earn direct digital cash payouts.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Live Material Rates -->
+        <div class="section-title">
+            <span>Accepted Materials & Live Rates</span>
+            <span>Updated Daily</span>
+        </div>
         <div class="grid-container" id="materials-list">
-            <p style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">Loading material rates...</p>
+            <p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); font-size: 0.85rem;">Loading material rates...</p>
         </div>
 
-        <h2 class="section-title">Recycling Hub Locations</h2>
+        <!-- Recycling Hub Directory -->
+        <div class="section-title">
+            <span>Partner Hub Locations</span>
+            <span>Verified Drop-offs</span>
+        </div>
         <div class="grid-container" id="hubs-list">
-            <p style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">Loading hub locations...</p>
+            <p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); font-size: 0.85rem;">Loading hub locations...</p>
         </div>
     </main>
 
@@ -276,9 +376,12 @@
                 const res = await fetch('/api/stats');
                 const data = await res.json();
                 if (data.status === 'success') {
-                    document.getElementById('stat-weight').innerText = `${data.total_weight.toFixed(1)} kg`;
-                    document.getElementById('stat-earnings').innerText = `RM ${data.total_earnings.toFixed(2)}`;
-                    document.getElementById('stat-hubs').innerText = data.active_hubs;
+                    const weight = data.total_weight || 0;
+                    document.getElementById('stat-weight').innerText = `${weight.toFixed(1)} kg`;
+                    document.getElementById('stat-earnings').innerText = `RM ${(data.total_earnings || 0).toFixed(2)}`;
+                    document.getElementById('stat-hubs').innerText = data.active_hubs || 0;
+                    // Formula estimate: ~1.5 kg CO2 saved per kg recycled
+                    document.getElementById('stat-co2').innerText = `${(weight * 1.5).toFixed(1)} kg`;
                 }
             } catch (err) {
                 console.error("Failed to fetch statistics:", err);
@@ -300,11 +403,11 @@
                         </div>
                     `).join('');
                 } else {
-                    container.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">No active materials found.</p>';
+                    container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; font-size: 0.85rem;">No active materials found.</p>';
                 }
             } catch (err) {
                 console.error("Failed to fetch materials:", err);
-                document.getElementById('materials-list').innerHTML = '<p style="grid-column: 1/-1; text-align: center;">Unable to load materials.</p>';
+                document.getElementById('materials-list').innerHTML = '<p style="grid-column: 1/-1; text-align: center; font-size: 0.85rem;">Unable to load materials.</p>';
             }
         }
 
@@ -319,16 +422,16 @@
                             <h4>${h.name}</h4>
                             <p><strong>City:</strong> ${h.city}</p>
                             <p><strong>Address:</strong> ${h.address}</p>
-                            <p><strong>Operating Hours:</strong> ${h.hours || 'N/A'}</p>
+                            <p><strong>Hours:</strong> ${h.hours || 'N/A'}</p>
                             <p><strong>Contact:</strong> ${h.phone || 'N/A'}</p>
                         </div>
                     `).join('');
                 } else {
-                    container.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">No active recycling hubs available.</p>';
+                    container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; font-size: 0.85rem;">No active recycling hubs available.</p>';
                 }
             } catch (err) {
                 console.error("Failed to fetch hubs:", err);
-                document.getElementById('hubs-list').innerHTML = '<p style="grid-column: 1/-1; text-align: center;">Unable to load hub locations.</p>';
+                document.getElementById('hubs-list').innerHTML = '<p style="grid-column: 1/-1; text-align: center; font-size: 0.85rem;">Unable to load hub locations.</p>';
             }
         }
 
