@@ -7,7 +7,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import psycopg2
 from google import genai
 
-# Dynamically resolve templates folder path relative to api/index.py for Vercel
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE_DIR = os.path.join(BASE_DIR, "templates")
 
@@ -174,7 +173,7 @@ def api_login():
         if conn:
             conn.close()
 
-# --- OTHER API ENDPOINTS ---
+# --- DATA API ENDPOINTS ---
 
 @app.route("/api/user/contributions", methods=["GET"])
 def get_user_contributions():
@@ -222,12 +221,21 @@ def get_user_contributions():
 
 @app.route("/api/hubs", methods=["GET"])
 def get_hubs():
+    city_filter = request.args.get("city", "").strip()
     conn = None
     cursor = None
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT id, hub_name, address, city, operating_hours, contact_phone FROM recycling_hubs WHERE is_active = TRUE ORDER BY hub_name ASC;")
+        
+        query = "SELECT id, hub_name, address, city, operating_hours, contact_phone FROM recycling_hubs WHERE is_active = TRUE"
+        params = []
+        if city_filter:
+            query += " AND city = %s"
+            params.append(city_filter)
+        query += " ORDER BY hub_name ASC;"
+
+        cursor.execute(query, tuple(params))
         rows = cursor.fetchall()
 
         hubs = [{
@@ -238,7 +246,11 @@ def get_hubs():
             "hours": r[4],
             "phone": r[5]
         } for r in rows]
-        return jsonify({"status": "success", "data": hubs})
+
+        cursor.execute("SELECT DISTINCT city FROM recycling_hubs WHERE is_active = TRUE ORDER BY city ASC;")
+        cities = [c[0] for c in cursor.fetchall() if c[0]]
+
+        return jsonify({"status": "success", "data": hubs, "cities": cities})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
     finally:
@@ -249,22 +261,59 @@ def get_hubs():
 
 @app.route("/api/materials", methods=["GET"])
 def get_materials():
+    city = request.args.get("city", "").strip()
+    hub_id = request.args.get("hub_id", "").strip()
+
     conn = None
     cursor = None
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT id, name, category, price_per_kg, preparation_tips, eco_impact_desc FROM materials WHERE is_active = TRUE;")
+
+        where_clauses = ["m.is_active = TRUE"]
+        params = []
+
+        if city:
+            where_clauses.append("h.city = %s")
+            params.append(city)
+        if hub_id and hub_id.isdigit():
+            where_clauses.append("h.id = %s")
+            params.append(int(hub_id))
+
+        where_str = " AND ".join(where_clauses)
+
+        query = f"""
+            SELECT 
+                m.id,
+                m.name,
+                m.category,
+                m.price_per_kg AS base_price,
+                COALESCE(AVG(c.calculated_payout / NULLIF(c.weight_kg, 0)), m.price_per_kg) AS avg_reported_rate,
+                COUNT(c.id) AS report_count,
+                m.preparation_tips,
+                m.eco_impact_desc
+            FROM materials m
+            LEFT JOIN contributions c ON m.id = c.material_id
+            LEFT JOIN recycling_hubs h ON c.hub_id = h.id
+            WHERE {where_str}
+            GROUP BY m.id, m.name, m.category, m.price_per_kg, m.preparation_tips, m.eco_impact_desc
+            ORDER BY m.name ASC;
+        """
+
+        cursor.execute(query, tuple(params))
         rows = cursor.fetchall()
 
         materials = [{
             "id": r[0],
             "name": r[1],
             "category": r[2],
-            "price_per_kg": float(r[3]),
-            "tips": r[4],
-            "impact": r[5]
+            "base_price": float(r[3]),
+            "avg_reported_rate": float(r[4]),
+            "report_count": int(r[5]),
+            "tips": r[6],
+            "impact": r[7]
         } for r in rows]
+
         return jsonify({"status": "success", "data": materials})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
