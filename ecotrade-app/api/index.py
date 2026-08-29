@@ -3,7 +3,6 @@ from flask import Flask, render_template, jsonify, request
 import psycopg2
 from google import genai
 
-# Default to current directory templates/
 app = Flask(__name__)
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
@@ -12,9 +11,29 @@ GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 def get_db_connection():
     return psycopg2.connect(DATABASE_URL)
 
+# --- PAGE ROUTES ---
+
 @app.route("/")
 def home():
     return render_template("index.html")
+
+@app.route("/contribute")
+def contribute_page():
+    return render_template("contribute.html")
+
+@app.route("/admin")
+def admin_page():
+    return render_template("admin.html")
+
+@app.route("/chat")
+def chat_page():
+    return render_template("chat.html")
+
+@app.route("/account")
+def account_page():
+    return render_template("account.html")
+
+# --- API ENDPOINTS ---
 
 @app.route("/api/materials", methods=["GET"])
 def get_materials():
@@ -49,7 +68,6 @@ def add_contribution():
 
         conn = get_db_connection()
         cursor = conn.cursor()
-        
         cursor.execute("SELECT id FROM materials WHERE name = %s LIMIT 1;", (material_name,))
         mat_row = cursor.fetchone()
         material_id = mat_row[0] if mat_row else 1
