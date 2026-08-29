@@ -7,6 +7,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import psycopg2
 from google import genai
 
+# Configured to find templates in api/templates
 app = Flask(__name__, template_folder="templates")
 app.secret_key = os.environ.get("SECRET_KEY", "ecotrade-secret-session-key-2026")
 
@@ -66,7 +67,6 @@ def contribute_page():
 
 @app.route("/admin")
 def admin_page():
-    # RESTORED ADMIN PROTECTED ROUTE CHECK
     if session.get("user_role") != "admin":
         return redirect(url_for("login_page"))
     return render_template("admin.html")
@@ -171,7 +171,7 @@ def api_login():
         if conn:
             conn.close()
 
-# --- USER CONTRIBUTIONS & DATA API ---
+# --- OTHER API ENDPOINTS ---
 
 @app.route("/api/user/contributions", methods=["GET"])
 def get_user_contributions():
