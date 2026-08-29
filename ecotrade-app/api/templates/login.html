@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+    <div class="col-md-5 col-lg-4">
+        <div class="card-custom p-4">
+            <h4 class="fw-bold text-success mb-1 text-center"><i class="bi bi-box-arrow-in-right"></i> Welcome Back</h4>
+            <p class="text-secondary small text-center mb-4">Log in to record contributions and track earnings.</p>
+            
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold text-light">Email Address</label>
+                    <input type="email" id="loginEmail" class="form-control bg-dark text-light border-secondary" placeholder="name@example.com" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold text-light">Password</label>
+                    <input type="password" id="loginPassword" class="form-control bg-dark text-light border-secondary" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-success w-100 fw-bold py-2 mb-3">Log In</button>
+            </form>
+
+            <div id="loginMsg"></div>
+
+            <div class="text-center pt-2 border-top border-secondary mt-3">
+                <span class="small text-secondary">Don't have an account?</span>
+                <a href="/signup" class="small text-success fw-bold text-decoration-none ms-1">Sign Up</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const msgDiv = document.getElementById('loginMsg');
+        msgDiv.innerHTML = '';
+
+        try {
+            const res = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: document.getElementById('loginEmail').value,
+                    password: document.getElementById('loginPassword').value
+                })
+            });
+            const data = await res.json();
+            if (data.status === 'success') {
+                msgDiv.innerHTML = `<div class="alert alert-success py-2 small">Login successful! Redirecting...</div>`;
+                setTimeout(() => window.location.href = '/account', 800);
+            } else {
+                msgDiv.innerHTML = `<div class="alert alert-danger py-2 small">${data.message}</div>`;
+            }
+        } catch (err) {
+            msgDiv.innerHTML = `<div class="alert alert-danger py-2 small">Connection error. Please try again.</div>`;
+        }
+    });
+</script>
+{% endblock %}
