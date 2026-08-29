@@ -453,7 +453,7 @@ Material Prices and Preparation Tips (id, name, category, price_per_kg, unit, pr
 User Question: {user_prompt}"""
 
         response = client.models.generate_content(
-            model="gemini-3.6-flash",
+            model="Gemini-3.1-Flash-Lite",
             contents=full_prompt
         )
         return jsonify({"status": "success", "reply": response.text})
