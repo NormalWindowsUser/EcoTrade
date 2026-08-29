@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center py-3">
+    <div class="col-md-8">
+        <!-- Account Summary Card -->
+        <div class="card-custom p-4 mb-4">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <div>
+                    <h4 class="fw-bold text-success mb-1">
+                        <i class="bi bi-person-circle me-2"></i>Account Dashboard
+                    </h4>
+                    <p class="text-secondary small mb-0">Manage your profile details and recycling activities.</p>
+                </div>
+                <span class="badge bg-success px-3 py-2 text-capitalize fs-6">{{ session.get('user_role', 'public') }}</span>
+            </div>
+            
+            <hr class="border-secondary">
+            
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="small text-secondary fw-semibold">Account Holder</label>
+                    <div class="text-light fw-bold fs-5">{{ session.get('user_name', 'User') }}</div>
+                </div>
+                <div class="col-md-6">
+                    <label class="small text-secondary fw-semibold">Account Status</label>
+                    <div class="text-success fw-bold fs-5"><i class="bi bi-check-circle-fill me-1"></i> Active Member</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Action Cards -->
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="card-custom p-3 text-center h-100">
+                    <div class="text-success mb-2 fs-3"><i class="bi bi-plus-circle-fill"></i></div>
+                    <h6 class="fw-bold text-light mb-1">Record Contribution</h6>
+                    <p class="text-secondary small mb-3">Submit a new batch of recyclable materials to earn rewards.</p>
+                    <a href="/contribute" class="btn btn-success btn-sm w-100 fw-bold">Submit Recyclables</a>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card-custom p-3 text-center h-100">
+                    <div class="text-success mb-2 fs-3"><i class="bi bi-robot"></i></div>
+                    <h6 class="fw-bold text-light mb-1">AI Assistant</h6>
+                    <p class="text-secondary small mb-3">Ask questions regarding current material prices and recycling tips.</p>
+                    <a href="/chat" class="btn btn-outline-success btn-sm w-100 fw-bold">Open AI Chat</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
