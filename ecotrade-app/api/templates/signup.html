@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
+<!-- Cloudflare Turnstile API Script -->
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
 <div class="row justify-content-center py-3">
     <div class="col-md-6 col-lg-5">
         <div class="card-custom p-4">
@@ -35,6 +38,11 @@
                     </div>
                 </div>
 
+                <!-- Cloudflare Turnstile Anti-Bot Widget -->
+                <div class="mb-3 text-center">
+                    <div class="cf-turnstile" data-sitekey="1x00000000000000000000AA"></div>
+                </div>
+
                 <button type="submit" class="btn btn-success w-100 fw-bold py-2 mb-3">Register Account</button>
             </form>
 
@@ -59,11 +67,18 @@
         const msgDiv = document.getElementById('signupMsg');
         msgDiv.innerHTML = '';
 
+        const turnstileResponse = turnstile.getResponse();
+        if (!turnstileResponse) {
+            msgDiv.innerHTML = `<div class="alert alert-warning py-2 small">Please complete the anti-bot verification.</div>`;
+            return;
+        }
+
         try {
             const res = await fetch('/api/signup', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
+                    cf_turnstile_response: turnstileResponse,
                     full_name: document.getElementById('signupName').value,
                     email: document.getElementById('signupEmail').value,
                     password: document.getElementById('signupPassword').value,
@@ -77,9 +92,11 @@
                 setTimeout(() => window.location.href = '/account', 800);
             } else {
                 msgDiv.innerHTML = `<div class="alert alert-danger py-2 small">${data.message}</div>`;
+                turnstile.reset();
             }
         } catch (err) {
             msgDiv.innerHTML = `<div class="alert alert-danger py-2 small">Connection error. Please try again.</div>`;
+            turnstile.reset();
         }
     });
 </script>
