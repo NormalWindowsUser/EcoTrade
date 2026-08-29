@@ -66,6 +66,7 @@ def contribute_page():
 
 @app.route("/admin")
 def admin_page():
+    # RESTORED ADMIN PROTECTED ROUTE CHECK
     if session.get("user_role") != "admin":
         return redirect(url_for("login_page"))
     return render_template("admin.html")
@@ -76,6 +77,12 @@ def chat_page():
 
 @app.route("/account")
 def account_page():
+    if "user_id" not in session:
+        return redirect(url_for("login_page"))
+    return render_template("account.html")
+
+@app.route("/activity")
+def activity_page():
     if "user_id" not in session:
         return redirect(url_for("login_page"))
     return render_template("account.html")
@@ -164,7 +171,51 @@ def api_login():
         if conn:
             conn.close()
 
-# --- OTHER API ENDPOINTS ---
+# --- USER CONTRIBUTIONS & DATA API ---
+
+@app.route("/api/user/contributions", methods=["GET"])
+def get_user_contributions():
+    if "user_id" not in session:
+        return jsonify({"status": "error", "message": "Unauthorized access."}), 401
+
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT 
+                c.id,
+                COALESCE(m.name, 'Recyclable Material') AS material_name,
+                COALESCE(h.hub_name, 'General Hub') AS hub_name,
+                c.weight_kg,
+                c.calculated_payout,
+                c.status
+            FROM contributions c
+            LEFT JOIN materials m ON c.material_id = m.id
+            LEFT JOIN recycling_hubs h ON c.hub_id = h.id
+            WHERE c.user_id = %s
+            ORDER BY c.id DESC;
+        """, (session["user_id"],))
+        rows = cursor.fetchall()
+
+        history = [{
+            "id": r[0],
+            "material": r[1],
+            "hub": r[2],
+            "weight": float(r[3]),
+            "payout": float(r[4]),
+            "status": r[5]
+        } for r in rows]
+
+        return jsonify({"status": "success", "data": history})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
 @app.route("/api/hubs", methods=["GET"])
 def get_hubs():
