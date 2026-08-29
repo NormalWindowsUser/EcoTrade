@@ -7,20 +7,46 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
+        :root {
+            --bg-color: #0b0f19;
+            --header-bg: #111827;
+            --card-bg: #111827;
+            --border-color: #1f2937;
+            --text-color: #e2e8f0;
+            --text-muted: #94a3b8;
+            --nav-bg: rgba(17, 24, 39, 0.85);
+            --nav-border: rgba(255, 255, 255, 0.12);
+            --nav-text: #94a3b8;
+        }
+
+        body.light-mode {
+            --bg-color: #f8fafc;
+            --header-bg: #ffffff;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --text-color: #0f172a;
+            --text-muted: #64748b;
+            --nav-bg: rgba(255, 255, 255, 0.85);
+            --nav-border: rgba(0, 0, 0, 0.12);
+            --nav-text: #475569;
+        }
+
         body {
-            background-color: #0b0f19;
-            color: #e2e8f0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            padding-bottom: 140px; /* Prevents floating nav from covering footer content */
+            padding-bottom: 140px;
+            transition: background-color 0.2s ease, color 0.2s ease;
         }
 
         .header-bar {
-            background: #111827;
-            border-bottom: 1px solid #1f2937;
+            background: var(--header-bg);
+            border-bottom: 1px solid var(--border-color);
             padding: 0.75rem 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
         }
 
         .brand-logo {
@@ -30,7 +56,26 @@
             text-decoration: none;
         }
 
-        /* SLEEK FLOATING GLASS NAVIGATION */
+        .theme-toggle-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 50px;
+            padding: 4px 12px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .theme-toggle-btn:hover {
+            border-color: #10b981;
+            color: #10b981;
+        }
+
+        /* FLOATING GLASS NAVIGATION */
         .bottom-nav-container {
             position: fixed;
             bottom: 20px;
@@ -45,20 +90,21 @@
             align-items: center;
             justify-content: center;
             gap: 0.75rem;
-            background: rgba(17, 24, 39, 0.85);
+            background: var(--nav-bg);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             padding: 6px 14px;
             border-radius: 50px;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--nav-border);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: background 0.2s ease, border-color 0.2s ease;
         }
 
         .nav-btn {
             display: flex;
             flex-direction: column;
             align-items: center;
-            color: #94a3b8;
+            color: var(--nav-text);
             text-decoration: none;
             font-size: 0.68rem;
             font-weight: 600;
@@ -94,9 +140,33 @@
         }
 
         .card-custom {
-            background-color: #111827;
-            border: 1px solid #1f2937;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
             border-radius: 10px;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+
+        /* Light Mode Utility Overrides */
+        body.light-mode .text-light {
+            color: #0f172a !important;
+        }
+        body.light-mode .text-secondary {
+            color: #475569 !important;
+        }
+        body.light-mode .text-muted {
+            color: #64748b !important;
+        }
+        body.light-mode .bg-dark {
+            background-color: #f1f5f9 !important;
+        }
+        body.light-mode .border-secondary {
+            border-color: #cbd5e1 !important;
+        }
+        body.light-mode .form-control, 
+        body.light-mode .form-select {
+            background-color: #ffffff !important;
+            color: #0f172a !important;
+            border-color: #cbd5e1 !important;
         }
     </style>
 </head>
@@ -104,14 +174,19 @@
 
     <header class="header-bar">
         <a href="/" class="brand-logo"><i class="bi bi-recycle"></i> EcoTrade</a>
-        <span class="badge bg-dark border border-secondary text-light px-2 py-1 small">Ahmad Razak (Student)</span>
+        
+        <!-- Dark/Light Theme Toggle -->
+        <button id="themeToggleBtn" class="theme-toggle-btn" onclick="toggleTheme()">
+            <i class="bi bi-sun-fill" id="themeIcon"></i>
+            <span id="themeLabel">Light</span>
+        </button>
     </header>
 
     <main class="container py-3" style="max-width: 960px;">
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Centered Floating Glass Bottom Navigation -->
+    <!-- Centered Floating Glass Navigation -->
     <div class="bottom-nav-container">
         <nav class="bottom-nav">
             <a href="/" class="nav-btn {% if request.path == '/' %}active{% endif %}">
@@ -136,6 +211,37 @@
             </a>
         </nav>
     </div>
+
+    <script>
+        // Apply saved theme preference on page load
+        (function initTheme() {
+            const savedTheme = localStorage.getItem('ecotrade-theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+                updateThemeUI(true);
+            } else {
+                updateThemeUI(false);
+            }
+        })();
+
+        function toggleTheme() {
+            const isLight = document.body.classList.toggle('light-mode');
+            localStorage.setItem('ecotrade-theme', isLight ? 'light' : 'dark');
+            updateThemeUI(isLight);
+        }
+
+        function updateThemeUI(isLight) {
+            const icon = document.getElementById('themeIcon');
+            const label = document.getElementById('themeLabel');
+            if (isLight) {
+                icon.className = 'bi bi-moon-stars-fill';
+                label.innerText = 'Dark';
+            } else {
+                icon.className = 'bi bi-sun-fill';
+                label.innerText = 'Light';
+            }
+        }
+    </script>
 
 </body>
 </html>
