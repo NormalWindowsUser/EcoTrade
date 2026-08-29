@@ -10,14 +10,14 @@
         body {
             background-color: #0b0f19;
             color: #e2e8f0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            padding-bottom: 90px;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            padding-bottom: 140px; /* Prevents floating nav from covering footer content */
         }
 
         .header-bar {
             background: #111827;
             border-bottom: 1px solid #1f2937;
-            padding: 1rem 2rem;
+            padding: 0.75rem 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -25,18 +25,18 @@
 
         .brand-logo {
             font-weight: 700;
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             color: #10b981;
             text-decoration: none;
         }
 
-        /* CENTERED FLOATING BOTTOM NAVIGATION */
+        /* SLEEK FLOATING GLASS NAVIGATION */
         .bottom-nav-container {
             position: fixed;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 1000;
+            z-index: 1050;
             width: auto;
         }
 
@@ -44,12 +44,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 1.25rem;
-            background: #1e293b;
-            padding: 10px 24px;
-            border-radius: 9999px;
-            border: 1px solid #334155;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6);
+            gap: 0.75rem;
+            background: rgba(17, 24, 39, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 6px 14px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
         .nav-btn {
@@ -58,39 +60,43 @@
             align-items: center;
             color: #94a3b8;
             text-decoration: none;
-            font-size: 0.75rem;
+            font-size: 0.68rem;
             font-weight: 600;
-            transition: color 0.2s ease;
+            padding: 4px 10px;
+            border-radius: 12px;
+            transition: all 0.2s ease;
         }
 
         .nav-btn i {
-            font-size: 1.25rem;
+            font-size: 1.1rem;
             margin-bottom: 2px;
         }
 
         .nav-btn:hover, .nav-btn.active {
             color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
         }
 
         .nav-btn.btn-action {
             background-color: #10b981;
-            color: #000;
-            padding: 8px 16px;
-            border-radius: 9999px;
+            color: #0b0f19;
+            padding: 6px 14px;
+            border-radius: 50px;
             flex-direction: row;
-            gap: 6px;
-            font-size: 0.85rem;
+            gap: 5px;
+            font-size: 0.75rem;
+            font-weight: 700;
         }
 
         .nav-btn.btn-action:hover {
             background-color: #059669;
-            color: #fff;
+            color: #ffffff;
         }
 
         .card-custom {
             background-color: #111827;
             border: 1px solid #1f2937;
-            border-radius: 12px;
+            border-radius: 10px;
         }
     </style>
 </head>
@@ -98,14 +104,14 @@
 
     <header class="header-bar">
         <a href="/" class="brand-logo"><i class="bi bi-recycle"></i> EcoTrade</a>
-        <span class="badge bg-dark border border-secondary text-light px-3 py-2">Ahmad Razak (Student)</span>
+        <span class="badge bg-dark border border-secondary text-light px-2 py-1 small">Ahmad Razak (Student)</span>
     </header>
 
-    <main class="container py-4">
+    <main class="container py-3" style="max-width: 960px;">
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Centered Bottom Navigation Bar -->
+    <!-- Centered Floating Glass Bottom Navigation -->
     <div class="bottom-nav-container">
         <nav class="bottom-nav">
             <a href="/" class="nav-btn {% if request.path == '/' %}active{% endif %}">
