@@ -205,6 +205,11 @@
                 <span>HOME</span>
             </a>
             
+            <a href="/activity" class="nav-btn {% if request.path == '/activity' %}active{% endif %}">
+                <i class="bi bi-clock-history"></i>
+                <span>ACTIVITY</span>
+            </a>
+
             {% if session.get('user_role') == 'admin' %}
             <a href="/admin" class="nav-btn {% if request.path == '/admin' %}active{% endif %}">
                 <i class="bi bi-shield-check"></i>
