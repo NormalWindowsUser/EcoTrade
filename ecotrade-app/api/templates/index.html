@@ -1,70 +1,68 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- Hero Section -->
-<div class="row g-4 mb-4">
-    <div class="col-12 text-center py-4">
-        <h1 class="display-5 fw-bold text-success mb-3">Empowering School Recycling</h1>
-        <p class="lead text-secondary mx-auto" style="max-width: 700px;">
-            Turn everyday recyclable waste into earnings for your school while reducing local carbon footprints. Join the Malaysia High School Eco Network today.
-        </p>
-    </div>
+<!-- Compact Hero Section -->
+<div class="text-center py-3 mb-3">
+    <h2 class="fw-bold text-success mb-2 fs-3">Empowering School Recycling</h2>
+    <p class="text-secondary mx-auto small mb-0" style="max-width: 580px;">
+        Turn everyday recyclable waste into earnings for your school while reducing local carbon footprints.
+    </p>
 </div>
 
-<!-- Community Impact Quick Stats -->
-<div class="row g-3 mb-5">
-    <div class="col-md-4">
-        <div class="card-custom p-4 text-center">
-            <h6 class="text-uppercase text-secondary fw-bold">Total Recycled</h6>
-            <h2 class="display-6 fw-bold text-light mb-0" id="stat-weight">-- kg</h2>
+<!-- Compact Stats Row -->
+<div class="row g-2 mb-4">
+    <div class="col-4">
+        <div class="card-custom p-3 text-center">
+            <div class="text-uppercase text-secondary fw-semibold" style="font-size: 0.7rem;">Total Recycled</div>
+            <h4 class="fw-bold text-light mb-0 mt-1" id="stat-weight">-- kg</h4>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card-custom p-4 text-center">
-            <h6 class="text-uppercase text-secondary fw-bold">Community Payouts</h6>
-            <h2 class="display-6 fw-bold text-success mb-0" id="stat-earnings">RM --</h2>
+    <div class="col-4">
+        <div class="card-custom p-3 text-center">
+            <div class="text-uppercase text-secondary fw-semibold" style="font-size: 0.7rem;">Community Payouts</div>
+            <h4 class="fw-bold text-success mb-0 mt-1" id="stat-earnings">RM --</h4>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card-custom p-4 text-center">
-            <h6 class="text-uppercase text-secondary fw-bold">Active Hubs</h6>
-            <h2 class="display-6 fw-bold text-light mb-0" id="stat-hubs">--</h2>
-        </div>
-    </div>
-</div>
-
-<!-- How It Works Section -->
-<h3 class="fw-bold mb-3"><i class="bi bi-info-circle text-success"></i> How EcoTrade Works</h3>
-<div class="row g-4 mb-5">
-    <div class="col-md-4">
-        <div class="card-custom p-4 h-100">
-            <div class="fs-1 text-success mb-2"><i class="bi bi-box-seam"></i></div>
-            <h5 class="fw-bold">1. Collect & Separate</h5>
-            <p class="text-secondary">Gather recyclables like paper, plastics, aluminum cans, and used cooking oil according to prep guidelines.</p>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card-custom p-4 h-100">
-            <div class="fs-1 text-success mb-2"><i class="bi bi-geo-alt"></i></div>
-            <h5 class="fw-bold">2. Drop off at Hub</h5>
-            <p class="text-secondary">Bring your materials to any designated school recycling hub for verified weighing.</p>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card-custom p-4 h-100">
-            <div class="fs-1 text-success mb-2"><i class="bi bi-wallet2"></i></div>
-            <h5 class="fw-bold">3. Earn Rewards</h5>
-            <p class="text-secondary">Get instant calculated payouts transferred to your student eco-account.</p>
+    <div class="col-4">
+        <div class="card-custom p-4 p-md-3 text-center">
+            <div class="text-uppercase text-secondary fw-semibold" style="font-size: 0.7rem;">Active Hubs</div>
+            <h4 class="fw-bold text-light mb-0 mt-1" id="stat-hubs">--</h4>
         </div>
     </div>
 </div>
 
-<!-- Accepted Materials Grid -->
-<h3 class="fw-bold mb-3"><i class="bi bi-list-stars text-success"></i> Current Accepted Rates</h3>
-<div class="row g-3" id="materials-list">
+<!-- Compact How It Works Section -->
+<h5 class="fw-bold mb-3 text-light fs-6"><i class="bi bi-info-circle text-success me-1"></i> How EcoTrade Works</h5>
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card-custom p-3 h-100">
+            <div class="text-success mb-2 fs-4"><i class="bi bi-box-seam"></i></div>
+            <h6 class="fw-bold mb-1">1. Collect & Separate</h6>
+            <p class="text-secondary small mb-0">Gather paper, plastics, cans, and oil according to prep guidelines.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card-custom p-3 h-100">
+            <div class="text-success mb-2 fs-4"><i class="bi bi-geo-alt"></i></div>
+            <h6 class="fw-bold mb-1">2. Drop off at Hub</h6>
+            <p class="text-secondary small mb-0">Bring materials to designated school recycling hubs for weighing.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card-custom p-3 h-100">
+            <div class="text-success mb-2 fs-4"><i class="bi bi-wallet2"></i></div>
+            <h6 class="fw-bold mb-1">3. Earn Rewards</h6>
+            <p class="text-secondary small mb-0">Get instant payouts transferred to your student eco-account.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Compact Accepted Rates Grid -->
+<h5 class="fw-bold mb-3 text-light fs-6"><i class="bi bi-list-stars text-success me-1"></i> Current Accepted Rates</h5>
+<div class="row g-2" id="materials-list">
     <div class="col-12 text-center text-secondary py-3">
-        <div class="spinner-border text-success" role="status"></div>
-        <p class="mt-2">Loading recycling rates...</p>
+        <div class="spinner-border spinner-border-sm text-success" role="status"></div>
+        <span class="ms-2 small">Loading rates...</span>
     </div>
 </div>
 
@@ -84,24 +82,24 @@
             if (matData.status === "success") {
                 const container = document.getElementById('materials-list');
                 if (matData.data.length === 0) {
-                    container.innerHTML = '<div class="col-12 text-secondary">No materials currently listed.</div>';
+                    container.innerHTML = '<div class="col-12 text-secondary small">No materials currently listed.</div>';
                     return;
                 }
                 container.innerHTML = matData.data.map(item => `
                     <div class="col-md-6 col-lg-4">
                         <div class="card-custom p-3 h-100">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <h5 class="fw-bold mb-0 text-light">${item.name}</h5>
-                                <span class="badge bg-success">RM ${item.price_per_kg.toFixed(2)} / kg</span>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-bold text-light small">${item.name}</span>
+                                <span class="badge bg-success" style="font-size: 0.7rem;">RM ${item.price_per_kg.toFixed(2)} / kg</span>
                             </div>
-                            <p class="small text-secondary mb-1"><strong>Tips:</strong> ${item.tips || 'Clean and dry before submission.'}</p>
-                            <p class="small text-muted mb-0"><strong>Impact:</strong> ${item.impact || 'Reduces landfill waste.'}</p>
+                            <p class="small text-secondary mb-1" style="font-size: 0.75rem;"><strong>Tips:</strong> ${item.tips || 'Clean and dry before submission.'}</p>
+                            <p class="small text-muted mb-0" style="font-size: 0.7rem;"><strong>Impact:</strong> ${item.impact || 'Reduces landfill waste.'}</p>
                         </div>
                     </div>
                 `).join('');
             }
         } catch (e) {
-            console.error('Error fetching dynamic data:', e);
+            console.error('Error loading page data:', e);
         }
     }
     document.addEventListener('DOMContentLoaded', loadData);
