@@ -1,135 +1,109 @@
-import os
-from flask import Flask, render_template, jsonify, request
-import psycopg2
-from google import genai
+{% extends "base.html" %}
 
-app = Flask(__name__)
+{% block content %}
+<!-- Hero Section -->
+<div class="row g-4 mb-4">
+    <div class="col-12 text-center py-4">
+        <h1 class="display-5 fw-bold text-success mb-3">Empowering School Recycling</h1>
+        <p class="lead text-secondary mx-auto" style="max-width: 700px;">
+            Turn everyday recyclable waste into earnings for your school while reducing local carbon footprints. Join the Malaysia High School Eco Network today.
+        </p>
+    </div>
+</div>
 
-DATABASE_URL = os.environ.get("DATABASE_URL")
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+<!-- Community Impact Quick Stats -->
+<div class="row g-3 mb-5">
+    <div class="col-md-4">
+        <div class="card-custom p-4 text-center">
+            <h6 class="text-uppercase text-secondary fw-bold">Total Recycled</h6>
+            <h2 class="display-6 fw-bold text-light mb-0" id="stat-weight">-- kg</h2>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card-custom p-4 text-center">
+            <h6 class="text-uppercase text-secondary fw-bold">Community Payouts</h6>
+            <h2 class="display-6 fw-bold text-success mb-0" id="stat-earnings">RM --</h2>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card-custom p-4 text-center">
+            <h6 class="text-uppercase text-secondary fw-bold">Active Hubs</h6>
+            <h2 class="display-6 fw-bold text-light mb-0" id="stat-hubs">--</h2>
+        </div>
+    </div>
+</div>
 
-def get_db_connection():
-    return psycopg2.connect(DATABASE_URL)
+<!-- How It Works Section -->
+<h3 class="fw-bold mb-3"><i class="bi bi-info-circle text-success"></i> How EcoTrade Works</h3>
+<div class="row g-4 mb-5">
+    <div class="col-md-4">
+        <div class="card-custom p-4 h-100">
+            <div class="fs-1 text-success mb-2"><i class="bi bi-box-seam"></i></div>
+            <h5 class="fw-bold">1. Collect & Separate</h5>
+            <p class="text-secondary">Gather recyclables like paper, plastics, aluminum cans, and used cooking oil according to prep guidelines.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card-custom p-4 h-100">
+            <div class="fs-1 text-success mb-2"><i class="bi bi-geo-alt"></i></div>
+            <h5 class="fw-bold">2. Drop off at Hub</h5>
+            <p class="text-secondary">Bring your materials to any designated school recycling hub for verified weighing.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card-custom p-4 h-100">
+            <div class="fs-1 text-success mb-2"><i class="bi bi-wallet2"></i></div>
+            <h5 class="fw-bold">3. Earn Rewards</h5>
+            <p class="text-secondary">Get instant calculated payouts transferred to your student eco-account.</p>
+        </div>
+    </div>
+</div>
 
-# --- PAGE ROUTES ---
+<!-- Accepted Materials Grid -->
+<h3 class="fw-bold mb-3"><i class="bi bi-list-stars text-success"></i> Current Accepted Rates</h3>
+<div class="row g-3" id="materials-list">
+    <div class="col-12 text-center text-secondary py-3">
+        <div class="spinner-border text-success" role="status"></div>
+        <p class="mt-2">Loading recycling rates...</p>
+    </div>
+</div>
 
-@app.route("/")
-def home():
-    return render_template("index.html")
+<script>
+    async function loadData() {
+        try {
+            const statsRes = await fetch('/api/stats');
+            const stats = await statsRes.json();
+            if (stats.status === "success") {
+                document.getElementById('stat-weight').innerText = `${stats.total_weight} kg`;
+                document.getElementById('stat-earnings').innerText = `RM ${stats.total_earnings.toFixed(2)}`;
+                document.getElementById('stat-hubs').innerText = stats.active_hubs;
+            }
 
-@app.route("/contribute")
-def contribute_page():
-    return render_template("contribute.html")
-
-@app.route("/admin")
-def admin_page():
-    return render_template("admin.html")
-
-@app.route("/chat")
-def chat_page():
-    return render_template("chat.html")
-
-@app.route("/account")
-def account_page():
-    return render_template("account.html")
-
-# --- API ENDPOINTS ---
-
-@app.route("/api/materials", methods=["GET"])
-def get_materials():
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT id, name, category, price_per_kg, preparation_tips, eco_impact_desc FROM materials WHERE is_active = TRUE;")
-        rows = cursor.fetchall()
-        cursor.close()
-        conn.close()
-
-        materials = [{
-            "id": r[0],
-            "name": r[1],
-            "category": r[2],
-            "price_per_kg": float(r[3]),
-            "tips": r[4],
-            "impact": r[5]
-        } for r in rows]
-        return jsonify({"status": "success", "data": materials})
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
-
-@app.route("/api/contribute", methods=["POST"])
-def add_contribution():
-    try:
-        data = request.json
-        material_name = data.get("material_name")
-        weight = float(data.get("weight", 0))
-        price = float(data.get("price", 0))
-        payout = weight * price
-
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT id FROM materials WHERE name = %s LIMIT 1;", (material_name,))
-        mat_row = cursor.fetchone()
-        material_id = mat_row[0] if mat_row else 1
-
-        cursor.execute(
-            "INSERT INTO contributions (user_id, material_id, weight_kg, calculated_payout, status) VALUES (%s, %s, %s, %s, %s) RETURNING id;",
-            (2, material_id, weight, payout, 'pending')
-        )
-        conn.commit()
-        cursor.close()
-        conn.close()
-        return jsonify({"status": "success", "payout": payout})
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
-
-@app.route("/api/stats", methods=["GET"])
-def get_stats():
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT COALESCE(SUM(weight_kg), 0), COALESCE(SUM(calculated_payout), 0) FROM contributions;")
-        row = cursor.fetchone()
-        cursor.execute("SELECT COUNT(*) FROM recycling_hubs WHERE is_active = TRUE;")
-        hubs_count = cursor.fetchone()[0]
-        cursor.close()
-        conn.close()
-        return jsonify({
-            "status": "success",
-            "total_weight": float(row[0]),
-            "total_earnings": float(row[1]),
-            "active_hubs": int(hubs_count)
-        })
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
-
-@app.route("/api/chat", methods=["POST"])
-def chat_ai():
-    try:
-        data = request.json
-        user_prompt = data.get("prompt", "")
-
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT name, price_per_kg FROM materials WHERE is_active = TRUE;")
-        db_context = cursor.fetchall()
-        cursor.close()
-        conn.close()
-
-        client = genai.Client(api_key=GEMINI_API_KEY)
-        full_prompt = f"""You are an eco-recycling assistant for high school students in Malaysia.
-        Use this current database context to answer:
-        Database Material Prices: {db_context}
-        
-        User Question: {user_prompt}"""
-        
-        response = client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=full_prompt
-        )
-        return jsonify({"status": "success", "reply": response.text})
-    except Exception as e:
-        return jsonify({"status": "error", "reply": f"AI service error: {str(e)}"}), 500
-
-if __name__ == "__main__":
-    app.run()
+            const matRes = await fetch('/api/materials');
+            const matData = await matRes.json();
+            if (matData.status === "success") {
+                const container = document.getElementById('materials-list');
+                if (matData.data.length === 0) {
+                    container.innerHTML = '<div class="col-12 text-secondary">No materials currently listed.</div>';
+                    return;
+                }
+                container.innerHTML = matData.data.map(item => `
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card-custom p-3 h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="fw-bold mb-0 text-light">${item.name}</h5>
+                                <span class="badge bg-success">RM ${item.price_per_kg.toFixed(2)} / kg</span>
+                            </div>
+                            <p class="small text-secondary mb-1"><strong>Tips:</strong> ${item.tips || 'Clean and dry before submission.'}</p>
+                            <p class="small text-muted mb-0"><strong>Impact:</strong> ${item.impact || 'Reduces landfill waste.'}</p>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        } catch (e) {
+            console.error('Error fetching dynamic data:', e);
+        }
+    }
+    document.addEventListener('DOMContentLoaded', loadData);
+</script>
+{% endblock %}
