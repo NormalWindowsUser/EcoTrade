@@ -356,7 +356,7 @@ def add_contribution():
 
         cursor.execute(
             "INSERT INTO contributions (user_id, material_id, hub_id, weight_kg, calculated_payout, status) VALUES (%s, %s, %s, %s, %s, %s) RETURNING id;",
-            (session["user_id"], material_id, hub_id, weight, payout, 'pending')
+            (session["user_id"], material_id, hub_id, weight, payout, 'approved')
         )
         conn.commit()
         return jsonify({"status": "success", "payout": payout})
