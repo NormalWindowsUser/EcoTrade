@@ -163,7 +163,7 @@
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
         gap: 1rem;
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
     }
 
     .info-card {
@@ -299,6 +299,11 @@
 <div class="grid-container" id="hubs-list">
     <p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); font-size: 0.85rem;">Loading hub locations...</p>
 </div>
+<div class="text-center mb-4" id="expand-hubs-container" style="display: none;">
+    <button id="toggle-hubs-btn" class="btn-custom-secondary" style="border-radius: 50px; cursor: pointer;">
+        Show All Hubs
+    </button>
+</div>
 
 <footer class="text-center py-3 border-top border-secondary mt-4" style="font-size: 0.82rem; color: var(--text-muted);">
     <p class="mb-0">&copy; 2026 EcoTrade Malaysia. Empowering Sustainable Recycling.</p>
@@ -306,6 +311,8 @@
 
 <script>
     let currentMaterialsData = [];
+    let currentHubsData = [];
+    let isHubsExpanded = false;
 
     async function fetchStats() {
         try {
@@ -354,26 +361,49 @@
                 if (previousHubValue) hubSelect.value = previousHubValue;
             }
 
-            // Render Hub list cards
-            const container = document.getElementById('hubs-list');
-            if (data.status === 'success' && data.data.length > 0) {
-                container.innerHTML = data.data.map(h => `
-                    <div class="info-card">
-                        <div>
-                            <h4>${h.name}</h4>
-                            <p><strong>City:</strong> ${h.city}</p>
-                            <p><strong>Address:</strong> ${h.address}</p>
-                            <p><strong>Hours:</strong> ${h.hours || 'N/A'}</p>
-                            <p><strong>Contact:</strong> ${h.phone || 'N/A'}</p>
-                        </div>
-                    </div>
-                `).join('');
+            if (data.status === 'success' && data.data) {
+                currentHubsData = data.data;
+                renderHubs();
             } else {
-                container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; font-size: 0.85rem;">No recycling hubs found for selected filters.</p>';
+                currentHubsData = [];
+                renderHubs();
             }
         } catch (err) {
             console.error("Failed to fetch hubs:", err);
             document.getElementById('hubs-list').innerHTML = '<p style="grid-column: 1/-1; text-align: center; font-size: 0.85rem;">Unable to load hub locations.</p>';
+            document.getElementById('expand-hubs-container').style.display = 'none';
+        }
+    }
+
+    function renderHubs() {
+        const container = document.getElementById('hubs-list');
+        const expandContainer = document.getElementById('expand-hubs-container');
+        const toggleBtn = document.getElementById('toggle-hubs-btn');
+
+        if (currentHubsData.length > 0) {
+            const hubsToDisplay = isHubsExpanded ? currentHubsData : currentHubsData.slice(0, 3);
+
+            container.innerHTML = hubsToDisplay.map(h => `
+                <div class="info-card">
+                    <div>
+                        <h4>${h.name}</h4>
+                        <p><strong>City:</strong> ${h.city}</p>
+                        <p><strong>Address:</strong> ${h.address}</p>
+                        <p><strong>Hours:</strong> ${h.hours || 'N/A'}</p>
+                        <p><strong>Contact:</strong> ${h.phone || 'N/A'}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            if (currentHubsData.length > 3) {
+                expandContainer.style.display = 'block';
+                toggleBtn.textContent = isHubsExpanded ? 'Show Less Hubs' : `Show All Partner Hubs (${currentHubsData.length})`;
+            } else {
+                expandContainer.style.display = 'none';
+            }
+        } else {
+            container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; font-size: 0.85rem;">No recycling hubs found for selected filters.</p>';
+            expandContainer.style.display = 'none';
         }
     }
 
@@ -436,7 +466,13 @@
         }
     }
 
+    document.getElementById('toggle-hubs-btn').addEventListener('click', () => {
+        isHubsExpanded = !isHubsExpanded;
+        renderHubs();
+    });
+
     document.getElementById('filter-city').addEventListener('change', async () => {
+        isHubsExpanded = false;
         await fetchHubs(document.getElementById('filter-city').value);
         fetchMaterials();
     });
