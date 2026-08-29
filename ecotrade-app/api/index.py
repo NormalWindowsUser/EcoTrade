@@ -17,7 +17,9 @@ TURNSTILE_SECRET_KEY = os.environ.get("TURNSTILE_SECRET_KEY", "1x000000000000000
 
 def get_db_connection():
     db_url = DATABASE_URL
-    if db_url and "sslmode=" not in db_url:
+    if not db_url:
+        raise ValueError("DATABASE_URL environment variable is not configured.")
+    if "sslmode=" not in db_url:
         separator = "&" if "?" in db_url else "?"
         db_url += f"{separator}sslmode=require"
     return psycopg2.connect(db_url, connect_timeout=10)
@@ -86,19 +88,20 @@ def logout():
 
 @app.route("/api/signup", methods=["POST"])
 def api_signup():
+    data = request.get_json(silent=True) or {}
+    full_name = data.get("full_name", "").strip()
+    email = data.get("email", "").strip().lower()
+    password = data.get("password", "")
+    role = data.get("role", "public")
+    school_name = data.get("school_name", "").strip() or None
+
+    if not full_name or not email or not password:
+        return jsonify({"status": "error", "message": "All required fields must be filled."}), 400
+
+    conn = None
+    cursor = None
     try:
-        data = request.json
-        full_name = data.get("full_name", "").strip()
-        email = data.get("email", "").strip().lower()
-        password = data.get("password", "")
-        role = data.get("role", "public")
-        school_name = data.get("school_name", "").strip() or None
-
-        if not full_name or not email or not password:
-            return jsonify({"status": "error", "message": "All required fields must be filled."}), 400
-
         pw_hash = generate_password_hash(password)
-
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
@@ -107,8 +110,6 @@ def api_signup():
         )
         user_id = cursor.fetchone()[0]
         conn.commit()
-        cursor.close()
-        conn.close()
 
         session["user_id"] = user_id
         session["user_name"] = full_name
@@ -116,25 +117,37 @@ def api_signup():
 
         return jsonify({"status": "success", "message": "Account created successfully!"})
     except psycopg2.IntegrityError:
+        if conn:
+            conn.rollback()
         return jsonify({"status": "error", "message": "An account with this email already exists."}), 400
     except Exception as e:
+        if conn:
+            conn.rollback()
         return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
 @app.route("/api/login", methods=["POST"])
 def api_login():
-    try:
-        data = request.json
-        email = data.get("email", "").strip().lower()
-        password = data.get("password", "")
+    data = request.get_json(silent=True) or {}
+    email = data.get("email", "").strip().lower()
+    password = data.get("password", "")
 
+    if not email or not password:
+        return jsonify({"status": "error", "message": "Please provide both email and password."}), 400
+
+    conn = None
+    cursor = None
+    try:
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT id, full_name, password_hash, role FROM users WHERE email = %s;", (email,))
         user = cursor.fetchone()
-        cursor.close()
-        conn.close()
 
-        if not user or not check_password_hash(user[2], password):
+        if not user or not user[2] or not check_password_hash(user[2], password):
             return jsonify({"status": "error", "message": "Invalid email or password."}), 401
 
         session["user_id"] = user[0]
@@ -144,18 +157,23 @@ def api_login():
         return jsonify({"status": "success", "message": "Login successful!"})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
 # --- OTHER API ENDPOINTS ---
 
 @app.route("/api/hubs", methods=["GET"])
 def get_hubs():
+    conn = None
+    cursor = None
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT id, hub_name, address, city, operating_hours, contact_phone FROM recycling_hubs WHERE is_active = TRUE ORDER BY hub_name ASC;")
         rows = cursor.fetchall()
-        cursor.close()
-        conn.close()
 
         hubs = [{
             "id": r[0],
@@ -168,16 +186,21 @@ def get_hubs():
         return jsonify({"status": "success", "data": hubs})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
 @app.route("/api/materials", methods=["GET"])
 def get_materials():
+    conn = None
+    cursor = None
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT id, name, category, price_per_kg, preparation_tips, eco_impact_desc FROM materials WHERE is_active = TRUE;")
         rows = cursor.fetchall()
-        cursor.close()
-        conn.close()
 
         materials = [{
             "id": r[0],
@@ -190,26 +213,37 @@ def get_materials():
         return jsonify({"status": "success", "data": materials})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
 @app.route("/api/contribute", methods=["POST"])
 def add_contribution():
     if "user_id" not in session:
         return jsonify({"status": "error", "message": "You must be logged in to submit a contribution."}), 401
 
+    data = request.get_json(silent=True) or {}
+    token = data.get("cf_turnstile_response")
+    remote_ip = request.remote_addr
+
+    if not verify_turnstile(token, remote_ip):
+        return jsonify({"status": "error", "message": "Anti-bot verification failed."}), 400
+
     try:
-        data = request.json
-        token = data.get("cf_turnstile_response")
-        remote_ip = request.remote_addr
-
-        if not verify_turnstile(token, remote_ip):
-            return jsonify({"status": "error", "message": "Anti-bot verification failed."}), 400
-
-        material_name = data.get("material_name")
         weight = float(data.get("weight", 0))
         price = float(data.get("price", 0))
-        hub_id = data.get("hub_id")
-        payout = weight * price
+    except (ValueError, TypeError):
+        return jsonify({"status": "error", "message": "Invalid weight or price format."}), 400
 
+    material_name = data.get("material_name")
+    hub_id = data.get("hub_id")
+    payout = weight * price
+
+    conn = None
+    cursor = None
+    try:
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT id FROM materials WHERE name = %s LIMIT 1;", (material_name,))
@@ -221,14 +255,21 @@ def add_contribution():
             (session["user_id"], material_id, hub_id, weight, payout, 'pending')
         )
         conn.commit()
-        cursor.close()
-        conn.close()
         return jsonify({"status": "success", "payout": payout})
     except Exception as e:
+        if conn:
+            conn.rollback()
         return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
 @app.route("/api/stats", methods=["GET"])
 def get_stats():
+    conn = None
+    cursor = None
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -236,8 +277,7 @@ def get_stats():
         row = cursor.fetchone()
         cursor.execute("SELECT COUNT(*) FROM recycling_hubs WHERE is_active = TRUE;")
         hubs_count = cursor.fetchone()[0]
-        cursor.close()
-        conn.close()
+
         return jsonify({
             "status": "success",
             "total_weight": float(row[0]),
@@ -246,20 +286,36 @@ def get_stats():
         })
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
 @app.route("/api/chat", methods=["POST"])
 def chat_ai():
-    try:
-        data = request.json
-        user_prompt = data.get("prompt", "")
+    data = request.get_json(silent=True) or {}
+    user_prompt = data.get("prompt", "").strip()
 
+    if not user_prompt:
+        return jsonify({"status": "error", "reply": "Please enter a question."}), 400
+
+    conn = None
+    cursor = None
+    try:
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT name, price_per_kg FROM materials WHERE is_active = TRUE;")
         db_context = cursor.fetchall()
-        cursor.close()
-        conn.close()
+    except Exception as e:
+        db_context = []
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
+    try:
         client = genai.Client(api_key=GEMINI_API_KEY)
         full_prompt = f"""You are an eco-recycling assistant in Malaysia.
         Use this current database context to answer:
