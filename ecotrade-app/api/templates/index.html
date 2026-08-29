@@ -1,369 +1,135 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EcoTrade - Community Recycling Platform</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        :root {
-            --bg-dark: #111723;
-            --bg-card: #1d2636;
-            --bg-input: #151d2a;
-            --accent-green: #10b981;
-            --accent-green-hover: #059669;
-            --accent-green-glow: rgba(16, 185, 129, 0.15);
-            --accent-amber: #f59e0b;
-            --accent-red: #ef4444;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border-color: #2a364f;
-        }
+import os
+from flask import Flask, render_template, jsonify, request
+import psycopg2
+from google import genai
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Geist', sans-serif; }
-        body { background-color: var(--bg-dark); color: var(--text-main); padding-bottom: 90px; min-height: 100vh; }
+app = Flask(__name__)
 
-        header {
-            display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem;
-            background-color: rgba(17, 23, 35, 0.85); backdrop-filter: blur(12px);
-            position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border-color);
-        }
-        .brand-logo { font-weight: 700; font-size: 1.25rem; display: flex; align-items: center; gap: 0.5rem; }
-        .brand-badge { background-color: var(--accent-green); color: #000; padding: 0.2rem 0.5rem; border-radius: 6px; }
-        .user-pill { display: flex; align-items: center; gap: 0.75rem; background: var(--bg-card); padding: 0.3rem 0.75rem; border-radius: 20px; border: 1px solid var(--border-color); font-size: 0.85rem; }
-        .user-avatar { width: 28px; height: 28px; border-radius: 50%; background-color: var(--accent-green); color: #000; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; }
+DATABASE_URL = os.environ.get("DATABASE_URL")
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 
-        .container { max-width: 1200px; margin: 0 auto; padding: 1.5rem 1rem; }
-        .tab-page { display: none; }
-        .tab-page.active { display: block; }
+def get_db_connection():
+    return psycopg2.connect(DATABASE_URL)
 
-        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
-        .metric-card { background-color: var(--bg-card); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color); }
-        .metric-card .label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem; font-weight: 600; }
-        .metric-card .value { font-size: 1.75rem; font-weight: 700; }
+# --- PAGE ROUTES ---
 
-        .btn-primary {
-            width: 100%; background-color: var(--accent-green); color: #000; border: none; padding: 0.85rem;
-            border-radius: 12px; font-weight: 700; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 1.5rem;
-            transition: background 0.2s;
-        }
-        .btn-primary:hover { background-color: var(--accent-green-hover); }
+@app.route("/")
+def home():
+    return render_template("index.html")
 
-        .search-box { position: relative; margin-bottom: 1.5rem; }
-        .search-box input {
-            width: 100%; padding: 0.85rem 1rem 0.85rem 2.75rem; background-color: var(--bg-input);
-            border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-main); font-size: 0.95rem; outline: none;
-        }
-        .search-box i { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); width: 18px; }
+@app.route("/contribute")
+def contribute_page():
+    return render_template("contribute.html")
 
-        .materials-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem; }
-        .material-card { background-color: var(--bg-card); border-radius: 16px; padding: 1.5rem; border: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between; }
-        .material-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
-        .material-icon { width: 42px; height: 42px; border-radius: 10px; background-color: var(--accent-green-glow); color: var(--accent-green); display: flex; align-items: center; justify-content: center; }
-        .material-price { font-size: 1.1rem; font-weight: 700; color: var(--accent-green); text-align: right; }
+@app.route("/admin")
+def admin_page():
+    return render_template("admin.html")
 
-        .admin-table { width: 100%; border-collapse: collapse; margin-top: 1rem; background: var(--bg-card); border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color); }
-        .admin-table th, .admin-table td { padding: 0.85rem 1rem; text-align: left; font-size: 0.85rem; border-bottom: 1px solid var(--border-color); }
-        .admin-table th { background: var(--bg-input); color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
-        .badge { padding: 0.25rem 0.5rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700; display: inline-block; }
-        .badge.pending { background: rgba(245, 158, 11, 0.2); color: var(--accent-amber); }
-        .badge.approved { background: var(--accent-green-glow); color: var(--accent-green); }
+@app.route("/chat")
+def chat_page():
+    return render_template("chat.html")
 
-        .dock-nav {
-            position: fixed; bottom: 0; left: 0; right: 0; background-color: rgba(24, 32, 46, 0.95);
-            backdrop-filter: blur(16px); border-top: 1px solid var(--border-color); display: flex; justify-space-around; align-items: center; padding: 0.5rem 1rem; z-index: 1000;
-        }
-        .dock-item { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; background: none; border: none; color: var(--text-muted); font-size: 0.7rem; font-weight: 600; cursor: pointer; padding: 0.4rem 0.75rem; border-radius: 8px; }
-        .dock-item.active { color: var(--accent-green); }
-        .dock-center-btn { background-color: var(--accent-green); color: #000; padding: 0.75rem 1.25rem; border-radius: 12px; display: flex; align-items: center; gap: 0.4rem; font-weight: 700; border: none; cursor: pointer; }
+@app.route("/account")
+def account_page():
+    return render_template("account.html")
 
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: none; justify-content: center; align-items: center; z-index: 2000; padding: 1rem; }
-        .modal-card { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; width: 100%; max-width: 480px; padding: 1.5rem; position: relative; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-        .modal-close { background: none; border: none; color: var(--text-muted); cursor: pointer; }
+# --- API ENDPOINTS ---
 
-        .form-group { margin-bottom: 1rem; }
-        .form-group label { display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.4rem; }
-        .form-group input, .form-group select { width: 100%; padding: 0.75rem; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main); outline: none; }
+@app.route("/api/materials", methods=["GET"])
+def get_materials():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, name, category, price_per_kg, preparation_tips, eco_impact_desc FROM materials WHERE is_active = TRUE;")
+        rows = cursor.fetchall()
+        cursor.close()
+        conn.close()
 
-        .chat-box { height: 280px; overflow-y: auto; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.75rem; }
-        .chat-bubble { padding: 0.6rem 0.9rem; border-radius: 10px; font-size: 0.85rem; max-width: 80%; }
-        .chat-bubble.user { background: var(--accent-green); color: #000; align-self: flex-end; font-weight: 500; }
-        .chat-bubble.ai { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); align-self: flex-start; }
-    </style>
-</head>
-<body>
+        materials = [{
+            "id": r[0],
+            "name": r[1],
+            "category": r[2],
+            "price_per_kg": float(r[3]),
+            "tips": r[4],
+            "impact": r[5]
+        } for r in rows]
+        return jsonify({"status": "success", "data": materials})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
 
-    <header>
-        <div class="brand-logo"><span class="brand-badge">E</span> EcoTrade</div>
-        <div class="user-pill">
-            <div class="user-avatar" id="userInitial">A</div>
-            <span id="userNameDisplay">Ahmad Razak (Student)</span>
-        </div>
-    </header>
+@app.route("/api/contribute", methods=["POST"])
+def add_contribution():
+    try:
+        data = request.json
+        material_name = data.get("material_name")
+        weight = float(data.get("weight", 0))
+        price = float(data.get("price", 0))
+        payout = weight * price
 
-    <div class="container">
-        <!-- 1. HOME DASHBOARD TAB -->
-        <div id="tab-home" class="tab-page active">
-            <h1>Community Recycling Hub</h1>
-            <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem;">Live SQL Stream • Kuala Lumpur Network</p>
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT id FROM materials WHERE name = %s LIMIT 1;", (material_name,))
+        mat_row = cursor.fetchone()
+        material_id = mat_row[0] if mat_row else 1
 
-            <div class="metrics-grid">
-                <div class="metric-card"><div class="label">Total Recycled</div><div class="value" id="metric-weight">0.0 kg</div></div>
-                <div class="metric-card"><div class="label">Total Earned</div><div class="value" id="metric-earnings">RM 0.00</div></div>
-                <div class="metric-card"><div class="label">Active Hubs</div><div class="value" id="metric-hubs">0</div></div>
-            </div>
+        cursor.execute(
+            "INSERT INTO contributions (user_id, material_id, weight_kg, calculated_payout, status) VALUES (%s, %s, %s, %s, %s) RETURNING id;",
+            (2, material_id, weight, payout, 'pending')
+        )
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return jsonify({"status": "success", "payout": payout})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
 
-            <button class="btn-primary" onclick="openModal('contributeModal')">
-                <i data-lucide="plus"></i> Submit Recycling Contribution
-            </button>
+@app.route("/api/stats", methods=["GET"])
+def get_stats():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT COALESCE(SUM(weight_kg), 0), COALESCE(SUM(calculated_payout), 0) FROM contributions;")
+        row = cursor.fetchone()
+        cursor.execute("SELECT COUNT(*) FROM recycling_hubs WHERE is_active = TRUE;")
+        hubs_count = cursor.fetchone()[0]
+        cursor.close()
+        conn.close()
+        return jsonify({
+            "status": "success",
+            "total_weight": float(row[0]),
+            "total_earnings": float(row[1]),
+            "active_hubs": int(hubs_count)
+        })
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
 
-            <div class="search-box">
-                <i data-lucide="search"></i>
-                <input type="text" id="searchInput" oninput="filterMaterials()" placeholder="Search material rate (e.g. Aluminum, PET, Oil)">
-            </div>
+@app.route("/api/chat", methods=["POST"])
+def chat_ai():
+    try:
+        data = request.json
+        user_prompt = data.get("prompt", "")
 
-            <h2 style="margin-bottom: 1rem;">Accepted Recyclables</h2>
-            <div class="materials-grid" id="materialsGrid"></div>
-        </div>
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT name, price_per_kg FROM materials WHERE is_active = TRUE;")
+        db_context = cursor.fetchall()
+        cursor.close()
+        conn.close()
 
-        <!-- 2. ADMIN PANEL TAB -->
-        <div id="tab-admin" class="tab-page">
-            <h2>Admin Operations & Verification</h2>
-            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">Approve student submissions and update database records.</p>
-            
-            <h3 style="font-size: 1rem; margin-top: 1.5rem;">Pending Contribution Approvals</h3>
-            <table class="admin-table">
-                <thead>
-                    <tr>
-                        <th>User</th>
-                        <th>Material</th>
-                        <th>Weight</th>
-                        <th>Payout</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="adminTableBody">
-                    <tr>
-                        <td>Ahmad Razak</td>
-                        <td>PET Plastic Bottles</td>
-                        <td>5.0 kg</td>
-                        <td>RM 4.50</td>
-                        <td><span class="badge pending">Pending</span></td>
-                        <td><button onclick="approveRecord(this)" style="background:var(--accent-green); border:none; padding:0.3rem 0.6rem; border-radius:4px; cursor:pointer; font-weight:700; font-size:0.75rem;">Approve</button></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+        client = genai.Client(api_key=GEMINI_API_KEY)
+        full_prompt = f"""You are an eco-recycling assistant for high school students in Malaysia.
+        Use this current database context to answer:
+        Database Material Prices: {db_context}
+        
+        User Question: {user_prompt}"""
+        
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=full_prompt
+        )
+        return jsonify({"status": "success", "reply": response.text})
+    except Exception as e:
+        return jsonify({"status": "error", "reply": f"AI service error: {str(e)}"}), 500
 
-        <!-- 3. ACCOUNT TAB -->
-        <div id="tab-account" class="tab-page">
-            <h2>User Account</h2>
-            <div style="background: var(--bg-card); padding: 1.5rem; border-radius: 12px; margin-top: 1rem; border: 1px solid var(--border-color); max-width: 500px;">
-                <p style="margin-bottom: 0.5rem;"><strong>Name:</strong> Ahmad Razak</p>
-                <p style="margin-bottom: 0.5rem;"><strong>Email:</strong> ahmad@student.edu.my</p>
-                <p style="margin-bottom: 0.5rem;"><strong>School:</strong> SMK Taman Tun Dr Ismail</p>
-                <p style="margin-bottom: 1rem;"><strong>Role:</strong> <span class="badge approved">Student Contributor</span></p>
-                <button class="btn-primary" style="background: var(--accent-red); color: white;" onclick="switchUserRole()">Switch Role Context</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Floating Navigation Dock -->
-    <nav class="dock-nav">
-        <button class="dock-item active" onclick="switchTab('home', this)"><i data-lucide="home"></i><span>HOME</span></button>
-        <button class="dock-item" onclick="switchTab('admin', this)"><i data-lucide="shield-check"></i><span>ADMIN</span></button>
-        <button class="dock-center-btn" onclick="openModal('contributeModal')"><i data-lucide="plus-circle"></i><span>CONTRIBUTE</span></button>
-        <button class="dock-item" onclick="openModal('chatModal')"><i data-lucide="bot"></i><span>AI CHAT</span></button>
-        <button class="dock-item" onclick="switchTab('account', this)"><i data-lucide="user"></i><span>ACCOUNT</span></button>
-    </nav>
-
-    <!-- Contribution Submission Modal -->
-    <div class="modal-overlay" id="contributeModal">
-        <div class="modal-card">
-            <div class="modal-header">
-                <h3>Submit Recycling Drop-off</h3>
-                <button class="modal-close" onclick="closeModal('contributeModal')"><i data-lucide="x"></i></button>
-            </div>
-            <form onsubmit="handleContributionSubmit(event)">
-                <div class="form-group">
-                    <label>Select Material</label>
-                    <select id="contribMaterial" onchange="calculatePayout()"></select>
-                </div>
-                <div class="form-group">
-                    <label>Weight (kg)</label>
-                    <input type="number" step="0.1" id="contribWeight" required oninput="calculatePayout()" placeholder="e.g. 3.5">
-                </div>
-                <div style="margin-bottom: 1.25rem; color: var(--accent-green); font-weight: 700; font-size: 1rem;">
-                    Calculated Payout: RM <span id="estPayout">0.00</span>
-                </div>
-                <button type="submit" class="btn-primary" style="margin-bottom:0;">Send To Admin For Approval</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- AI Chat Assistant Modal -->
-    <div class="modal-overlay" id="chatModal">
-        <div class="modal-card">
-            <div class="modal-header">
-                <h3>Eco AI Assistant</h3>
-                <button class="modal-close" onclick="closeModal('chatModal')"><i data-lucide="x"></i></button>
-            </div>
-            <div class="chat-box" id="chatBox">
-                <div class="chat-bubble ai">Hello! Ask me about material rates, prep guidelines, or eco impact.</div>
-            </div>
-            <div style="display:flex; gap:0.5rem;">
-                <input type="text" id="chatInput" placeholder="Ask AI chatbot..." style="flex:1; padding:0.75rem; background:var(--bg-input); border:1px solid var(--border-color); border-radius:8px; color:var(--text-main); outline:none;">
-                <button onclick="sendChatMessage()" style="background:var(--accent-green); border:none; padding:0 1rem; border-radius:8px; font-weight:700; cursor:pointer;"><i data-lucide="send"></i></button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        let allMaterials = [];
-
-        async function initPage() {
-            lucide.createIcons();
-            await fetchMaterials();
-            await fetchStats();
-        }
-
-        async function fetchMaterials() {
-            try {
-                const res = await fetch('/api/materials');
-                const result = await res.json();
-                if (result.status === 'success') {
-                    allMaterials = result.data;
-                    renderMaterials(allMaterials);
-                    populateContribSelect(allMaterials);
-                }
-            } catch (err) { console.error("Error loading materials:", err); }
-        }
-
-        async function fetchStats() {
-            try {
-                const res = await fetch('/api/stats');
-                const result = await res.json();
-                if (result.status === 'success') {
-                    document.getElementById('metric-weight').innerText = `${result.total_weight.toFixed(1)} kg`;
-                    document.getElementById('metric-earnings').innerText = `RM ${result.total_earnings.toFixed(2)}`;
-                    document.getElementById('metric-hubs').innerText = result.active_hubs;
-                }
-            } catch (err) { console.error("Error loading stats:", err); }
-        }
-
-        function renderMaterials(list) {
-            const grid = document.getElementById('materialsGrid');
-            grid.innerHTML = list.map(m => `
-                <div class="material-card">
-                    <div>
-                        <div class="material-head">
-                            <div class="material-icon"><i data-lucide="package"></i></div>
-                            <div class="material-price">RM ${m.price_per_kg.toFixed(2)} / kg</div>
-                        </div>
-                        <h3 style="margin-bottom:0.5rem;">${m.name}</h3>
-                        <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">${m.tips}</p>
-                    </div>
-                    <div style="border-top:1px solid var(--border-color); padding-top:0.75rem; font-size:0.8rem;">
-                        <span style="color:var(--accent-green); font-weight:600;">Impact:</span> ${m.impact}
-                    </div>
-                </div>
-            `).join('');
-            lucide.createIcons();
-        }
-
-        function filterMaterials() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = allMaterials.filter(m => m.name.toLowerCase().includes(query) || m.category.toLowerCase().includes(query));
-            renderMaterials(filtered);
-        }
-
-        function populateContribSelect(materials) {
-            const select = document.getElementById('contribMaterial');
-            select.innerHTML = materials.map(m => `<option value="${m.name}" data-price="${m.price_per_kg}">${m.name} (RM ${m.price_per_kg.toFixed(2)}/kg)</option>`).join('');
-            calculatePayout();
-        }
-
-        function calculatePayout() {
-            const select = document.getElementById('contribMaterial');
-            if(!select.options.length) return;
-            const price = parseFloat(select.options[select.selectedIndex].getAttribute('data-price'));
-            const weight = parseFloat(document.getElementById('contribWeight').value) || 0;
-            document.getElementById('estPayout').innerText = (price * weight).toFixed(2);
-        }
-
-        async function handleContributionSubmit(e) {
-            e.preventDefault();
-            const select = document.getElementById('contribMaterial');
-            const material_name = select.value;
-            const price = parseFloat(select.options[select.selectedIndex].getAttribute('data-price'));
-            const weight = parseFloat(document.getElementById('contribWeight').value);
-
-            const res = await fetch('/api/contribute', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ material_name, price, weight })
-            });
-
-            const result = await res.json();
-            if (result.status === 'success') {
-                closeModal('contributeModal');
-                await fetchStats();
-                alert(`Contribution submitted! Estimated payout: RM ${result.payout.toFixed(2)}`);
-            }
-        }
-
-        function approveRecord(btn) {
-            const row = btn.closest('tr');
-            row.cells[4].innerHTML = '<span class="badge approved">Approved</span>';
-            btn.remove();
-        }
-
-        async function sendChatMessage() {
-            const input = document.getElementById('chatInput');
-            const text = input.value.trim();
-            if (!text) return;
-
-            const box = document.getElementById('chatBox');
-            box.innerHTML += `<div class="chat-bubble user">${text}</div>`;
-            input.value = '';
-            box.scrollTop = box.scrollHeight;
-
-            try {
-                const res = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt: text })
-                });
-                const data = await res.json();
-                box.innerHTML += `<div class="chat-bubble ai">${data.reply}</div>`;
-            } catch (e) {
-                box.innerHTML += `<div class="chat-bubble ai">Could not connect to server.</div>`;
-            }
-            box.scrollTop = box.scrollHeight;
-        }
-
-        function switchTab(tabName, el) {
-            document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.dock-item').forEach(i => i.classList.remove('active'));
-            document.getElementById(`tab-${tabName}`).classList.add('active');
-            if (el) el.classList.add('active');
-        }
-
-        function switchUserRole() {
-            document.getElementById('userInitial').innerText = 'A';
-            document.getElementById('userNameDisplay').innerText = 'System Admin (HQ Ops)';
-            alert('Switched session to Admin view.');
-        }
-
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-        window.onload = initPage;
-    </script>
-</body>
-</html>
+if __name__ == "__main__":
+    app.run()
