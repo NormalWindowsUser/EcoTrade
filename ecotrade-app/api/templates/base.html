@@ -168,9 +168,25 @@
             color: #0f172a !important;
             border-color: #cbd5e1 !important;
         }
+
+        /* Light Mode Table Overrides */
+        body.light-mode .table {
+            color: #0f172a !important;
+            border-color: #cbd5e1 !important;
+        }
+        body.light-mode .table th,
+        body.light-mode .table td {
+            background-color: #ffffff !important;
+            color: #0f172a !important;
+            border-color: #cbd5e1 !important;
+        }
+        body.light-mode .table-hover tbody tr:hover td {
+            background-color: #f1f5f9 !important;
+            color: #0f172a !important;
+        }
     </style>
 </head>
-<body>
+<body class="light-mode">
 
     <header class="header-bar">
         <a href="/" class="brand-logo"><i class="bi bi-recycle"></i> EcoTrade</a>
@@ -187,8 +203,8 @@
 
             <!-- Dark/Light Theme Toggle -->
             <button id="themeToggleBtn" class="theme-toggle-btn ms-1" onclick="toggleTheme()">
-                <i class="bi bi-sun-fill" id="themeIcon"></i>
-                <span id="themeLabel">Light</span>
+                <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
+                <span id="themeLabel">Dark</span>
             </button>
         </div>
     </header>
@@ -233,14 +249,15 @@
     </div>
 
     <script>
-        // Apply saved theme preference on page load
+        // Apply saved theme preference on page load (defaults to light mode)
         (function initTheme() {
             const savedTheme = localStorage.getItem('ecotrade-theme');
-            if (savedTheme === 'light') {
+            if (savedTheme === 'dark') {
+                document.body.classList.remove('light-mode');
+                updateThemeUI(false);
+            } else {
                 document.body.classList.add('light-mode');
                 updateThemeUI(true);
-            } else {
-                updateThemeUI(false);
             }
         })();
 
