@@ -100,6 +100,12 @@ def logout():
 @app.route("/api/signup", methods=["POST"])
 def api_signup():
     data = request.get_json(silent=True) or {}
+    token = data.get("cf_turnstile_response")
+    remote_ip = request.remote_addr
+
+    if not verify_turnstile(token, remote_ip):
+        return jsonify({"status": "error", "message": "Anti-bot verification failed."}), 400
+
     full_name = data.get("full_name", "").strip()
     email = data.get("email", "").strip().lower()
     password = data.get("password", "")
@@ -144,6 +150,12 @@ def api_signup():
 @app.route("/api/login", methods=["POST"])
 def api_login():
     data = request.get_json(silent=True) or {}
+    token = data.get("cf_turnstile_response")
+    remote_ip = request.remote_addr
+
+    if not verify_turnstile(token, remote_ip):
+        return jsonify({"status": "error", "message": "Anti-bot verification failed."}), 400
+
     email = data.get("email", "").strip().lower()
     password = data.get("password", "")
 
@@ -379,7 +391,7 @@ def chat_ai():
         User Question: {user_prompt}"""
 
         response = client.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-2.0-flash",
             contents=full_prompt
         )
         return jsonify({"status": "success", "reply": response.text})
