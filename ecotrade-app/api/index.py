@@ -344,6 +344,7 @@ def add_contribution():
     material_name = data.get("material_name")
     hub_id = data.get("hub_id")
     payout = weight * price
+    earned_points = int(payout * 10)  # Award 10 points per RM 1.00
 
     conn = None
     cursor = None
@@ -354,12 +355,33 @@ def add_contribution():
         mat_row = cursor.fetchone()
         material_id = mat_row[0] if mat_row else 1
 
+        # Save contribution as auto-approved
         cursor.execute(
-            "INSERT INTO contributions (user_id, material_id, hub_id, weight_kg, calculated_payout, status) VALUES (%s, %s, %s, %s, %s, %s) RETURNING id;",
-            (session["user_id"], material_id, hub_id, weight, payout, 'pending')
+            """
+            INSERT INTO contributions (user_id, material_id, hub_id, weight_kg, calculated_payout, status) 
+            VALUES (%s, %s, %s, %s, %s, 'approved') 
+            RETURNING id;
+            """,
+            (session["user_id"], material_id, hub_id, weight, payout)
         )
+
+        # Update user total points
+        cursor.execute(
+            """
+            UPDATE users 
+            SET total_points = COALESCE(total_points, 0) + %s 
+            WHERE id = %s;
+            """,
+            (earned_points, session["user_id"])
+        )
+
         conn.commit()
-        return jsonify({"status": "success", "payout": payout})
+        return jsonify({
+            "status": "success",
+            "payout": payout,
+            "points_earned": earned_points,
+            "message": "Contribution submitted and auto-approved!"
+        })
     except Exception as e:
         if conn:
             conn.rollback()
