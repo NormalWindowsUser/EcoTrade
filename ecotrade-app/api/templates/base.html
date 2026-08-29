@@ -175,11 +175,22 @@
     <header class="header-bar">
         <a href="/" class="brand-logo"><i class="bi bi-recycle"></i> EcoTrade</a>
         
-        <!-- Dark/Light Theme Toggle -->
-        <button id="themeToggleBtn" class="theme-toggle-btn" onclick="toggleTheme()">
-            <i class="bi bi-sun-fill" id="themeIcon"></i>
-            <span id="themeLabel">Light</span>
-        </button>
+        <div class="d-flex align-items-center gap-2">
+            {% if session.get('user_id') %}
+                <span class="badge bg-dark border border-secondary text-light px-2 py-1 small">
+                    <i class="bi bi-person-circle text-success me-1"></i> {{ session.get('user_name') }}
+                </span>
+                <a href="/logout" class="btn btn-outline-danger btn-sm rounded-pill px-2 py-0" style="font-size: 0.75rem;">Logout</a>
+            {% else %}
+                <a href="/login" class="btn btn-outline-success btn-sm rounded-pill px-3 py-1" style="font-size: 0.75rem;">Log In</a>
+            {% endif %}
+
+            <!-- Dark/Light Theme Toggle -->
+            <button id="themeToggleBtn" class="theme-toggle-btn ms-1" onclick="toggleTheme()">
+                <i class="bi bi-sun-fill" id="themeIcon"></i>
+                <span id="themeLabel">Light</span>
+            </button>
+        </div>
     </header>
 
     <main class="container py-3" style="max-width: 960px;">
