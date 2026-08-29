@@ -16,7 +16,11 @@ GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 TURNSTILE_SECRET_KEY = os.environ.get("TURNSTILE_SECRET_KEY", "1x0000000000000000000000000000000AA")
 
 def get_db_connection():
-    return psycopg2.connect(DATABASE_URL)
+    db_url = DATABASE_URL
+    if db_url and "sslmode=" not in db_url:
+        separator = "&" if "?" in db_url else "?"
+        db_url += f"{separator}sslmode=require"
+    return psycopg2.connect(db_url, connect_timeout=10)
 
 def verify_turnstile(token, ip):
     if not token:
