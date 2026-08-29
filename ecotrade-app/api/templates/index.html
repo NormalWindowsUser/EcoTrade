@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- Compact Hero Section -->
+<!-- Compact Hero Section (General Public & Earnings Focus) -->
 <div class="text-center py-3 mb-3">
-    <h2 class="fw-bold text-success mb-2 fs-3">Empowering School Recycling</h2>
-    <p class="text-secondary mx-auto small mb-0" style="max-width: 580px;">
-        Turn everyday recyclable waste into earnings for your school while reducing local carbon footprints.
+    <h2 class="fw-bold text-success mb-2 fs-3">Empowering Community Recycling</h2>
+    <p class="text-secondary mx-auto small mb-0" style="max-width: 600px;">
+        Turn recyclable waste into cash earnings. Drop off materials at authorized hubs, record your contribution, and track your total earnings balance live in your personal account dashboard.
     </p>
 </div>
 
@@ -19,50 +19,50 @@
     </div>
     <div class="col-4">
         <div class="card-custom p-3 text-center">
-            <div class="text-uppercase text-secondary fw-semibold" style="font-size: 0.7rem;">Community Payouts</div>
+            <div class="text-uppercase text-secondary fw-semibold" style="font-size: 0.7rem;">Total Paid Out</div>
             <h4 class="fw-bold text-success mb-0 mt-1" id="stat-earnings">RM --</h4>
         </div>
     </div>
     <div class="col-4">
-        <div class="card-custom p-4 p-md-3 text-center">
+        <div class="card-custom p-3 text-center">
             <div class="text-uppercase text-secondary fw-semibold" style="font-size: 0.7rem;">Active Hubs</div>
             <h4 class="fw-bold text-light mb-0 mt-1" id="stat-hubs">--</h4>
         </div>
     </div>
 </div>
 
-<!-- Compact How It Works Section -->
+<!-- How It Works Section -->
 <h5 class="fw-bold mb-3 text-light fs-6"><i class="bi bi-info-circle text-success me-1"></i> How EcoTrade Works</h5>
 <div class="row g-3 mb-4">
     <div class="col-md-4">
         <div class="card-custom p-3 h-100">
             <div class="text-success mb-2 fs-4"><i class="bi bi-box-seam"></i></div>
-            <h6 class="fw-bold mb-1">1. Collect & Separate</h6>
-            <p class="text-secondary small mb-0">Gather paper, plastics, cans, and oil according to prep guidelines.</p>
+            <h6 class="fw-bold mb-1">1. Separate Waste</h6>
+            <p class="text-secondary small mb-0">Gather paper, plastics, cans, or used cooking oil according to preparation guidelines.</p>
         </div>
     </div>
     <div class="col-md-4">
         <div class="card-custom p-3 h-100">
             <div class="text-success mb-2 fs-4"><i class="bi bi-geo-alt"></i></div>
-            <h6 class="fw-bold mb-1">2. Drop off at Hub</h6>
-            <p class="text-secondary small mb-0">Bring materials to designated school recycling hubs for weighing.</p>
+            <h6 class="fw-bold mb-1">2. Select Hub & Drop Off</h6>
+            <p class="text-secondary small mb-0">Locate an authorized recycling hub near you and drop off your sorted recyclables.</p>
         </div>
     </div>
     <div class="col-md-4">
         <div class="card-custom p-3 h-100">
             <div class="text-success mb-2 fs-4"><i class="bi bi-wallet2"></i></div>
-            <h6 class="fw-bold mb-1">3. Earn Rewards</h6>
-            <p class="text-secondary small mb-0">Get instant payouts transferred to your student eco-account.</p>
+            <h6 class="fw-bold mb-1">3. Earn & Track Money</h6>
+            <p class="text-secondary small mb-0">Log in to record your batch. Every submission updates your calculated payout and account history.</p>
         </div>
     </div>
 </div>
 
-<!-- Compact Accepted Rates Grid -->
-<h5 class="fw-bold mb-3 text-light fs-6"><i class="bi bi-list-stars text-success me-1"></i> Current Accepted Rates</h5>
+<!-- Accepted Rates Grid -->
+<h5 class="fw-bold mb-3 text-light fs-6"><i class="bi bi-list-stars text-success me-1"></i> Current Recycling Rates</h5>
 <div class="row g-2" id="materials-list">
     <div class="col-12 text-center text-secondary py-3">
         <div class="spinner-border spinner-border-sm text-success" role="status"></div>
-        <span class="ms-2 small">Loading rates...</span>
+        <span class="ms-2 small">Loading current rates...</span>
     </div>
 </div>
 
