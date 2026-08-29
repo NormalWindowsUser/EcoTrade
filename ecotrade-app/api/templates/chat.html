@@ -7,10 +7,13 @@
 <div class="row justify-content-center">
     <div class="col-md-8">
         <div class="card-custom p-4">
-            <h3 class="fw-bold text-success mb-3"><i class="bi bi-robot"></i> AI Eco Assistant</h3>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3 class="fw-bold text-success mb-0"><i class="bi bi-robot"></i> AI Eco Assistant</h3>
+                <button class="btn btn-outline-danger btn-sm" id="clearBtn"><i class="bi bi-trash"></i> Clear Chat</button>
+            </div>
             
             <div id="chatBox" class="p-3 mb-3 bg-dark rounded border border-secondary" style="height: 380px; overflow-y: auto;">
-                <p class="text-secondary small mb-0">Ask questions about material prices, preparation tips, or recycling impact!</p>
+                <p class="text-secondary small mb-0" id="defaultWelcome">Ask questions about material prices, preparation tips, or recycling impact!</p>
             </div>
             
             <div class="input-group">
@@ -22,22 +25,76 @@
 </div>
 
 <script>
+    const STORAGE_KEY = 'eco_ai_chat_history';
+
+    // Load saved messages on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        loadSavedHistory();
+    });
+
+    function saveMessageToHistory(role, content) {
+        const history = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        history.push({ role, content, timestamp: new Date().toISOString() });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+    }
+
+    function loadSavedHistory() {
+        const history = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        if (history.length > 0) {
+            const defaultWelcome = document.getElementById('defaultWelcome');
+            if (defaultWelcome) defaultWelcome.remove();
+            
+            history.forEach(item => {
+                if (item.role === 'user') {
+                    renderUserBubble(item.content);
+                } else if (item.role === 'ai') {
+                    renderAiBubble(item.content);
+                }
+            });
+            const box = document.getElementById('chatBox');
+            box.scrollTop = box.scrollHeight;
+        }
+    }
+
+    function renderUserBubble(text) {
+        const box = document.getElementById('chatBox');
+        box.innerHTML += `
+            <div class="mb-3 text-end">
+                <span class="badge bg-secondary mb-1">You</span>
+                <div class="p-2 px-3 bg-secondary bg-opacity-20 rounded text-light d-inline-block text-start" style="max-width: 85%;">
+                    ${escapeHtml(text)}
+                </div>
+            </div>
+        `;
+    }
+
+    function renderAiBubble(markdownContent) {
+        const box = document.getElementById('chatBox');
+        const parsedHtml = marked.parse(markdownContent);
+        box.innerHTML += `
+            <div class="mb-3 text-start">
+                <span class="badge bg-success mb-1"><i class="bi bi-robot"></i> Eco AI</span>
+                <div class="p-3 bg-dark border border-secondary rounded text-light ai-reply-content">
+                    ${parsedHtml}
+                </div>
+            </div>
+        `;
+    }
+
     async function sendMessage() {
         const input = document.getElementById('chatInput');
         const box = document.getElementById('chatBox');
         if (!input.value.trim()) return;
 
+        const defaultWelcome = document.getElementById('defaultWelcome');
+        if (defaultWelcome) defaultWelcome.remove();
+
         const userMsg = input.value.trim();
         
-        // Render User Message Bubble
-        box.innerHTML += `
-            <div class="mb-3 text-end">
-                <span class="badge bg-secondary mb-1">You</span>
-                <div class="p-2 px-3 bg-secondary bg-opacity-20 rounded text-light d-inline-block text-start" style="max-width: 85%;">
-                    ${escapeHtml(userMsg)}
-                </div>
-            </div>
-        `;
+        // Render & Save User Message
+        renderUserBubble(userMsg);
+        saveMessageToHistory('user', userMsg);
+
         input.value = '';
         box.scrollTop = box.scrollHeight;
 
@@ -68,16 +125,9 @@
             document.getElementById(loadingId)?.remove();
 
             if (data.status === 'success') {
-                // Parse AI Markdown to HTML
-                const parsedHtml = marked.parse(data.reply);
-                box.innerHTML += `
-                    <div class="mb-3 text-start">
-                        <span class="badge bg-success mb-1"><i class="bi bi-robot"></i> Eco AI</span>
-                        <div class="p-3 bg-dark border border-secondary rounded text-light ai-reply-content">
-                            ${parsedHtml}
-                        </div>
-                    </div>
-                `;
+                // Render & Save AI Response
+                renderAiBubble(data.reply);
+                saveMessageToHistory('ai', data.reply);
             } else {
                 box.innerHTML += `
                     <div class="mb-3 text-start">
@@ -107,6 +157,13 @@
             e.preventDefault();
             sendMessage();
         }
+    });
+
+    document.getElementById('clearBtn').addEventListener('click', () => {
+        localStorage.removeItem(STORAGE_KEY);
+        document.getElementById('chatBox').innerHTML = `
+            <p class="text-secondary small mb-0" id="defaultWelcome">Ask questions about material prices, preparation tips, or recycling impact!</p>
+        `;
     });
 </script>
 
