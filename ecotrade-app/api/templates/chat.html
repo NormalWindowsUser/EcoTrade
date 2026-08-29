@@ -1,16 +1,21 @@
 {% extends "base.html" %}
 
 {% block content %}
+<!-- Include Marked.js to render AI Markdown responses into HTML -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
 <div class="row justify-content-center">
     <div class="col-md-8">
         <div class="card-custom p-4">
             <h3 class="fw-bold text-success mb-3"><i class="bi bi-robot"></i> AI Eco Assistant</h3>
-            <div id="chatBox" class="p-3 mb-3 bg-dark rounded border border-secondary" style="height: 300px; overflow-y: auto;">
-                <p class="text-secondary">Ask questions about material prices, preparation tips, or recycling impact!</p>
+            
+            <div id="chatBox" class="p-3 mb-3 bg-dark rounded border border-secondary" style="height: 380px; overflow-y: auto;">
+                <p class="text-secondary small mb-0">Ask questions about material prices, preparation tips, or recycling impact!</p>
             </div>
+            
             <div class="input-group">
                 <input type="text" id="chatInput" class="form-control bg-dark text-light border-secondary" placeholder="Ask AI anything about recycling...">
-                <button class="btn btn-success" id="sendBtn">Send</button>
+                <button class="btn btn-success fw-bold px-4" id="sendBtn">Send</button>
             </div>
         </div>
     </div>
@@ -23,8 +28,27 @@
         if (!input.value.trim()) return;
 
         const userMsg = input.value.trim();
-        box.innerHTML += `<p><strong>You:</strong> ${userMsg}</p>`;
+        
+        // Render User Message Bubble
+        box.innerHTML += `
+            <div class="mb-3 text-end">
+                <span class="badge bg-secondary mb-1">You</span>
+                <div class="p-2 px-3 bg-secondary bg-opacity-20 rounded text-light d-inline-block text-start" style="max-width: 85%;">
+                    ${escapeHtml(userMsg)}
+                </div>
+            </div>
+        `;
         input.value = '';
+        box.scrollTop = box.scrollHeight;
+
+        // Render Loading Indicator
+        const loadingId = 'loading-' + Date.now();
+        box.innerHTML += `
+            <div id="${loadingId}" class="mb-3 text-start">
+                <span class="badge bg-success mb-1"><i class="bi bi-robot"></i> Eco AI</span>
+                <div class="text-secondary small italic">Thinking...</div>
+            </div>
+        `;
         box.scrollTop = box.scrollHeight;
 
         try {
@@ -34,11 +58,40 @@
                 body: JSON.stringify({ prompt: userMsg })
             });
             const data = await res.json();
-            box.innerHTML += `<p class="text-success"><strong>Eco AI:</strong> ${data.reply}</p>`;
+            
+            document.getElementById(loadingId)?.remove();
+
+            if (data.status === 'success') {
+                // Parse AI Markdown to HTML
+                const parsedHtml = marked.parse(data.reply);
+                box.innerHTML += `
+                    <div class="mb-3 text-start">
+                        <span class="badge bg-success mb-1"><i class="bi bi-robot"></i> Eco AI</span>
+                        <div class="p-3 bg-dark border border-secondary rounded text-light ai-reply-content">
+                            ${parsedHtml}
+                        </div>
+                    </div>
+                `;
+            } else {
+                box.innerHTML += `
+                    <div class="mb-3 text-start">
+                        <div class="alert alert-danger py-2 small mb-0">${data.reply || 'AI service error.'}</div>
+                    </div>
+                `;
+            }
         } catch (err) {
-            box.innerHTML += `<p class="text-danger"><strong>System:</strong> Failed to reach AI service.</p>`;
+            document.getElementById(loadingId)?.remove();
+            box.innerHTML += `
+                <div class="mb-3 text-start">
+                    <div class="alert alert-danger py-2 small mb-0">Connection error. Please try again.</div>
+                </div>
+            `;
         }
         box.scrollTop = box.scrollHeight;
+    }
+
+    function escapeHtml(str) {
+        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
 
     document.getElementById('sendBtn').addEventListener('click', sendMessage);
@@ -50,4 +103,26 @@
         }
     });
 </script>
+
+<style>
+    /* Styling for rendered AI Markdown content */
+    .ai-reply-content p:last-child {
+        margin-bottom: 0;
+    }
+    .ai-reply-content ul, .ai-reply-content ol {
+        padding-left: 1.25rem;
+        margin-bottom: 0.5rem;
+    }
+    .ai-reply-content h1, .ai-reply-content h2, .ai-reply-content h3, .ai-reply-content h4 {
+        font-size: 1rem;
+        font-weight: bold;
+        color: #198754;
+        margin-top: 0.5rem;
+        margin-bottom: 0.25rem;
+    }
+    .ai-reply-content hr {
+        margin: 0.5rem 0;
+        border-color: #495057;
+    }
+</style>
 {% endblock %}
