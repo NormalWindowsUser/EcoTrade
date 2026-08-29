@@ -41,12 +41,18 @@
         input.value = '';
         box.scrollTop = box.scrollHeight;
 
-        // Render Loading Indicator
+        // Render Animated Thinking Indicator
         const loadingId = 'loading-' + Date.now();
         box.innerHTML += `
             <div id="${loadingId}" class="mb-3 text-start">
-                <span class="badge bg-success mb-1"><i class="bi bi-robot"></i> Eco AI</span>
-                <div class="text-secondary small italic">Thinking...</div>
+                <span class="badge bg-success mb-1"><i class="bi bi-robot spin-icon"></i> Eco AI</span>
+                <div class="p-2 px-3 bg-dark border border-secondary rounded text-light d-inline-block thinking-bubble">
+                    <span class="spinner-grow spinner-grow-sm text-success me-2" role="status"></span>
+                    <span class="text-secondary small me-1">Thinking</span>
+                    <span class="typing-dots">
+                        <span>.</span><span>.</span><span>.</span>
+                    </span>
+                </div>
             </div>
         `;
         box.scrollTop = box.scrollHeight;
@@ -123,6 +129,60 @@
     .ai-reply-content hr {
         margin: 0.5rem 0;
         border-color: #495057;
+    }
+
+    /* Thinking state animation styles */
+    .thinking-bubble {
+        animation: pulseBorder 1.5s infinite ease-in-out;
+    }
+
+    .spin-icon {
+        display: inline-block;
+        animation: subtleRotate 2s infinite linear;
+    }
+
+    .typing-dots span {
+        display: inline-block;
+        font-weight: bold;
+        color: #198754;
+        animation: waveDots 1.4s infinite ease-in-out;
+    }
+
+    .typing-dots span:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .typing-dots span:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+
+    @keyframes pulseBorder {
+        0%, 100% {
+            border-color: #495057 !important;
+            box-shadow: 0 0 0 0 rgba(25, 135, 84, 0.2);
+        }
+        50% {
+            border-color: #198754 !important;
+            box-shadow: 0 0 8px 0 rgba(25, 135, 84, 0.4);
+        }
+    }
+
+    @keyframes subtleRotate {
+        0% { transform: rotate(0deg); }
+        25% { transform: rotate(-10deg); }
+        75% { transform: rotate(10deg); }
+        100% { transform: rotate(0deg); }
+    }
+
+    @keyframes waveDots {
+        0%, 100% {
+            transform: translateY(0);
+            opacity: 0.4;
+        }
+        50% {
+            transform: translateY(-3px);
+            opacity: 1;
+        }
     }
 </style>
 {% endblock %}
