@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card-custom p-4">
+            <h3 class="fw-bold text-success mb-3"><i class="bi bi-plus-circle"></i> Submit Recycling Contribution</h3>
+            <form id="contribForm">
+                <div class="mb-3">
+                    <label class="form-label">Material Type</label>
+                    <select class="form-select bg-dark text-light border-secondary" id="materialSelect" required>
+                        <option value="Paper">Paper / Cardboard</option>
+                        <option value="Plastic PET">Plastic PET Bottles</option>
+                        <option value="Aluminum Cans">Aluminum Cans</option>
+                        <option value="Used Cooking Oil">Used Cooking Oil</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Weight (kg)</label>
+                    <input type="number" step="0.1" class="form-control bg-dark text-light border-secondary" id="weightInput" placeholder="e.g. 2.5" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Price Rate per kg (RM)</label>
+                    <input type="number" step="0.1" class="form-control bg-dark text-light border-secondary" id="priceInput" value="0.50" required>
+                </div>
+                <button type="submit" class="btn btn-success w-100 fw-bold py-2">Submit Batch</button>
+            </form>
+            <div id="resultMsg" class="mt-3"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('contribForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const res = await fetch('/api/contribute', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                material_name: document.getElementById('materialSelect').value,
+                weight: parseFloat(document.getElementById('weightInput').value),
+                price: parseFloat(document.getElementById('priceInput').value)
+            })
+        });
+        const data = await res.json();
+        const msgDiv = document.getElementById('resultMsg');
+        if(data.status === 'success') {
+            msgDiv.innerHTML = `<div class="alert alert-success">Recorded! Payout: RM ${data.payout.toFixed(2)}</div>`;
+        } else {
+            msgDiv.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
+        }
+    });
+</script>
+{% endblock %}
