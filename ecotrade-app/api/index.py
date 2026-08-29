@@ -7,8 +7,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import psycopg2
 from google import genai
 
-template_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'templates'))
-app = Flask(__name__, template_folder=template_dir)
+app = Flask(__name__, template_folder="templates")
 app.secret_key = os.environ.get("SECRET_KEY", "ecotrade-secret-session-key-2026")
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
@@ -67,6 +66,8 @@ def contribute_page():
 
 @app.route("/admin")
 def admin_page():
+    if session.get("user_role") != "admin":
+        return redirect(url_for("login_page"))
     return render_template("admin.html")
 
 @app.route("/chat")
