@@ -26,6 +26,7 @@
             background-color: var(--bg-light);
             color: var(--text-dark);
             line-height: 1.5;
+            padding-bottom: 70px; /* Space for fixed bottom nav on mobile */
         }
 
         header {
@@ -47,13 +48,13 @@
             text-decoration: none;
         }
 
-        nav {
+        .desktop-nav {
             display: flex;
             gap: 1rem;
             align-items: center;
         }
 
-        nav a {
+        .desktop-nav a {
             text-decoration: none;
             color: var(--text-dark);
             font-size: 0.9rem;
@@ -61,7 +62,7 @@
             transition: color 0.2s;
         }
 
-        nav a:hover {
+        .desktop-nav a:hover {
             color: var(--primary);
         }
 
@@ -78,13 +79,67 @@
             background-color: var(--primary-hover);
         }
 
+        /* Mobile Bottom Navigation Bar */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: var(--card-bg);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid var(--border);
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
+            z-index: 1000;
+        }
+
+        .bottom-nav a {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            font-weight: 500;
+            width: 20%;
+            transition: color 0.2s;
+        }
+
+        .bottom-nav a.active, .bottom-nav a:hover {
+            color: var(--primary);
+        }
+
+        .bottom-nav svg {
+            width: 22px;
+            height: 22px;
+            margin-bottom: 2px;
+            fill: currentColor;
+        }
+
+        @media (min-width: 769px) {
+            body {
+                padding-bottom: 0;
+            }
+            .bottom-nav {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .desktop-nav {
+                display: none;
+            }
+        }
+
         main {
             max-width: 1100px;
             margin: 0 auto;
             padding: 1.5rem 1rem;
         }
 
-        /* Compact Hero */
         .hero {
             background: var(--card-bg);
             border-radius: 12px;
@@ -142,7 +197,6 @@
             background-color: #c8e6c9;
         }
 
-        /* Compact Stats Grid */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -171,7 +225,6 @@
             font-weight: 500;
         }
 
-        /* How It Works Section */
         .how-it-works {
             background: #e8f5e9;
             border: 1px solid #c8e6c9;
@@ -279,9 +332,10 @@
 </head>
 <body>
 
+    <!-- Header (Desktop Navigation) -->
     <header>
         <a href="/" class="logo">EcoTrade</a>
-        <nav>
+        <nav class="desktop-nav">
             <a href="/">Home</a>
             <a href="/contribute">Contribute</a>
             <a href="/chat">AI Assistant</a>
@@ -292,7 +346,6 @@
     </header>
 
     <main>
-        <!-- Compact Hero Banner -->
         <section class="hero">
             <h1>Recycle Smarter, Earn Rewards</h1>
             <p>Convert household recyclables into payouts while lowering carbon emissions in Malaysia.</p>
@@ -302,7 +355,6 @@
             </div>
         </section>
 
-        <!-- Dynamic Live Stats -->
         <section class="stats-grid">
             <div class="stat-card">
                 <h3 id="stat-weight">0.0 kg</h3>
@@ -322,7 +374,6 @@
             </div>
         </section>
 
-        <!-- Quick 3-Step Process -->
         <section class="how-it-works">
             <div class="step-item">
                 <div class="step-number">1</div>
@@ -347,7 +398,6 @@
             </div>
         </section>
 
-        <!-- Live Material Rates -->
         <div class="section-title">
             <span>Accepted Materials & Live Rates</span>
             <span>Updated Daily</span>
@@ -356,7 +406,6 @@
             <p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); font-size: 0.85rem;">Loading material rates...</p>
         </div>
 
-        <!-- Recycling Hub Directory -->
         <div class="section-title">
             <span>Partner Hub Locations</span>
             <span>Verified Drop-offs</span>
@@ -365,6 +414,26 @@
             <p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); font-size: 0.85rem;">Loading hub locations...</p>
         </div>
     </main>
+
+    <!-- Fixed Bottom Navigation Bar (Mobile) -->
+    <nav class="bottom-nav">
+        <a href="/" class="active">
+            <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            <span>Home</span>
+        </a>
+        <a href="/contribute">
+            <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            <span>Contribute</span>
+        </a>
+        <a href="/chat">
+            <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
+            <span>AI Chat</span>
+        </a>
+        <a href="/account">
+            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            <span>Account</span>
+        </a>
+    </nav>
 
     <footer>
         <p>&copy; 2026 EcoTrade Malaysia. Empowering Sustainable Recycling.</p>
@@ -380,7 +449,6 @@
                     document.getElementById('stat-weight').innerText = `${weight.toFixed(1)} kg`;
                     document.getElementById('stat-earnings').innerText = `RM ${(data.total_earnings || 0).toFixed(2)}`;
                     document.getElementById('stat-hubs').innerText = data.active_hubs || 0;
-                    // Formula estimate: ~1.5 kg CO2 saved per kg recycled
                     document.getElementById('stat-co2').innerText = `${(weight * 1.5).toFixed(1)} kg`;
                 }
             } catch (err) {
