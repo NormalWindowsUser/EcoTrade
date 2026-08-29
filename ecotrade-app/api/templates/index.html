@@ -1,545 +1,336 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EcoTrade - Recycle & Earn</title>
-    <style>
-        :root {
-            --primary: #059669;
-            --primary-hover: #047857;
-            --bg-light: #f8fafc;
-            --card-bg: #ffffff;
-            --text-dark: #1e293b;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
-        }
+{% extends "base.html" %}
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
+{% block content %}
+<style>
+    .hero {
+        background: var(--card-bg);
+        border-radius: 12px;
+        padding: 2rem 1.5rem;
+        text-align: center;
+        margin-bottom: 1.5rem;
+        border: 1px solid var(--border-color);
+    }
 
-        body {
-            background-color: var(--bg-light);
-            color: var(--text-dark);
-            line-height: 1.5;
-            padding-bottom: 110px; /* Clearance for floating bottom pill bar */
-        }
+    .hero h1 {
+        font-size: 1.9rem;
+        font-weight: 700;
+        color: #10b981;
+        margin-bottom: 0.5rem;
+    }
 
-        /* Top Header - Minimal (Logo & Top Quick Actions Only) */
-        header {
-            background: var(--card-bg);
-            padding: 0.85rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+    .hero p {
+        font-size: 0.95rem;
+        color: var(--text-muted);
+        max-width: 600px;
+        margin: 0 auto 1.25rem;
+    }
 
-        .logo {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--primary);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-        }
+    .cta-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 0.75rem;
+    }
 
-        .logo svg {
-            width: 24px;
-            height: 24px;
-            fill: var(--primary);
-        }
+    .btn-custom-primary {
+        background-color: #10b981;
+        color: #0b0f19;
+        font-weight: 700;
+        padding: 0.5rem 1.25rem;
+        border-radius: 50px;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
 
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-        }
+    .btn-custom-primary:hover {
+        background-color: #059669;
+        color: #ffffff;
+    }
 
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--text-dark);
-            padding: 0.4rem 0.9rem;
-            border-radius: 999px;
-            font-size: 0.82rem;
-            font-weight: 500;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.3rem;
-            transition: all 0.2s;
-            cursor: pointer;
-        }
+    .btn-custom-secondary {
+        background-color: rgba(16, 185, 129, 0.12);
+        color: #10b981;
+        font-weight: 600;
+        padding: 0.5rem 1.25rem;
+        border-radius: 50px;
+        text-decoration: none;
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        transition: all 0.2s ease;
+    }
 
-        .btn-outline:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-        }
+    .btn-custom-secondary:hover {
+        background-color: rgba(16, 185, 129, 0.2);
+        color: #10b981;
+    }
 
-        /* Main Floating Pill Bottom Navigation Bar (All Devices) */
-        .floating-bottom-nav {
-            position: fixed;
-            bottom: 1.25rem;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--card-bg);
-            border-radius: 999px;
-            padding: 0.4rem 0.8rem;
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
-            border: 1px solid var(--border);
-            z-index: 1000;
-            width: max-content;
-            max-width: 95vw;
-        }
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
 
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            color: var(--text-muted);
-            font-size: 0.65rem;
-            font-weight: 700;
-            padding: 0.4rem 0.75rem;
-            border-radius: 20px;
-            transition: color 0.2s;
-            letter-spacing: 0.04em;
-        }
+    .stat-card {
+        background: var(--card-bg);
+        padding: 1.2rem 1rem;
+        border-radius: 12px;
+        text-align: center;
+        border: 1px solid var(--border-color);
+    }
 
-        .nav-item svg {
-            width: 18px;
-            height: 18px;
-            margin-bottom: 2px;
-            fill: currentColor;
-        }
+    .stat-card h3 {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: #10b981;
+        margin-bottom: 0.2rem;
+    }
 
-        .nav-item:hover, .nav-item.active {
-            color: var(--primary);
-        }
+    .stat-card p {
+        color: var(--text-muted);
+        font-size: 0.82rem;
+        font-weight: 500;
+        margin: 0;
+    }
 
-        /* Highlighted Center Pill Action Button */
-        .nav-item-cta {
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            background-color: var(--primary);
-            color: #ffffff !important;
-            text-decoration: none;
-            font-size: 0.72rem;
-            font-weight: 700;
-            padding: 0.55rem 1.1rem;
-            border-radius: 999px;
-            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
-            transition: background 0.2s, transform 0.1s;
-            letter-spacing: 0.04em;
-            margin: 0 0.2rem;
-        }
+    .how-it-works {
+        background: rgba(16, 185, 129, 0.08);
+        border: 1px solid rgba(16, 185, 129, 0.2);
+        border-radius: 12px;
+        padding: 1.25rem;
+        margin-bottom: 1.75rem;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.25rem;
+    }
 
-        .nav-item-cta:hover {
-            background-color: var(--primary-hover);
-            transform: translateY(-1px);
-        }
+    .step-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
 
-        .nav-item-cta svg {
-            width: 16px;
-            height: 16px;
-            fill: currentColor;
-        }
+    .step-number {
+        background: #10b981;
+        color: #0b0f19;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.85rem;
+        flex-shrink: 0;
+    }
 
-        /* Layout Content */
-        main {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 1.5rem 1rem;
-        }
+    .step-text h5 {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #10b981;
+        margin-bottom: 0.15rem;
+    }
 
-        .hero {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 1.75rem 1.5rem;
-            text-align: center;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
-            margin-bottom: 1.25rem;
-            border: 1px solid var(--border);
-        }
+    .step-text p {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        margin: 0;
+    }
 
-        .hero h1 {
-            font-size: 1.8rem;
-            color: var(--primary);
-            margin-bottom: 0.4rem;
-        }
+    .section-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 0.85rem;
+        color: var(--text-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 
-        .hero p {
-            font-size: 0.95rem;
-            color: var(--text-muted);
-            max-width: 600px;
-            margin: 0 auto 1.2rem;
-        }
+    .section-title span.sub-text {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        font-weight: normal;
+    }
 
-        .cta-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 0.75rem;
-        }
+    .grid-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
 
-        .btn {
-            padding: 0.5rem 1.25rem;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.88rem;
-            display: inline-block;
-            transition: background 0.2s;
-        }
+    .info-card {
+        background: var(--card-bg);
+        border-radius: 10px;
+        padding: 1.1rem;
+        border: 1px solid var(--border-color);
+    }
 
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-        }
+    .info-card h4 {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #10b981;
+        margin-bottom: 0.4rem;
+    }
 
-        .btn-primary:hover {
-            background-color: var(--primary-hover);
-        }
+    .info-card p {
+        color: var(--text-muted);
+        font-size: 0.82rem;
+        margin-bottom: 0.3rem;
+    }
 
-        .btn-secondary {
-            background-color: #ecfdf5;
-            color: var(--primary);
-        }
+    .price-badge {
+        display: inline-block;
+        background: rgba(16, 185, 129, 0.12);
+        color: #10b981;
+        font-weight: 700;
+        font-size: 0.82rem;
+        padding: 0.25rem 0.6rem;
+        border-radius: 6px;
+        margin-top: 0.4rem;
+        border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+</style>
 
-        .btn-secondary:hover {
-            background-color: #d1fae5;
-        }
+<section class="hero">
+    <h1>Recycle Smarter, Earn Rewards</h1>
+    <p>Convert household recyclables into payouts while lowering carbon emissions in Malaysia.</p>
+    <div class="cta-buttons">
+        <a href="/contribute" class="btn-custom-primary">Submit Recycling</a>
+        <a href="/chat" class="btn-custom-secondary">Ask AI Assistant</a>
+    </div>
+</section>
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.25rem;
-        }
+<section class="stats-grid">
+    <div class="stat-card">
+        <h3 id="stat-weight">0.0 kg</h3>
+        <p>Total Recycled</p>
+    </div>
+    <div class="stat-card">
+        <h3 id="stat-earnings">RM 0.00</h3>
+        <p>Payouts Distributed</p>
+    </div>
+    <div class="stat-card">
+        <h3 id="stat-hubs">0</h3>
+        <p>Active Hubs</p>
+    </div>
+    <div class="stat-card">
+        <h3 id="stat-co2">0.0 kg</h3>
+        <p>Estimated CO₂ Offset</p>
+    </div>
+</section>
 
-        .stat-card {
-            background: var(--card-bg);
-            padding: 1rem;
-            border-radius: 8px;
-            text-align: center;
-            border: 1px solid var(--border);
-            box-shadow: 0 1px 4px rgba(0,0,0,0.02);
-        }
-
-        .stat-card h3 {
-            font-size: 1.5rem;
-            color: var(--primary);
-            margin-bottom: 0.2rem;
-        }
-
-        .stat-card p {
-            color: var(--text-muted);
-            font-size: 0.82rem;
-            font-weight: 500;
-        }
-
-        .how-it-works {
-            background: #ecfdf5;
-            border: 1px solid #a7f3d0;
-            border-radius: 10px;
-            padding: 1rem 1.25rem;
-            margin-bottom: 1.5rem;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1rem;
-        }
-
-        .step-item {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .step-number {
-            background: var(--primary);
-            color: white;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 0.85rem;
-            flex-shrink: 0;
-        }
-
-        .step-text h5 {
-            font-size: 0.9rem;
-            color: var(--primary);
-        }
-
-        .step-text p {
-            font-size: 0.78rem;
-            color: var(--text-muted);
-        }
-
-        .section-title {
-            font-size: 1.25rem;
-            margin-bottom: 0.75rem;
-            color: var(--text-dark);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .section-title span {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            font-weight: normal;
-        }
-
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .info-card {
-            background: var(--card-bg);
-            border-radius: 8px;
-            padding: 1rem;
-            border: 1px solid var(--border);
-            box-shadow: 0 1px 4px rgba(0,0,0,0.02);
-        }
-
-        .info-card h4 {
-            font-size: 1rem;
-            color: var(--primary);
-            margin-bottom: 0.3rem;
-        }
-
-        .info-card p {
-            color: var(--text-muted);
-            font-size: 0.82rem;
-            margin-bottom: 0.2rem;
-        }
-
-        .price-badge {
-            display: inline-block;
-            background: #ecfdf5;
-            color: var(--primary);
-            font-weight: bold;
-            font-size: 0.82rem;
-            padding: 0.2rem 0.5rem;
-            border-radius: 4px;
-            margin-top: 0.4rem;
-        }
-
-        footer {
-            text-align: center;
-            padding: 1.25rem;
-            font-size: 0.82rem;
-            color: var(--text-muted);
-            border-top: 1px solid var(--border);
-            background: var(--card-bg);
-            margin-top: 2rem;
-        }
-    </style>
-</head>
-<body>
-
-    <!-- Minimal Header (No Navigation Links) -->
-    <header>
-        <a href="/" class="logo">
-            <svg viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2zm-1 14.5v-5l-4 2.5 4 2.5zm2-4.5v5l4-2.5-4-2.5z"/></svg>
-            EcoTrade
-        </a>
-        <div class="header-actions">
-            <a href="/login" class="btn-outline">Log In</a>
-            <button class="btn-outline">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-5.4-5.4c0-1.81.89-3.42 2.26-4.4C12.92 3.04 12.46 3 12 3z"/></svg>
-                <span>Dark</span>
-            </button>
+<section class="how-it-works">
+    <div class="step-item">
+        <div class="step-number">1</div>
+        <div class="step-text">
+            <h5>Collect & Prepare</h5>
+            <p>Clean and categorize your paper, plastic, aluminum, or glass.</p>
         </div>
-    </header>
-
-    <main>
-        <section class="hero">
-            <h1>Recycle Smarter, Earn Rewards</h1>
-            <p>Convert household recyclables into payouts while lowering carbon emissions in Malaysia.</p>
-            <div class="cta-buttons">
-                <a href="/contribute" class="btn btn-primary">Submit Recycling</a>
-                <a href="/chat" class="btn btn-secondary">Ask AI Assistant</a>
-            </div>
-        </section>
-
-        <section class="stats-grid">
-            <div class="stat-card">
-                <h3 id="stat-weight">0.0 kg</h3>
-                <p>Total Recycled</p>
-            </div>
-            <div class="stat-card">
-                <h3 id="stat-earnings">RM 0.00</h3>
-                <p>Payouts Distributed</p>
-            </div>
-            <div class="stat-card">
-                <h3 id="stat-hubs">0</h3>
-                <p>Active Hubs</p>
-            </div>
-            <div class="stat-card">
-                <h3 id="stat-co2">0.0 kg</h3>
-                <p>Estimated CO₂ Offset</p>
-            </div>
-        </section>
-
-        <section class="how-it-works">
-            <div class="step-item">
-                <div class="step-number">1</div>
-                <div class="step-text">
-                    <h5>Collect & Prepare</h5>
-                    <p>Clean and categorize your paper, plastic, aluminum, or glass.</p>
-                </div>
-            </div>
-            <div class="step-item">
-                <div class="step-number">2</div>
-                <div class="step-text">
-                    <h5>Drop Off at Hub</h5>
-                    <p>Bring materials to any of our registered partner locations.</p>
-                </div>
-            </div>
-            <div class="step-item">
-                <div class="step-number">3</div>
-                <div class="step-text">
-                    <h5>Get Paid</h5>
-                    <p>Submit your log to earn direct digital cash payouts.</p>
-                </div>
-            </div>
-        </section>
-
-        <div class="section-title">
-            <span>Accepted Materials & Live Rates</span>
-            <span>Updated Daily</span>
+    </div>
+    <div class="step-item">
+        <div class="step-number">2</div>
+        <div class="step-text">
+            <h5>Drop Off at Hub</h5>
+            <p>Bring materials to any of our registered partner locations.</p>
         </div>
-        <div class="grid-container" id="materials-list">
-            <p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); font-size: 0.85rem;">Loading material rates...</p>
+    </div>
+    <div class="step-item">
+        <div class="step-number">3</div>
+        <div class="step-text">
+            <h5>Get Paid</h5>
+            <p>Submit your log to earn direct digital cash payouts.</p>
         </div>
+    </div>
+</section>
 
-        <div class="section-title">
-            <span>Partner Hub Locations</span>
-            <span>Verified Drop-offs</span>
-        </div>
-        <div class="grid-container" id="hubs-list">
-            <p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); font-size: 0.85rem;">Loading hub locations...</p>
-        </div>
-    </main>
+<div class="section-title">
+    <span>Accepted Materials & Live Rates</span>
+    <span class="sub-text">Updated Daily</span>
+</div>
+<div class="grid-container" id="materials-list">
+    <p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); font-size: 0.85rem;">Loading material rates...</p>
+</div>
 
-    <!-- Floating Pill Bottom Navigation Bar (Visible on ALL Devices) -->
-    <nav class="floating-bottom-nav">
-        <a href="/" class="nav-item active">
-            <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-            <span>HOME</span>
-        </a>
-        <a href="/account" class="nav-item">
-            <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
-            <span>ACTIVITY</span>
-        </a>
-        <a href="/contribute" class="nav-item-cta">
-            <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-            <span>CONTRIBUTE</span>
-        </a>
-        <a href="/chat" class="nav-item">
-            <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
-            <span>AI CHAT</span>
-        </a>
-        <a href="/account" class="nav-item">
-            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-            <span>ACCOUNT</span>
-        </a>
-    </nav>
+<div class="section-title">
+    <span>Partner Hub Locations</span>
+    <span class="sub-text">Verified Drop-offs</span>
+</div>
+<div class="grid-container" id="hubs-list">
+    <p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); font-size: 0.85rem;">Loading hub locations...</p>
+</div>
 
-    <footer>
-        <p>&copy; 2026 EcoTrade Malaysia. Empowering Sustainable Recycling.</p>
-    </footer>
+<footer class="text-center py-3 border-top border-secondary mt-4" style="font-size: 0.82rem; color: var(--text-muted);">
+    <p class="mb-0">&copy; 2026 EcoTrade Malaysia. Empowering Sustainable Recycling.</p>
+</footer>
 
-    <script>
-        async function fetchStats() {
-            try {
-                const res = await fetch('/api/stats');
-                const data = await res.json();
-                if (data.status === 'success') {
-                    const weight = data.total_weight || 0;
-                    document.getElementById('stat-weight').innerText = `${weight.toFixed(1)} kg`;
-                    document.getElementById('stat-earnings').innerText = `RM ${(data.total_earnings || 0).toFixed(2)}`;
-                    document.getElementById('stat-hubs').innerText = data.active_hubs || 0;
-                    document.getElementById('stat-co2').innerText = `${(weight * 1.5).toFixed(1)} kg`;
-                }
-            } catch (err) {
-                console.error("Failed to fetch statistics:", err);
+<script>
+    async function fetchStats() {
+        try {
+            const res = await fetch('/api/stats');
+            const data = await res.json();
+            if (data.status === 'success') {
+                const weight = data.total_weight || 0;
+                document.getElementById('stat-weight').innerText = `${weight.toFixed(1)} kg`;
+                document.getElementById('stat-earnings').innerText = `RM ${(data.total_earnings || 0).toFixed(2)}`;
+                document.getElementById('stat-hubs').innerText = data.active_hubs || 0;
+                document.getElementById('stat-co2').innerText = `${(weight * 1.5).toFixed(1)} kg`;
             }
+        } catch (err) {
+            console.error("Failed to fetch statistics:", err);
         }
+    }
 
-        async function fetchMaterials() {
-            try {
-                const res = await fetch('/api/materials');
-                const data = await res.json();
-                const container = document.getElementById('materials-list');
-                if (data.status === 'success' && data.data.length > 0) {
-                    container.innerHTML = data.data.map(m => `
-                        <div class="info-card">
-                            <h4>${m.name}</h4>
-                            <p><strong>Category:</strong> ${m.category}</p>
-                            <p>${m.tips || 'Clean and prepare materials prior to drop-off.'}</p>
-                            <span class="price-badge">RM ${m.price_per_kg.toFixed(2)} / kg</span>
-                        </div>
-                    `).join('');
-                } else {
-                    container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; font-size: 0.85rem;">No active materials found.</p>';
-                }
-            } catch (err) {
-                console.error("Failed to fetch materials:", err);
-                document.getElementById('materials-list').innerHTML = '<p style="grid-column: 1/-1; text-align: center; font-size: 0.85rem;">Unable to load materials.</p>';
+    async function fetchMaterials() {
+        try {
+            const res = await fetch('/api/materials');
+            const data = await res.json();
+            const container = document.getElementById('materials-list');
+            if (data.status === 'success' && data.data.length > 0) {
+                container.innerHTML = data.data.map(m => `
+                    <div class="info-card">
+                        <h4>${m.name}</h4>
+                        <p><strong>Category:</strong> ${m.category}</p>
+                        <p>${m.tips || 'Clean and prepare materials prior to drop-off.'}</p>
+                        <span class="price-badge">RM ${m.price_per_kg.toFixed(2)} / kg</span>
+                    </div>
+                `).join('');
+            } else {
+                container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; font-size: 0.85rem;">No active materials found.</p>';
             }
+        } catch (err) {
+            console.error("Failed to fetch materials:", err);
+            document.getElementById('materials-list').innerHTML = '<p style="grid-column: 1/-1; text-align: center; font-size: 0.85rem;">Unable to load materials.</p>';
         }
+    }
 
-        async function fetchHubs() {
-            try {
-                const res = await fetch('/api/hubs');
-                const data = await res.json();
-                const container = document.getElementById('hubs-list');
-                if (data.status === 'success' && data.data.length > 0) {
-                    container.innerHTML = data.data.map(h => `
-                        <div class="info-card">
-                            <h4>${h.name}</h4>
-                            <p><strong>City:</strong> ${h.city}</p>
-                            <p><strong>Address:</strong> ${h.address}</p>
-                            <p><strong>Hours:</strong> ${h.hours || 'N/A'}</p>
-                            <p><strong>Contact:</strong> ${h.phone || 'N/A'}</p>
-                        </div>
-                    `).join('');
-                } else {
-                    container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; font-size: 0.85rem;">No active recycling hubs available.</p>';
-                }
-            } catch (err) {
-                console.error("Failed to fetch hubs:", err);
-                document.getElementById('hubs-list').innerHTML = '<p style="grid-column: 1/-1; text-align: center; font-size: 0.85rem;">Unable to load hub locations.</p>';
+    async function fetchHubs() {
+        try {
+            const res = await fetch('/api/hubs');
+            const data = await res.json();
+            const container = document.getElementById('hubs-list');
+            if (data.status === 'success' && data.data.length > 0) {
+                container.innerHTML = data.data.map(h => `
+                    <div class="info-card">
+                        <h4>${h.name}</h4>
+                        <p><strong>City:</strong> ${h.city}</p>
+                        <p><strong>Address:</strong> ${h.address}</p>
+                        <p><strong>Hours:</strong> ${h.hours || 'N/A'}</p>
+                        <p><strong>Contact:</strong> ${h.phone || 'N/A'}</p>
+                    </div>
+                `).join('');
+            } else {
+                container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; font-size: 0.85rem;">No active recycling hubs available.</p>';
             }
+        } catch (err) {
+            console.error("Failed to fetch hubs:", err);
+            document.getElementById('hubs-list').innerHTML = '<p style="grid-column: 1/-1; text-align: center; font-size: 0.85rem;">Unable to load hub locations.</p>';
         }
+    }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            fetchStats();
-            fetchMaterials();
-            fetchHubs();
-        });
-    </script>
-</body>
-</html>
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchStats();
+        fetchMaterials();
+        fetchHubs();
+    });
+</script>
+{% endblock %}
