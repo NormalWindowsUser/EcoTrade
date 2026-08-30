@@ -119,6 +119,307 @@
             transition: all 0.2s ease;
         }
 
+        /* Hide activity button while retaining full DOM/Python availability */
+        .nav-btn-activity {
+            display: none !important;
+        }
+
+        /* Match outer rounded edge of dock for first and last visible items */
+        .nav-btn.nav-first-item {
+            border-radius: 50px 12px 12px 50px;
+            padding-left: 18px;
+        }
+
+        .nav-btn.nav-last-item {
+            border-radius: 12px 50px 50px 12px;
+            padding-right: 18px;
+        }
+
+        .nav-btn i {
+            font-size: 1.1rem;
+            margin-bottom: 2px;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .nav-btn.btn-action {
+            background-color: #10b981;
+            color: #0b0f19;
+            padding: 6px 14px;
+            border-radius: 50px !important;
+            flex-direction: row;
+            gap: 5px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .nav-btn.btn-action:hover {
+            background-color: #059669;
+            color: #ffffff;
+        }
+
+        /* Mobile / Small Screen Edge Dock Adaptation */
+        @media (max-width: 576px) {
+            .bottom-nav-container {
+                bottom: 0;
+                left: 0;
+                transform: none;
+                width: 100%;
+            }
+
+            .bottom-nav {
+                border-radius: 0;
+                border-left: none;
+                border-right: none;
+                border-bottom: none;
+                justify-content: space-around;
+                padding: 8px 4px;
+                gap: 0;
+            }
+
+            .nav-btn.nav-first-item,
+            .nav-btn.nav-last-item {
+                border-radius: 12px;
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+        }
+
+        .card-custom {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+
+        /* Light Mode Utility Overrides */
+        body.light-mode .text-light {
+            color: #0f172a !important;
+        }
+        body.light-mode .text-secondary {
+            color: #475569 !important;
+        }
+        body.light-mode .text-muted {
+            color: #64748b !important;
+        }
+        body.light-mode .bg-dark {
+            background-color: #f1f5f9 !important;
+        }
+        body.light-mode .border-secondary {
+            border-color: #cbd5e1 !important;
+        }
+        body.light-mode .form-control, 
+        body.light-mode .form-select {
+            background-color: #ffffff !important;
+            color: #0f172a !important;
+            border-color: #cbd5e1 !important;
+        }
+
+        /* Light Mode Table Overrides */
+        body.light-mode .table {
+            color: #0f172a !important;
+            border-color: #cbd5e1 !important;
+        }
+        body.light-mode .table th,
+        body.light-mode .table td {
+            background-color: #ffffff !important;
+            color: #0f172a !important;
+            border-color: #cbd5e1 !important;
+        }
+        body.light-mode .table-hover tbody tr:hover td {
+            background-color: #f1f5f9 !important;
+            color: #0f172a !important;
+        }
+    </style>
+</head>
+<body class="light-mode">
+
+    <header class="header-bar">
+        <!-- Updated Navbar Logo using Bootstrap Icons -->
+        <a href="/" class="brand-logo text-decoration-none d-flex align-items-center gap-2">
+            <i class="bi bi-recycle text-success" style="font-size: 1.5rem;"></i>
+            <span class="fs-5 fw-bold" style="color: var(--text-color);">EcoTrade</span>
+        </a>
+
+        <div class="d-flex align-items-center gap-2">
+            {% if session.get('user_id') %}
+                <span class="badge bg-dark border border-secondary text-light px-2 py-1 small">
+                    <i class="bi bi-person-circle text-success me-1"></i> {{ session.get('user_name') }}
+                </span>
+                <a href="/logout" class="btn btn-outline-danger btn-sm rounded-pill px-2 py-0" style="font-size: 0.75rem;">Logout</a>
+            {% else %}
+                <a href="/login" class="btn btn-outline-success btn-sm rounded-pill px-3 py-1" style="font-size: 0.75rem;">Log In</a>
+            {% endif %}
+
+            <!-- Dark/Light Theme Toggle -->
+            <button id="themeToggleBtn" class="theme-toggle-btn ms-1" onclick="toggleTheme()">
+                <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
+                <span id="themeLabel">Dark</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="container py-3" style="max-width: 960px;">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Centered Floating Glass Navigation -->
+    <div class="bottom-nav-container">
+        <nav class="bottom-nav">
+            <a href="/" class="nav-btn nav-first-item {% if request.path == '/' %}active{% endif %}">
+                <i class="bi bi-house-door"></i>
+                <span>HOME</span>
+            </a>
+
+            <!-- Kept in template to prevent Flask routes/session errors, hidden via CSS -->
+            <a href="/activity" class="nav-btn nav-btn-activity {% if request.path == '/activity' %}active{% endif %}">
+                <i class="bi bi-clock-history"></i>
+                <span>ACTIVITY</span>
+            </a>
+
+            {% if session.get('user_role') == 'admin' %}
+            <a href="/admin" class="nav-btn {% if request.path == '/admin' %}active{% endif %}">
+                <i class="bi bi-shield-check"></i>
+                <span>ADMIN</span>
+            </a>
+            {% endif %}
+
+            <a href="/contribute" class="nav-btn btn-action">
+                <i class="bi bi-plus-circle-fill"></i>
+                <span>CONTRIBUTE</span>
+            </a>
+            <a href="/chat" class="nav-btn {% if request.path == '/chat' %}active{% endif %}">
+                <i class="bi bi-robot"></i>
+                <span>AI CHAT</span>
+            </a>
+            <a href="/account" class="nav-btn nav-last-item {% if request.path == '/account' %}active{% endif %}">
+                <i class="bi bi-person"></i>
+                <span>ACCOUNT</span>
+            </a>
+        </nav>
+    </div>
+
+    <script>
+        // Apply saved theme preference on page load (defaults to light mode)
+        (function initTheme() {
+            const savedTheme = localStorage.getItem('ecotrade-theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.remove('light-mode');
+                updateThemeUI(false);
+            } else {
+                document.body.classList.add('light-mode');
+                updateThemeUI(true);
+            }
+        })();
+
+        function toggleTheme() {
+            const isLight = document.body.classList.toggle('light-mode');
+            localStorage.setItem('ecotrade-theme', isLight ? 'light' : 'dark');
+            updateThemeUI(isLight);
+        }
+
+        function updateThemeUI(isLight) {
+            const icon = document.getElementById('themeIcon');
+            const label = document.getElementById('themeLabel');
+            if (isLight) {
+                icon.className = 'bi bi-moon-stars-fill';
+                label.innerText = 'Dark';
+            } else {
+                icon.className = 'bi bi-sun-fill';
+                label.innerText = 'Light';
+            }
+        }
+    </script>
+
+</body>
+</html>            --nav-text: #475569;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            padding-bottom: 140px;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .header-bar {
+            background: var(--header-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .brand-logo {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .theme-toggle-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 50px;
+            padding: 4px 12px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .theme-toggle-btn:hover {
+            border-color: #10b981;
+            color: #10b981;
+        }
+
+        /* FLOATING GLASS NAVIGATION */
+        .bottom-nav-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1050;
+            width: auto;
+            transition: all 0.2s ease;
+        }
+
+        .bottom-nav {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            background: var(--nav-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 6px 8px;
+            border-radius: 50px;
+            border: 1px solid var(--nav-border);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: background 0.2s ease, border-color 0.2s ease;
+        }
+
+        .nav-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--nav-text);
+            text-decoration: none;
+            font-size: 0.68rem;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+
         /* Match outer rounded edge of dock for first and last elements */
         .nav-btn:first-child {
             border-radius: 50px 12px 12px 50px;
