@@ -133,14 +133,13 @@
             background: var(--nav-bg);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            padding: 6px 6px; /* Equal top, bottom, left, and right outer gaps */
+            padding: 6px 6px;
             border-radius: 50px;
             border: 1px solid var(--nav-border);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             transition: background 0.2s ease, border-color 0.2s ease;
         }
 
-        /* UNIFORM EQUAL SIZE NAV BUTTONS WITH SPACIOUS PADDING */
         .nav-btn {
             flex: 1 1 0px;
             min-width: 85px;
@@ -200,7 +199,7 @@
         .card-custom {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 10px;
+            border-radius: 12px;
             transition: background-color 0.2s ease, border-color 0.2s ease;
         }
 
@@ -239,22 +238,26 @@
             display: inline-flex !important;
         }
 
-        /* TITLE EMOJI INLINE WRAPPER */
-        .inline-title-icon {
+        /* LOCK EMOJI + RECYCLE TOGETHER */
+        .title-recycle-wrapper {
             display: inline-flex;
             align-items: center;
-            vertical-align: middle;
-            margin-right: 0.35rem;
+            gap: 0.35rem;
+            white-space: nowrap;
         }
 
-        /* TOTAL RECYCLED STAT ICON ALIGNMENT */
-        .stat-icon-recycled {
+        /* STAT CARD ICON STYLING */
+        .stat-icon-wrapper {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            vertical-align: middle;
-            font-size: 1.2rem;
-            margin-right: 0.4rem;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: rgba(16, 185, 129, 0.12);
+            color: #10b981;
+            font-size: 1.1rem;
+            flex-shrink: 0;
         }
 
         /* Table Overrides */
@@ -301,6 +304,28 @@
     </header>
 
     <main class="container py-3" style="max-width: 960px;">
+        
+        <!-- MAIN TITLE WITH LOCKED EMOJI -->
+        <h1 class="fw-bold mb-2">
+            <span class="title-recycle-wrapper">♻️ Recycle</span> Smarter, Earn Rewards
+        </h1>
+        <p class="text-muted mb-4">Convert household recyclables into payouts while lowering carbon emissions in Malaysia.</p>
+
+        <!-- STAT CARDS WITH PROPER RECYCLED ICON -->
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-md-3">
+                <div class="card card-custom p-3 h-100">
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <div class="stat-icon-wrapper">
+                            <i class="bi bi-arrow-repeat"></i>
+                        </div>
+                        <span class="fs-5 fw-bold">7.0 kg</span>
+                    </div>
+                    <small class="text-muted">Total Recycled</small>
+                </div>
+            </div>
+        </div>
+
         {% block content %}{% endblock %}
     </main>
 
