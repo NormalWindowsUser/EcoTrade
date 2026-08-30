@@ -79,14 +79,6 @@
             color: var(--text-color);
         }
 
-        /* INLINE TITLE EMOJI FIX */
-        .page-header-title {
-            display: inline-flex;
-            align-items: baseline;
-            flex-wrap: wrap;
-            gap: 0.4rem;
-        }
-
         .header-bar {
             background: var(--header-bg);
             border-bottom: 1px solid var(--border-color);
@@ -101,17 +93,6 @@
             text-decoration: none;
             display: flex;
             align-items: center;
-        }
-
-        /* LOGOUT BUTTON MATCHES LOGIN BUTTON DESIGN EXACTLY */
-        .btn-auth {
-            font-size: 0.75rem;
-            border-radius: 50px;
-            padding: 0.25rem 0.75rem;
-            font-weight: 500;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
         }
 
         .theme-toggle-btn {
@@ -152,13 +133,14 @@
             background: var(--nav-bg);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            padding: 6px 6px;
+            padding: 6px 6px; /* Equal top, bottom, left, and right outer gaps */
             border-radius: 50px;
             border: 1px solid var(--nav-border);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             transition: background 0.2s ease, border-color 0.2s ease;
         }
 
+        /* UNIFORM EQUAL SIZE NAV BUTTONS WITH SPACIOUS PADDING */
         .nav-btn {
             flex: 1 1 0px;
             min-width: 85px;
@@ -218,37 +200,8 @@
         .card-custom {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
+            border-radius: 10px;
             transition: background-color 0.2s ease, border-color 0.2s ease;
-        }
-
-        /* WEIGHT STEPPER CONTROL (ALWAYS VISIBLE) */
-        .weight-stepper {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .btn-stepper {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            border: 1px solid var(--border-color);
-            background: var(--input-bg);
-            color: var(--text-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0;
-            font-size: 0.75rem;
-            cursor: pointer;
-            transition: all 0.15s ease;
-        }
-
-        .btn-stepper:hover {
-            background: #10b981;
-            color: #ffffff;
-            border-color: #10b981;
         }
 
         /* DYNAMIC UTILITY OVERRIDES */
@@ -275,6 +228,36 @@
             opacity: 0.7;
         }
 
+        /* ALWAYS-VISIBLE WEIGHT STEPPER BUTTONS */
+        .show-stepper-always,
+        .weight-input-container .btn-stepper,
+        .weight-control-btn,
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: inline-flex !important;
+        }
+
+        /* TITLE EMOJI INLINE WRAPPER */
+        .inline-title-icon {
+            display: inline-flex;
+            align-items: center;
+            vertical-align: middle;
+            margin-right: 0.35rem;
+        }
+
+        /* TOTAL RECYCLED STAT ICON ALIGNMENT */
+        .stat-icon-recycled {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            vertical-align: middle;
+            font-size: 1.2rem;
+            margin-right: 0.4rem;
+        }
+
+        /* Table Overrides */
         .table {
             color: var(--text-color) !important;
             border-color: var(--border-color) !important;
@@ -303,11 +286,11 @@
                 <span class="badge bg-dark border border-secondary text-light px-2 py-1 small me-1">
                     <i class="bi bi-person-circle text-success me-1"></i> {{ session.get('user_name') }}
                 </span>
-                <a href="/logout" class="btn btn-outline-danger btn-auth">
+                <a href="/logout" class="btn btn-outline-danger btn-sm rounded-pill px-3 py-1" style="font-size: 0.75rem;">
                     <i class="bi bi-box-arrow-right"></i> Logout
                 </a>
             {% else %}
-                <a href="/login" class="btn btn-outline-success btn-auth">Log In</a>
+                <a href="/login" class="btn btn-outline-success btn-sm rounded-pill px-3 py-1" style="font-size: 0.75rem;">Log In</a>
             {% endif %}
 
             <button id="themeToggleBtn" class="theme-toggle-btn ms-1" onclick="toggleTheme()">
@@ -318,33 +301,6 @@
     </header>
 
     <main class="container py-3" style="max-width: 960px;">
-        <!-- EXAMPLE INLINE TITLE & STAT CARD USAGE -->
-        <div class="mb-4">
-            <h1 class="fw-bold page-header-title">
-                <i class="bi bi-recycle text-success"></i> Recycle Smarter, Earn Rewards
-            </h1>
-            <p class="text-muted">Convert household recyclables into payouts while lowering carbon emissions in Malaysia.</p>
-        </div>
-
-        <div class="row g-3 mb-4">
-            <!-- RECYCLED STAT CARD WITH ALWAYS VISIBLE STEPPER CONTROLS -->
-            <div class="col-6 col-md-3">
-                <div class="card-custom p-3">
-                    <div class="d-flex align-items-center justify-content-between mb-1">
-                        <div class="weight-stepper">
-                            <i class="bi bi-recycle text-success me-1 fs-5"></i>
-                            <span class="fw-bold fs-5" id="totalRecycledVal">7.0 kg</span>
-                        </div>
-                        <div class="weight-stepper">
-                            <button class="btn-stepper" onclick="adjustWeight(-0.5)" title="Decrease weight">-</button>
-                            <button class="btn-stepper" onclick="adjustWeight(0.5)" title="Increase weight">+</button>
-                        </div>
-                    </div>
-                    <div class="text-muted small">Total Recycled</div>
-                </div>
-            </div>
-        </div>
-
         {% block content %}{% endblock %}
     </main>
 
@@ -414,12 +370,6 @@
                 icon.className = 'bi bi-sun-fill';
                 label.innerText = 'Light';
             }
-        }
-
-        let currentWeight = 7.0;
-        function adjustWeight(amount) {
-            currentWeight = Math.max(0, currentWeight + amount);
-            document.getElementById('totalRecycledVal').innerText = currentWeight.toFixed(1) + ' kg';
         }
     </script>
 
