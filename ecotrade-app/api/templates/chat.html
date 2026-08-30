@@ -1,21 +1,25 @@
 {% extends "base.html" %}
 
 {% block content %}
+<!-- Include Marked.js to render AI Markdown responses into HTML -->
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-<div class="container py-4">
+<!-- Added pb-5 and mb-5 to clear the floating bottom navigation bar -->
+<div class="container py-4 pb-5 mb-5">
     <div class="row justify-content-center">
         <div class="col-lg-8 col-md-10">
-            <div class="card bg-dark border-secondary shadow-lg rounded-4 overflow-hidden">
+            <!-- Main Chat Card -->
+            <div class="card bg-white border-light-subtle shadow-sm rounded-4 overflow-hidden">
                 
-                <div class="card-header bg-dark border-bottom border-secondary p-4 d-flex justify-content-between align-items-center">
+                <!-- Header -->
+                <div class="card-header bg-white border-bottom p-3 d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center gap-2">
                         <div class="bg-success rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
                             <i class="bi bi-robot text-white fs-5"></i>
                         </div>
                         <div>
-                            <h5 class="fw-bold text-success mb-0">Eco Assistant</h5>
-                            <small class="text-secondary">AI-powered recycling guide</small>
+                            <h5 class="fw-bold text-success mb-0" style="font-size: 1.1rem;">Eco Assistant</h5>
+                            <small class="text-secondary" style="font-size: 0.8rem;">AI-powered recycling guide</small>
                         </div>
                     </div>
                     <button class="btn btn-outline-danger btn-sm rounded-pill px-3" id="clearBtn">
@@ -23,19 +27,22 @@
                     </button>
                 </div>
                 
-                <div id="chatBox" class="card-body p-4 custom-scrollbar bg-opacity-50" style="height: 60vh; min-height: 400px; overflow-y: auto;">
+                <!-- Chat History Area -->
+                <!-- Adjusted height using calc() to ensure it fits the screen without being pushed behind the bottom nav -->
+                <div id="chatBox" class="card-body p-3 custom-scrollbar" style="height: calc(100vh - 320px); min-height: 350px; overflow-y: auto; background-color: #f8f9fa;">
                     <div class="text-center mt-4" id="defaultWelcome">
-                        <div class="badge bg-secondary bg-opacity-25 text-light px-3 py-2 rounded-pill mb-2">
+                        <div class="badge bg-secondary bg-opacity-10 text-dark border px-3 py-2 rounded-pill mb-2">
                             👋 Welcome!
                         </div>
                         <p class="text-secondary small">Ask questions about material prices, preparation tips, or recycling impact!</p>
                     </div>
                 </div>
                 
-                <div class="card-footer bg-dark border-top border-secondary p-3 p-md-4">
-                    <div class="input-group input-group-lg shadow-sm rounded-pill overflow-hidden border border-secondary focus-ring-container">
-                        <input type="text" id="chatInput" class="form-control bg-dark text-light border-0 shadow-none px-4" placeholder="Ask AI anything about recycling...">
-                        <button class="btn btn-success fw-bold px-4 px-md-5" id="sendBtn">
+                <!-- Input Area -->
+                <div class="card-footer bg-white border-top p-3">
+                    <div class="input-group shadow-sm rounded-pill overflow-hidden border focus-ring-container bg-white">
+                        <input type="text" id="chatInput" class="form-control border-0 shadow-none px-4" placeholder="Ask AI anything about recycling...">
+                        <button class="btn btn-success fw-bold px-4" id="sendBtn">
                             <i class="bi bi-send-fill d-md-none"></i>
                             <span class="d-none d-md-inline">Send</span>
                         </button>
@@ -86,8 +93,8 @@
     function renderUserBubble(text) {
         const box = document.getElementById('chatBox');
         box.innerHTML += `
-            <div class="d-flex justify-content-end mb-4 animate-fade-in">
-                <div class="user-bubble p-3 bg-success bg-opacity-25 border border-success border-opacity-50 text-light shadow-sm" style="max-width: 80%;">
+            <div class="d-flex justify-content-end mb-3 animate-fade-in">
+                <div class="user-bubble p-3 bg-success bg-opacity-25 border border-success border-opacity-25 text-dark shadow-sm" style="max-width: 80%; font-size: 0.95rem;">
                     ${escapeHtml(text)}
                 </div>
             </div>
@@ -98,8 +105,8 @@
         const box = document.getElementById('chatBox');
         const parsedHtml = marked.parse(markdownContent);
         box.innerHTML += `
-            <div class="d-flex justify-content-start mb-4 animate-fade-in">
-                <div class="ai-bubble p-3 bg-secondary bg-opacity-25 border border-secondary text-light shadow-sm ai-reply-content" style="max-width: 85%;">
+            <div class="d-flex justify-content-start mb-3 animate-fade-in">
+                <div class="ai-bubble p-3 bg-white border shadow-sm ai-reply-content text-dark" style="max-width: 85%; font-size: 0.95rem;">
                     ${parsedHtml}
                 </div>
             </div>
@@ -126,10 +133,10 @@
         // Render Animated Thinking Indicator
         const loadingId = 'loading-' + Date.now();
         box.innerHTML += `
-            <div id="${loadingId}" class="d-flex justify-content-start mb-4 animate-fade-in">
-                <div class="ai-bubble p-3 bg-secondary bg-opacity-25 border border-secondary text-light shadow-sm thinking-bubble">
+            <div id="${loadingId}" class="d-flex justify-content-start mb-3 animate-fade-in">
+                <div class="ai-bubble p-3 bg-white border shadow-sm text-secondary thinking-bubble" style="font-size: 0.9rem;">
                     <span class="spinner-grow spinner-grow-sm text-success me-2" role="status"></span>
-                    <span class="text-secondary small me-1">Eco AI is thinking</span>
+                    <span class="me-1">Eco AI is thinking</span>
                     <span class="typing-dots">
                         <span>.</span><span>.</span><span>.</span>
                     </span>
@@ -154,7 +161,7 @@
                 saveMessageToHistory('ai', data.reply);
             } else {
                 box.innerHTML += `
-                    <div class="d-flex justify-content-center mb-4">
+                    <div class="d-flex justify-content-center mb-3">
                         <div class="alert alert-danger py-2 small mb-0 rounded-pill shadow-sm">${data.reply || 'AI service error.'}</div>
                     </div>
                 `;
@@ -162,7 +169,7 @@
         } catch (err) {
             document.getElementById(loadingId)?.remove();
             box.innerHTML += `
-                <div class="d-flex justify-content-center mb-4">
+                <div class="d-flex justify-content-center mb-3">
                     <div class="alert alert-danger py-2 small mb-0 rounded-pill shadow-sm"><i class="bi bi-exclamation-triangle"></i> Connection error. Please try again.</div>
                 </div>
             `;
@@ -187,7 +194,7 @@
         localStorage.removeItem(STORAGE_KEY);
         document.getElementById('chatBox').innerHTML = `
             <div class="text-center mt-4" id="defaultWelcome">
-                <div class="badge bg-secondary bg-opacity-25 text-light px-3 py-2 rounded-pill mb-2">
+                <div class="badge bg-secondary bg-opacity-10 text-dark border px-3 py-2 rounded-pill mb-2">
                     👋 Welcome!
                 </div>
                 <p class="text-secondary small">Ask questions about material prices, preparation tips, or recycling impact!</p>
@@ -199,10 +206,10 @@
 <style>
     /* --- Modern Chat Bubble Shapes --- */
     .user-bubble {
-        border-radius: 1.2rem 1.2rem 0.2rem 1.2rem; /* Square bottom-right */
+        border-radius: 1.2rem 1.2rem 0.2rem 1.2rem;
     }
     .ai-bubble {
-        border-radius: 1.2rem 1.2rem 1.2rem 0.2rem; /* Square bottom-left */
+        border-radius: 1.2rem 1.2rem 1.2rem 0.2rem;
     }
 
     /* --- Custom Scrollbar for Chatbox --- */
@@ -213,17 +220,17 @@
         background: transparent;
     }
     .custom-scrollbar::-webkit-scrollbar-thumb {
-        background-color: #495057;
+        background-color: #ced4da;
         border-radius: 10px;
     }
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-        background-color: #6c757d;
+        background-color: #adb5bd;
     }
 
     /* --- Input Focus Ring Styling --- */
     .focus-ring-container:focus-within {
         border-color: #198754 !important;
-        box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25) !important;
+        box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.15) !important;
         transition: all 0.3s ease;
     }
 
@@ -239,49 +246,30 @@
 
     /* --- Styling for rendered AI Markdown content --- */
     .ai-reply-content {
-        line-height: 1.6;
+        line-height: 1.5;
     }
     .ai-reply-content p:last-child {
         margin-bottom: 0;
     }
     .ai-reply-content ul, .ai-reply-content ol {
-        padding-left: 1.5rem;
-        margin-bottom: 0.75rem;
-    }
-    .ai-reply-content li {
-        margin-bottom: 0.25rem;
+        padding-left: 1.25rem;
+        margin-bottom: 0.5rem;
     }
     .ai-reply-content h1, .ai-reply-content h2, .ai-reply-content h3, .ai-reply-content h4 {
-        font-size: 1.1rem;
+        font-size: 1.05rem;
         font-weight: 700;
         color: #198754;
-        margin-top: 1rem;
+        margin-top: 0.5rem;
         margin-bottom: 0.5rem;
     }
     .ai-reply-content h1:first-child, .ai-reply-content h2:first-child, .ai-reply-content h3:first-child {
         margin-top: 0;
     }
-    .ai-reply-content hr {
-        margin: 1rem 0;
-        border-color: rgba(255, 255, 255, 0.1);
-    }
     .ai-reply-content code {
-        background-color: rgba(0,0,0,0.3);
+        background-color: rgba(0,0,0,0.05);
         padding: 0.2rem 0.4rem;
         border-radius: 0.3rem;
-        color: #e83e8c;
-    }
-    .ai-reply-content pre {
-        background-color: #1a1d20;
-        padding: 1rem;
-        border-radius: 0.5rem;
-        overflow-x: auto;
-        border: 1px solid #495057;
-    }
-    .ai-reply-content pre code {
-        background-color: transparent;
-        padding: 0;
-        color: inherit;
+        color: #d63384;
     }
 
     /* --- Thinking state animation styles --- */
@@ -296,34 +284,23 @@
         animation: waveDots 1.4s infinite ease-in-out;
     }
 
-    .typing-dots span:nth-child(2) {
-        animation-delay: 0.2s;
-    }
-
-    .typing-dots span:nth-child(3) {
-        animation-delay: 0.4s;
-    }
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
 
     @keyframes pulseBorder {
         0%, 100% {
-            border-color: #495057;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-color: #dee2e6;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
         50% {
             border-color: #198754;
-            box-shadow: 0 0 10px rgba(25, 135, 84, 0.3);
+            box-shadow: 0 0 8px rgba(25, 135, 84, 0.2);
         }
     }
 
     @keyframes waveDots {
-        0%, 100% {
-            transform: translateY(0);
-            opacity: 0.4;
-        }
-        50% {
-            transform: translateY(-3px);
-            opacity: 1;
-        }
+        0%, 100% { transform: translateY(0); opacity: 0.4; }
+        50% { transform: translateY(-3px); opacity: 1; }
     }
 </style>
 {% endblock %}
