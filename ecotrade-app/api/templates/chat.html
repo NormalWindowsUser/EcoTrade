@@ -358,11 +358,32 @@
     .ai-reply-content h1:first-child, .ai-reply-content h2:first-child, .ai-reply-content h3:first-child {
         margin-top: 0;
     }
+
+    /* Inline single-word code highlights */
     .ai-reply-content code {
-        background-color: var(--bs-tertiary-bg);
-        padding: 0.2rem 0.4rem;
+        background-color: rgba(25, 135, 84, 0.1);
+        color: #198754;
+        padding: 0.15rem 0.4rem;
         border-radius: 0.3rem;
-        color: #d63384;
+        font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: 0.875em;
+    }
+
+    /* Multi-line code block box */
+    .ai-reply-content pre {
+        background-color: #1e1e1e;
+        color: #d4d4d4;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        overflow-x: auto;
+        margin-top: 0.5rem;
+        margin-bottom: 0.75rem;
+    }
+    .ai-reply-content pre code {
+        background-color: transparent !important;
+        color: inherit !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
     }
 
     .typing-dots span {
