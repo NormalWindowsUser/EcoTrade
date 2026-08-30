@@ -30,10 +30,25 @@
                 <div class="mb-3">
                     <label class="form-label small fw-semibold text-light">Material Type</label>
                     <select class="form-select bg-dark text-light border-secondary" id="materialSelect" required>
-                        <option value="Paper">Paper / Cardboard</option>
-                        <option value="Plastic PET">Plastic PET Bottles</option>
-                        <option value="Aluminum Cans">Aluminum Cans</option>
-                        <option value="Used Cooking Oil">Used Cooking Oil</option>
+                        <option value="" disabled selected>Select a material...</option>
+                        
+                        <optgroup label="Plastics">
+                            <option value="PET Plastic Bottles">PET Plastic Bottles</option>
+                            <option value="HDPE Detergent Containers">HDPE Detergent Containers</option>
+                        </optgroup>
+                        
+                        <optgroup label="Paper">
+                            <option value="Corrugated Cardboard">Corrugated Cardboard</option>
+                        </optgroup>
+                        
+                        <optgroup label="Metals">
+                            <option value="Aluminum Drink Cans">Aluminum Drink Cans</option>
+                            <option value="Copper Wiring (Bare)">Copper Wiring (Bare)</option>
+                        </optgroup>
+                        
+                        <optgroup label="Oil">
+                            <option value="Used Cooking Oil (UCO)">Used Cooking Oil (UCO)</option>
+                        </optgroup>
                     </select>
                 </div>
 
