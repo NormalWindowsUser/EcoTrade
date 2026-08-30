@@ -6,8 +6,8 @@
     
     <title>EcoTrade - Community</title>
     
-    <!-- Browser Tab Icon -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>♻️</text></svg>">
+    <!-- Browser Tab Icon (Clean Recycling Arrow SVG) -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2310b981' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67'/></svg>">
     
     <!-- Google Fonts: Geist -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -111,7 +111,7 @@
             color: #10b981;
         }
 
-        /* FLOATING GLASS NAVIGATION */
+        /* FLOATING NAVIGATION */
         .bottom-nav-container {
             position: fixed;
             bottom: 20px;
@@ -200,15 +200,16 @@
             transition: background-color 0.2s ease, border-color 0.2s ease;
         }
 
-        /* STAT ICON CONTAINER FIX */
+        /* STAT ICON WRAPPER FIX */
         .stat-icon-wrapper {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
             background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
             flex-shrink: 0;
         }
 
@@ -267,337 +268,10 @@
 
     <header class="header-bar">
         <a href="/" class="brand-logo text-decoration-none d-flex align-items-center gap-2">
-            <i class="bi bi-recycle text-success" style="font-size: 1.5rem;"></i>
-            <span class="fs-5 fw-bold" style="color: var(--text-color);">EcoTrade</span>
-        </a>
-
-        <div class="d-flex align-items-center gap-2">
-            {% if session.get('user_id') %}
-                <span class="badge bg-dark border border-secondary text-light px-2 py-1 small me-1">
-                    <i class="bi bi-person-circle text-success me-1"></i> {{ session.get('user_name') }}
-                </span>
-                <a href="/logout" class="btn btn-outline-danger btn-sm rounded-pill px-3 py-1" style="font-size: 0.75rem;">
-                    <i class="bi bi-box-arrow-right"></i> Logout
-                </a>
-            {% else %}
-                <a href="/login" class="btn btn-outline-success btn-sm rounded-pill px-3 py-1" style="font-size: 0.75rem;">Log In</a>
-            {% endif %}
-
-            <button id="themeToggleBtn" class="theme-toggle-btn ms-1" onclick="toggleTheme()">
-                <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
-                <span id="themeLabel">Dark</span>
-            </button>
-        </div>
-    </header>
-
-    <main class="container py-3" style="max-width: 960px;">
-        {% block content %}{% endblock %}
-    </main>
-
-    <div class="bottom-nav-container">
-        <nav class="bottom-nav">
-            <a href="/" class="nav-btn {% if request.path == '/' %}active{% endif %}">
-                <i class="bi bi-house-door"></i>
-                <span>HOME</span>
-            </a>
-
-            <a href="/activity" class="nav-btn nav-btn-activity {% if request.path == '/activity' %}active{% endif %}">
-                <i class="bi bi-clock-history"></i>
-                <span>ACTIVITY</span>
-            </a>
-
-            {% if session.get('user_role') == 'admin' %}
-            <a href="/admin" class="nav-btn {% if request.path == '/admin' %}active{% endif %}">
-                <i class="bi bi-shield-check"></i>
-                <span>ADMIN</span>
-            </a>
-            {% endif %}
-
-            <a href="/contribute" class="nav-btn {% if request.path == '/contribute' %}active{% endif %}">
-                <i class="bi bi-plus-circle"></i>
-                <span>CONTRIBUTE</span>
-            </a>
-            <a href="/chat" class="nav-btn {% if request.path == '/chat' %}active{% endif %}">
-                <i class="bi bi-robot"></i>
-                <span>AI CHAT</span>
-            </a>
-            <a href="/account" class="nav-btn {% if request.path == '/account' %}active{% endif %}">
-                <i class="bi bi-person"></i>
-                <span>ACCOUNT</span>
-            </a>
-        </nav>
-    </div>
-
-    <script>
-        (function initTheme() {
-            const savedTheme = localStorage.getItem('ecotrade-theme');
-            if (savedTheme === 'dark') {
-                document.body.classList.remove('light-mode');
-                document.documentElement.setAttribute('data-bs-theme', 'dark');
-                updateThemeUI(false);
-            } else {
-                document.body.classList.add('light-mode');
-                document.documentElement.setAttribute('data-bs-theme', 'light');
-                updateThemeUI(true);
-            }
-        })();
-
-        function toggleTheme() {
-            const isLight = document.body.classList.toggle('light-mode');
-            const themeMode = isLight ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-bs-theme', themeMode);
-            localStorage.setItem('ecotrade-theme', themeMode);
-            updateThemeUI(isLight);
-        }
-
-        function updateThemeUI(isLight) {
-            const icon = document.getElementById('themeIcon');
-            const label = document.getElementById('themeLabel');
-            if (isLight) {
-                icon.className = 'bi bi-moon-stars-fill';
-                label.innerText = 'Dark';
-            } else {
-                icon.className = 'bi bi-sun-fill';
-                label.innerText = 'Light';
-            }
-        }
-    </script>
-
-</body>
-</html>            --bs-card-bg: var(--card-bg);
-            --bs-border-color: var(--border-color);
-            --bs-tertiary-bg: #1e293b;
-            --bs-secondary-bg: #374151;
-            --bs-secondary-color: var(--text-muted);
-        }
-
-        /* LIGHT MODE OVERRIDES */
-        body.light-mode {
-            --bg-color: #f8fafc;
-            --header-bg: #ffffff;
-            --card-bg: #ffffff;
-            --border-color: #e2e8f0;
-            --text-color: #0f172a;
-            --text-muted: #64748b;
-            --nav-bg: rgba(255, 255, 255, 0.85);
-            --nav-border: rgba(0, 0, 0, 0.12);
-            --nav-text: #475569;
-            --input-bg: #ffffff;
-            --input-text: #0f172a;
-
-            --bs-body-bg: var(--bg-color);
-            --bs-body-color: var(--text-color);
-            --bs-card-bg: var(--card-bg);
-            --bs-border-color: var(--border-color);
-            --bs-tertiary-bg: #f1f5f9;
-            --bs-secondary-bg: #e2e8f0;
-            --bs-secondary-color: var(--text-muted);
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: 'Geist', 'Segoe UI', system-ui, -apple-system, sans-serif;
-            padding-bottom: 140px;
-            transition: background-color 0.2s ease, color 0.2s ease;
-        }
-
-        h1, h2, h3, h4, h5, h6 {
-            color: var(--text-color);
-        }
-
-        .header-bar {
-            background: var(--header-bg);
-            border-bottom: 1px solid var(--border-color);
-            padding: 0.75rem 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: background-color 0.2s ease, border-color 0.2s ease;
-        }
-
-        .brand-logo {
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-        }
-
-        .theme-toggle-btn {
-            background: transparent;
-            border: 1px solid var(--border-color);
-            color: var(--text-color);
-            border-radius: 50px;
-            padding: 4px 12px;
-            font-size: 0.8rem;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .theme-toggle-btn:hover {
-            border-color: #10b981;
-            color: #10b981;
-        }
-
-        /* FLOATING GLASS NAVIGATION */
-        .bottom-nav-container {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1050;
-            width: auto;
-            transition: all 0.2s ease;
-        }
-
-        .bottom-nav {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.4rem;
-            background: var(--nav-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            padding: 6px 6px;
-            border-radius: 50px;
-            border: 1px solid var(--nav-border);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            transition: background 0.2s ease, border-color 0.2s ease;
-        }
-
-        .nav-btn {
-            flex: 1 1 0px;
-            min-width: 85px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: var(--nav-text);
-            text-decoration: none;
-            font-size: 0.65rem;
-            font-weight: 600;
-            padding: 6px 16px;
-            border-radius: 50px !important;
-            transition: all 0.2s ease;
-            text-align: center;
-            white-space: nowrap;
-        }
-
-        .nav-btn-activity {
-            display: none !important;
-        }
-
-        .nav-btn i {
-            font-size: 1.1rem;
-            margin-bottom: 2px;
-        }
-
-        .nav-btn:hover, .nav-btn.active {
-            color: #10b981;
-            background: rgba(16, 185, 129, 0.12);
-        }
-
-        @media (max-width: 576px) {
-            .bottom-nav-container {
-                bottom: 0;
-                left: 0;
-                transform: none;
-                width: 100%;
-            }
-
-            .bottom-nav {
-                border-radius: 0;
-                border-left: none;
-                border-right: none;
-                border-bottom: none;
-                justify-content: space-around;
-                padding: 8px 4px;
-                gap: 2px;
-            }
-
-            .nav-btn {
-                min-width: 0;
-                padding: 6px 8px;
-            }
-        }
-
-        .card-custom {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            transition: background-color 0.2s ease, border-color 0.2s ease;
-        }
-
-        /* STAT ICON CONTAINER FIX */
-        .stat-icon-wrapper {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            background: rgba(16, 185, 129, 0.1);
-            flex-shrink: 0;
-        }
-
-        /* DYNAMIC UTILITY OVERRIDES */
-        .text-muted, .text-secondary {
-            color: var(--text-muted) !important;
-        }
-        .text-light {
-            color: var(--text-color) !important;
-        }
-        .bg-dark {
-            background-color: var(--card-bg) !important;
-        }
-        .border-secondary {
-            border-color: var(--border-color) !important;
-        }
-        
-        .form-control, .form-select {
-            background-color: var(--input-bg) !important;
-            color: var(--input-text) !important;
-            border-color: var(--border-color) !important;
-        }
-        .form-control::placeholder {
-            color: var(--text-muted) !important;
-            opacity: 0.7;
-        }
-
-        /* ALWAYS-VISIBLE WEIGHT STEPPER CONTROLS */
-        .show-stepper-always,
-        .weight-input-container .btn-stepper,
-        .weight-control-btn,
-        input[type="number"]::-webkit-inner-spin-button,
-        input[type="number"]::-webkit-outer-spin-button {
-            opacity: 1 !important;
-            visibility: visible !important;
-            display: inline-flex !important;
-        }
-
-        /* Table Overrides */
-        .table {
-            color: var(--text-color) !important;
-            border-color: var(--border-color) !important;
-        }
-        .table th, .table td {
-            background-color: var(--card-bg) !important;
-            color: var(--text-color) !important;
-            border-color: var(--border-color) !important;
-        }
-        .table-hover tbody tr:hover td {
-            background-color: var(--bg-color) !important;
-            color: var(--text-color) !important;
-        }
-    </style>
-</head>
-<body class="light-mode">
-
-    <header class="header-bar">
-        <a href="/" class="brand-logo text-decoration-none d-flex align-items-center gap-2">
-            <i class="bi bi-recycle text-success" style="font-size: 1.5rem;"></i>
+            <!-- Updated Brand Icon to Circular Arrow -->
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+            </svg>
             <span class="fs-5 fw-bold" style="color: var(--text-color);">EcoTrade</span>
         </a>
 
