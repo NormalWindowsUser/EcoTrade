@@ -4,8 +4,8 @@
 <!-- Include Marked.js to render AI Markdown responses into HTML -->
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-<!-- Added pb-5 and mb-5 to clear the floating bottom navigation bar -->
-<div class="container py-4 pb-5 mb-5">
+<!-- Increased bottom padding/margin explicitly to clear the floating nav bar -->
+<div class="container py-4" style="padding-bottom: 120px !important;">
     <div class="row justify-content-center">
         <div class="col-lg-8 col-md-10">
             <!-- Main Chat Card -->
@@ -28,8 +28,8 @@
                 </div>
                 
                 <!-- Chat History Area -->
-                <!-- Adjusted height using calc() to ensure it fits the screen without being pushed behind the bottom nav -->
-                <div id="chatBox" class="card-body p-3 custom-scrollbar" style="height: calc(100vh - 320px); min-height: 350px; overflow-y: auto; background-color: #f8f9fa;">
+                <!-- Adjusted calculation to leave more room for the input and bottom nav -->
+                <div id="chatBox" class="card-body p-3 custom-scrollbar" style="height: calc(100vh - 340px); min-height: 350px; overflow-y: auto; background-color: #f8f9fa;">
                     <div class="text-center mt-4" id="defaultWelcome">
                         <div class="badge bg-secondary bg-opacity-10 text-dark border px-3 py-2 rounded-pill mb-2">
                             👋 Welcome!
