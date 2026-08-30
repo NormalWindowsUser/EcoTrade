@@ -1,24 +1,47 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- Include Marked.js to render AI Markdown responses into HTML -->
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card-custom p-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h3 class="fw-bold text-success mb-0"><i class="bi bi-robot"></i> AI Eco Assistant</h3>
-                <button class="btn btn-outline-danger btn-sm" id="clearBtn"><i class="bi bi-trash"></i> Clear Chat</button>
-            </div>
-            
-            <div id="chatBox" class="p-3 mb-3 bg-dark rounded border border-secondary" style="height: 380px; overflow-y: auto;">
-                <p class="text-secondary small mb-0" id="defaultWelcome">Ask questions about material prices, preparation tips, or recycling impact!</p>
-            </div>
-            
-            <div class="input-group">
-                <input type="text" id="chatInput" class="form-control bg-dark text-light border-secondary" placeholder="Ask AI anything about recycling...">
-                <button class="btn btn-success fw-bold px-4" id="sendBtn">Send</button>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="card bg-dark border-secondary shadow-lg rounded-4 overflow-hidden">
+                
+                <div class="card-header bg-dark border-bottom border-secondary p-4 d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="bg-success rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                            <i class="bi bi-robot text-white fs-5"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold text-success mb-0">Eco Assistant</h5>
+                            <small class="text-secondary">AI-powered recycling guide</small>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline-danger btn-sm rounded-pill px-3" id="clearBtn">
+                        <i class="bi bi-trash me-1"></i> Clear
+                    </button>
+                </div>
+                
+                <div id="chatBox" class="card-body p-4 custom-scrollbar bg-opacity-50" style="height: 60vh; min-height: 400px; overflow-y: auto;">
+                    <div class="text-center mt-4" id="defaultWelcome">
+                        <div class="badge bg-secondary bg-opacity-25 text-light px-3 py-2 rounded-pill mb-2">
+                            👋 Welcome!
+                        </div>
+                        <p class="text-secondary small">Ask questions about material prices, preparation tips, or recycling impact!</p>
+                    </div>
+                </div>
+                
+                <div class="card-footer bg-dark border-top border-secondary p-3 p-md-4">
+                    <div class="input-group input-group-lg shadow-sm rounded-pill overflow-hidden border border-secondary focus-ring-container">
+                        <input type="text" id="chatInput" class="form-control bg-dark text-light border-0 shadow-none px-4" placeholder="Ask AI anything about recycling...">
+                        <button class="btn btn-success fw-bold px-4 px-md-5" id="sendBtn">
+                            <i class="bi bi-send-fill d-md-none"></i>
+                            <span class="d-none d-md-inline">Send</span>
+                        </button>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -51,17 +74,20 @@
                     renderAiBubble(item.content);
                 }
             });
-            const box = document.getElementById('chatBox');
-            box.scrollTop = box.scrollHeight;
+            scrollToBottom();
         }
+    }
+
+    function scrollToBottom() {
+        const box = document.getElementById('chatBox');
+        box.scrollTop = box.scrollHeight;
     }
 
     function renderUserBubble(text) {
         const box = document.getElementById('chatBox');
         box.innerHTML += `
-            <div class="mb-3 text-end">
-                <span class="badge bg-secondary mb-1">You</span>
-                <div class="p-2 px-3 bg-secondary bg-opacity-20 rounded text-light d-inline-block text-start" style="max-width: 85%;">
+            <div class="d-flex justify-content-end mb-4 animate-fade-in">
+                <div class="user-bubble p-3 bg-success bg-opacity-25 border border-success border-opacity-50 text-light shadow-sm" style="max-width: 80%;">
                     ${escapeHtml(text)}
                 </div>
             </div>
@@ -72,9 +98,8 @@
         const box = document.getElementById('chatBox');
         const parsedHtml = marked.parse(markdownContent);
         box.innerHTML += `
-            <div class="mb-3 text-start">
-                <span class="badge bg-success mb-1"><i class="bi bi-robot"></i> Eco AI</span>
-                <div class="p-3 bg-dark border border-secondary rounded text-light ai-reply-content">
+            <div class="d-flex justify-content-start mb-4 animate-fade-in">
+                <div class="ai-bubble p-3 bg-secondary bg-opacity-25 border border-secondary text-light shadow-sm ai-reply-content" style="max-width: 85%;">
                     ${parsedHtml}
                 </div>
             </div>
@@ -96,23 +121,22 @@
         saveMessageToHistory('user', userMsg);
 
         input.value = '';
-        box.scrollTop = box.scrollHeight;
+        scrollToBottom();
 
         // Render Animated Thinking Indicator
         const loadingId = 'loading-' + Date.now();
         box.innerHTML += `
-            <div id="${loadingId}" class="mb-3 text-start">
-                <span class="badge bg-success mb-1"><i class="bi bi-robot spin-icon"></i> Eco AI</span>
-                <div class="p-2 px-3 bg-dark border border-secondary rounded text-light d-inline-block thinking-bubble">
+            <div id="${loadingId}" class="d-flex justify-content-start mb-4 animate-fade-in">
+                <div class="ai-bubble p-3 bg-secondary bg-opacity-25 border border-secondary text-light shadow-sm thinking-bubble">
                     <span class="spinner-grow spinner-grow-sm text-success me-2" role="status"></span>
-                    <span class="text-secondary small me-1">Thinking</span>
+                    <span class="text-secondary small me-1">Eco AI is thinking</span>
                     <span class="typing-dots">
                         <span>.</span><span>.</span><span>.</span>
                     </span>
                 </div>
             </div>
         `;
-        box.scrollTop = box.scrollHeight;
+        scrollToBottom();
 
         try {
             const res = await fetch('/api/chat', {
@@ -130,20 +154,20 @@
                 saveMessageToHistory('ai', data.reply);
             } else {
                 box.innerHTML += `
-                    <div class="mb-3 text-start">
-                        <div class="alert alert-danger py-2 small mb-0">${data.reply || 'AI service error.'}</div>
+                    <div class="d-flex justify-content-center mb-4">
+                        <div class="alert alert-danger py-2 small mb-0 rounded-pill shadow-sm">${data.reply || 'AI service error.'}</div>
                     </div>
                 `;
             }
         } catch (err) {
             document.getElementById(loadingId)?.remove();
             box.innerHTML += `
-                <div class="mb-3 text-start">
-                    <div class="alert alert-danger py-2 small mb-0">Connection error. Please try again.</div>
+                <div class="d-flex justify-content-center mb-4">
+                    <div class="alert alert-danger py-2 small mb-0 rounded-pill shadow-sm"><i class="bi bi-exclamation-triangle"></i> Connection error. Please try again.</div>
                 </div>
             `;
         }
-        box.scrollTop = box.scrollHeight;
+        scrollToBottom();
     }
 
     function escapeHtml(str) {
@@ -162,40 +186,107 @@
     document.getElementById('clearBtn').addEventListener('click', () => {
         localStorage.removeItem(STORAGE_KEY);
         document.getElementById('chatBox').innerHTML = `
-            <p class="text-secondary small mb-0" id="defaultWelcome">Ask questions about material prices, preparation tips, or recycling impact!</p>
+            <div class="text-center mt-4" id="defaultWelcome">
+                <div class="badge bg-secondary bg-opacity-25 text-light px-3 py-2 rounded-pill mb-2">
+                    👋 Welcome!
+                </div>
+                <p class="text-secondary small">Ask questions about material prices, preparation tips, or recycling impact!</p>
+            </div>
         `;
     });
 </script>
 
 <style>
-    /* Styling for rendered AI Markdown content */
+    /* --- Modern Chat Bubble Shapes --- */
+    .user-bubble {
+        border-radius: 1.2rem 1.2rem 0.2rem 1.2rem; /* Square bottom-right */
+    }
+    .ai-bubble {
+        border-radius: 1.2rem 1.2rem 1.2rem 0.2rem; /* Square bottom-left */
+    }
+
+    /* --- Custom Scrollbar for Chatbox --- */
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background-color: #495057;
+        border-radius: 10px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background-color: #6c757d;
+    }
+
+    /* --- Input Focus Ring Styling --- */
+    .focus-ring-container:focus-within {
+        border-color: #198754 !important;
+        box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25) !important;
+        transition: all 0.3s ease;
+    }
+
+    /* --- Fade-in Animation for New Messages --- */
+    .animate-fade-in {
+        animation: fadeIn 0.3s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* --- Styling for rendered AI Markdown content --- */
+    .ai-reply-content {
+        line-height: 1.6;
+    }
     .ai-reply-content p:last-child {
         margin-bottom: 0;
     }
     .ai-reply-content ul, .ai-reply-content ol {
-        padding-left: 1.25rem;
-        margin-bottom: 0.5rem;
+        padding-left: 1.5rem;
+        margin-bottom: 0.75rem;
     }
-    .ai-reply-content h1, .ai-reply-content h2, .ai-reply-content h3, .ai-reply-content h4 {
-        font-size: 1rem;
-        font-weight: bold;
-        color: #198754;
-        margin-top: 0.5rem;
+    .ai-reply-content li {
         margin-bottom: 0.25rem;
     }
+    .ai-reply-content h1, .ai-reply-content h2, .ai-reply-content h3, .ai-reply-content h4 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #198754;
+        margin-top: 1rem;
+        margin-bottom: 0.5rem;
+    }
+    .ai-reply-content h1:first-child, .ai-reply-content h2:first-child, .ai-reply-content h3:first-child {
+        margin-top: 0;
+    }
     .ai-reply-content hr {
-        margin: 0.5rem 0;
-        border-color: #495057;
+        margin: 1rem 0;
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+    .ai-reply-content code {
+        background-color: rgba(0,0,0,0.3);
+        padding: 0.2rem 0.4rem;
+        border-radius: 0.3rem;
+        color: #e83e8c;
+    }
+    .ai-reply-content pre {
+        background-color: #1a1d20;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        overflow-x: auto;
+        border: 1px solid #495057;
+    }
+    .ai-reply-content pre code {
+        background-color: transparent;
+        padding: 0;
+        color: inherit;
     }
 
-    /* Thinking state animation styles */
+    /* --- Thinking state animation styles --- */
     .thinking-bubble {
-        animation: pulseBorder 1.5s infinite ease-in-out;
-    }
-
-    .spin-icon {
-        display: inline-block;
-        animation: subtleRotate 2s infinite linear;
+        animation: pulseBorder 2s infinite ease-in-out;
     }
 
     .typing-dots span {
@@ -215,20 +306,13 @@
 
     @keyframes pulseBorder {
         0%, 100% {
-            border-color: #495057 !important;
-            box-shadow: 0 0 0 0 rgba(25, 135, 84, 0.2);
+            border-color: #495057;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         50% {
-            border-color: #198754 !important;
-            box-shadow: 0 0 8px 0 rgba(25, 135, 84, 0.4);
+            border-color: #198754;
+            box-shadow: 0 0 10px rgba(25, 135, 84, 0.3);
         }
-    }
-
-    @keyframes subtleRotate {
-        0% { transform: rotate(0deg); }
-        25% { transform: rotate(-10deg); }
-        75% { transform: rotate(10deg); }
-        100% { transform: rotate(0deg); }
     }
 
     @keyframes waveDots {
