@@ -209,7 +209,6 @@
         border: 1px dashed rgba(16, 185, 129, 0.3);
     }
 
-    /* Shared Scrollable List UI for Hubs & Contributions */
     .scroll-container {
         background: var(--card-bg);
         border: 1px solid var(--border-color);
@@ -347,8 +346,7 @@
 
 <!-- Materials Display -->
 <div class="section-title">
-    <span>Accepted Materials & User-Reported Live Rates</span>
-    <span class="sub-text" id="rate-summary-tag">Based on community reports</span>
+    <span>Accepted Materials & Live Rates</span>
 </div>
 <div class="grid-container" id="materials-list">
     <p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); font-size: 0.85rem;">Loading material rates...</p>
@@ -396,17 +394,15 @@
 <script>
     // Global States
     let currentMaterialsData = [];
-    
     let currentHubsData = [];
     let hubDisplayLimit = 10;
-    
     let allContributions = [];
     let filteredContributions = [];
     let contribDisplayLimit = 10;
 
     // --- Helper function for dynamic DB time ---
     function formatTimeAgo(seconds) {
-        if (!seconds && seconds !== 0) return "Just now"; // fallback if null
+        if (!seconds && seconds !== 0) return "Just now";
         if (seconds < 60) return `${Math.floor(seconds)} secs ago`;
         const minutes = Math.floor(seconds / 60);
         if (minutes < 60) return `${minutes} mins ago`;
@@ -432,6 +428,7 @@
         }
     }
 
+    // Aligned with `materials` table schema
     async function fetchMaterials() {
         const city = document.getElementById('filter-city').value;
         const hubId = document.getElementById('filter-hub').value;
@@ -462,24 +459,23 @@
 
         if (currentMaterialsData.length > 0) {
             container.innerHTML = currentMaterialsData.map(m => {
-                const estimatedPayout = (m.avg_reported_rate * weightInput).toFixed(2);
-                const reportBadge = m.report_count > 0 
-                    ? `<span class="badge bg-secondary ms-1">${m.report_count} user report${m.report_count > 1 ? 's' : ''}</span>`
-                    : `<span class="badge bg-dark border border-secondary text-secondary ms-1">Base Rate</span>`;
+                // Using exact schema columns: price_per_kg, name, category, preparation_tips, unit
+                const price = parseFloat(m.price_per_kg) || 0;
+                const estimatedPayout = (price * weightInput).toFixed(2);
 
                 return `
                     <div class="info-card">
                         <div>
                             <h4>${m.name}</h4>
-                            <p><strong>Category:</strong> ${m.category}</p>
-                            <p>${m.tips || 'Clean and prepare materials prior to drop-off.'}</p>
+                            <p><strong>Category:</strong> ${m.category || 'N/A'}</p>
+                            <p>${m.preparation_tips || 'Clean and prepare materials prior to drop-off.'}</p>
                         </div>
                         <div>
                             <div class="price-badge">
-                                RM ${m.avg_reported_rate.toFixed(2)} / kg ${reportBadge}
+                                RM ${price.toFixed(2)} / ${m.unit || 'kg'}
                             </div>
                             <div class="payout-estimate-box">
-                                <small class="text-muted d-block">Estimated Payout for <strong>${weightInput} kg</strong>:</small>
+                                <small class="text-muted d-block">Estimated Payout for <strong>${weightInput} ${m.unit || 'kg'}</strong>:</small>
                                 <span class="fw-bold text-success fs-6">RM ${estimatedPayout}</span>
                             </div>
                         </div>
@@ -491,7 +487,7 @@
         }
     }
 
-    // --- Hubs Functions ---
+    // Aligned with `recycling_hubs` table schema
     async function fetchHubs(city = '') {
         try {
             const url = city ? `/api/hubs?city=${encodeURIComponent(city)}` : '/api/hubs';
@@ -516,7 +512,8 @@
                 data.data.forEach(h => {
                     const opt = document.createElement('option');
                     opt.value = h.id;
-                    opt.textContent = `${h.name} (${h.city})`;
+                    // Using hub_name from schema
+                    opt.textContent = `${h.hub_name} (${h.city})`;
                     hubSelect.appendChild(opt);
                 });
                 if (previousHubValue) hubSelect.value = previousHubValue;
@@ -549,12 +546,14 @@
         container.innerHTML = toDisplay.map(h => `
             <div class="list-row-item">
                 <div class="list-details">
-                    <h6>${h.name}</h6>
+                    <!-- Using hub_name from recycling_hubs -->
+                    <h6>${h.hub_name}</h6>
                     <p>📍 ${h.address}, ${h.city}</p>
                 </div>
                 <div class="list-right-col">
-                    <div style="margin-bottom: 0.15rem;">🕒 ${h.hours || 'N/A'}</div>
-                    <div>📞 ${h.phone || 'N/A'}</div>
+                    <!-- Using operating_hours and contact_phone from recycling_hubs -->
+                    <div style="margin-bottom: 0.15rem;">🕒 ${h.operating_hours || 'N/A'}</div>
+                    <div>📞 ${h.contact_phone || 'N/A'}</div>
                 </div>
             </div>
         `).join('');
@@ -566,7 +565,8 @@
         }
     }
 
-    // --- Contributions Feed Functions (Updated to reflect SQL schema) ---
+    // Aligned with `contributions` table schema 
+    // Assumes SQL query joins: `materials.name as name` and `recycling_hubs.hub_name as hub_name`
     async function fetchRecentContributions() {
         try {
             const res = await fetch('/api/recent_contributions');
@@ -574,21 +574,19 @@
                 const data = await res.json();
                 if (data.status === 'success') {
                     allContributions = data.data.map(c => {
-                        // Calculate elapsed time securely parsing DB 'created_at' to UTC
                         let secondsAgo = c.seconds_ago;
                         if (secondsAgo === undefined && c.created_at) {
-                            // Replace space with 'T' and ensure it ends with 'Z' for UTC parsing
                             let dateStr = c.created_at.replace(' ', 'T');
                             if (!dateStr.endsWith('Z')) dateStr += 'Z';
                             secondsAgo = (Date.now() - new Date(dateStr).getTime()) / 1000;
                         }
 
                         return {
-                            material_name: c.material_name || c.name || 'Unknown Material',
+                            material_name: c.name || c.material_name || 'Unknown Material',
                             hub_name: c.hub_name || 'Unknown Hub',
-                            weight: parseFloat(c.weight_kg || c.weight || 0).toFixed(1),
-                            payout: parseFloat(c.calculated_payout || c.payout || 0).toFixed(2),
-                            status: c.status || 'pending',
+                            weight: parseFloat(c.weight_kg || 0).toFixed(1), // From contributions.weight_kg
+                            payout: parseFloat(c.calculated_payout || 0).toFixed(2), // From contributions.calculated_payout
+                            status: c.status || 'pending', // From contributions.status
                             time_ago: formatTimeAgo(secondsAgo)
                         };
                     });
@@ -596,7 +594,7 @@
                     allContributions = generateMockContributions();
                 }
             } else {
-                allContributions = generateMockContributions(); // Fallback for local testing
+                allContributions = generateMockContributions(); 
             }
         } catch (err) {
             allContributions = generateMockContributions();
@@ -612,17 +610,16 @@
         for(let i = 0; i < 45; i++) {
             let weight = (Math.random() * 8 + 0.5).toFixed(1);
             let payout = (weight * 0.8).toFixed(2);
-            let randomSecondsAgo = Math.floor(Math.random() * 86400); // within the last 24 hrs
-            
-            // Format to match PostgreSQL "timestamp without time zone" style
+            let randomSecondsAgo = Math.floor(Math.random() * 86400); 
             let pastDateStr = new Date(Date.now() - randomSecondsAgo * 1000).toISOString().replace('T', ' ').substring(0, 19);
             
+            // Mock objects formatted to map exactly to the joined backend response expectation
             mock.push({
-                material_name: mats[Math.floor(Math.random() * mats.length)],
-                hub_name: hubs[Math.floor(Math.random() * hubs.length)],
+                name: mats[Math.floor(Math.random() * mats.length)], // joined from materials
+                hub_name: hubs[Math.floor(Math.random() * hubs.length)], // joined from recycling_hubs
                 weight_kg: weight,
                 calculated_payout: payout,
-                status: Math.random() > 0.8 ? 'pending' : 'completed', // Randomize status
+                status: Math.random() > 0.8 ? 'pending' : 'completed',
                 created_at: pastDateStr
             });
         }
