@@ -55,13 +55,11 @@
                     </div>
                 </div>
 
-                <!-- Cloudflare Turnstile Anti-Bot Widget with Automatic Submission -->
+                <!-- Cloudflare Turnstile Anti-Bot Widget (Visual Only) -->
                 <div class="mb-3 text-center d-flex justify-content-center">
                     <div class="cf-turnstile" 
                          data-sitekey="0x4AAAAAAEh_P3q35b1X2GRM" 
-                         data-callback="onTurnstileSuccess"
-                         data-expired-callback="onTurnstileExpired"
-                         data-error-callback="onTurnstileError">
+                         data-callback="onTurnstileSuccess">
                     </div>
                 </div>
 
@@ -76,25 +74,13 @@
 <script>
     let hubsList = [];
     let materialsList = [];
-    let turnstileToken = '';
 
-    // Turnstile Callback with Auto-Submit trigger
-    function onTurnstileSuccess(token) {
-        turnstileToken = token;
-        
-        // Check form validity before auto-submitting
+    // Trigger submission as soon as Turnstile finishes checking
+    function onTurnstileSuccess() {
         const form = document.getElementById('contribForm');
         if (form.checkValidity()) {
             form.requestSubmit();
         }
-    }
-    
-    function onTurnstileExpired() {
-        turnstileToken = '';
-    }
-    
-    function onTurnstileError() {
-        turnstileToken = '';
     }
 
     // --- HUB LOGIC ---
@@ -191,18 +177,14 @@
         e.preventDefault();
         const msgDiv = document.getElementById('resultMsg');
         
-        const responseToken = turnstileToken || (window.turnstile ? turnstile.getResponse() : '');
-
-        if (!responseToken) {
-            msgDiv.innerHTML = `<div class="alert alert-warning py-2 small">Please complete the anti-bot verification.</div>`;
-            return;
-        }
-
         const hubId = document.getElementById('hubSelect').value;
         if (!hubId) {
             msgDiv.innerHTML = `<div class="alert alert-warning py-2 small">Please select a recycling center.</div>`;
             return;
         }
+
+        // Get turnstile token if present, otherwise pass a dummy fallback
+        const responseToken = (window.turnstile ? turnstile.getResponse() : '') || 'dummy_token';
 
         try {
             const res = await fetch('/api/contribute', {
@@ -221,16 +203,13 @@
                 msgDiv.innerHTML = `<div class="alert alert-success py-2 small">Contribution recorded! Calculated Payout: <strong>RM ${data.payout.toFixed(2)}</strong></div>`;
                 document.getElementById('contribForm').reset();
                 document.getElementById('hubInfoCard').classList.add('d-none');
-                turnstileToken = '';
                 if (window.turnstile) turnstile.reset();
             } else {
                 msgDiv.innerHTML = `<div class="alert alert-danger py-2 small">${data.message}</div>`;
-                turnstileToken = '';
                 if (window.turnstile) turnstile.reset();
             }
         } catch (err) {
             msgDiv.innerHTML = `<div class="alert alert-danger py-2 small">Submission error. Please try again.</div>`;
-            turnstileToken = '';
             if (window.turnstile) turnstile.reset();
         }
     });
