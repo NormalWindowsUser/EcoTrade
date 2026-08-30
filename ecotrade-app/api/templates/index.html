@@ -2,141 +2,174 @@
 
 {% block content %}
 <style>
+    /* Hero Section */
     .hero {
-        background: var(--card-bg, #111827);
-        border-radius: 12px;
-        padding: 2rem 1.5rem;
         text-align: center;
-        margin-bottom: 1.5rem;
-        border: 1px solid var(--border-color, #1f2937);
-        transition: background-color 0.2s ease, border-color 0.2s ease;
+        padding: 2.5rem 1rem 1.5rem;
+        background: transparent;
+        border: none;
+    }
+
+    .hero-title-container {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .hero-icon {
+        width: 2.2rem;
+        height: 2.2rem;
+        color: #10b981;
     }
 
     .hero h1 {
-        font-size: 1.9rem;
-        font-weight: 700;
-        color: #10b981;
-        margin-bottom: 0.5rem;
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: var(--text-color, #0f172a);
+        margin: 0;
+        letter-spacing: -0.02em;
     }
 
     .hero p {
         font-size: 0.95rem;
-        color: var(--text-muted, #94a3b8);
+        color: var(--text-muted, #64748b);
         max-width: 600px;
-        margin: 0 auto 1.25rem;
+        margin: 0 auto 1.5rem;
     }
 
     .cta-buttons {
         display: flex;
         justify-content: center;
-        gap: 0.75rem;
+        align-items: center;
     }
 
-    .btn-custom-primary {
-        background-color: #10b981;
-        color: #ffffff;
-        font-weight: 700;
-        padding: 0.5rem 1.25rem;
+    .pill-btn-group {
+        display: inline-flex;
+        align-items: center;
+        background: var(--card-bg, #1e293b);
+        padding: 4px 6px 4px 14px;
         border-radius: 50px;
+        border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+        gap: 8px;
         text-decoration: none;
-        transition: all 0.2s ease;
+        transition: transform 0.2s ease;
     }
 
-    .btn-custom-primary:hover {
-        background-color: #059669;
-        color: #ffffff;
+    .pill-btn-group:hover {
+        transform: translateY(-1px);
     }
 
-    .btn-custom-secondary {
-        background-color: rgba(16, 185, 129, 0.12);
-        color: #10b981;
+    .pill-btn-text {
+        color: var(--text-color, #f8fafc);
+        font-size: 0.85rem;
         font-weight: 600;
-        padding: 0.5rem 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .pill-btn-badge {
+        background: #10b981;
+        color: #ffffff;
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 4px 12px;
         border-radius: 50px;
-        text-decoration: none;
-        border: 1px solid rgba(16, 185, 129, 0.3);
-        transition: all 0.2s ease;
     }
 
-    .btn-custom-secondary:hover {
-        background-color: rgba(16, 185, 129, 0.2);
-        color: #10b981;
-    }
-
+    /* Stats Grid */
     .stats-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 1rem;
-        margin-bottom: 1.5rem;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.25rem;
+        margin-bottom: 2.5rem;
     }
 
     .stat-card {
-        background: var(--card-bg, #111827);
-        padding: 1.2rem 1rem;
-        border-radius: 12px;
-        text-align: center;
-        border: 1px solid var(--border-color, #1f2937);
-        transition: background-color 0.2s ease, border-color 0.2s ease;
+        background: var(--card-bg, #ffffff);
+        padding: 1.25rem 1.5rem;
+        border-radius: 16px;
+        border: 1px solid var(--border-color, #e2e8f0);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.02);
     }
 
-    .stat-card h3 {
-        font-size: 1.6rem;
-        font-weight: 700;
-        color: #10b981;
-        margin-bottom: 0.2rem;
+    .stat-icon {
+        width: 1.5rem;
+        height: 1.5rem;
+        color: var(--text-color, #334155);
+        flex-shrink: 0;
     }
 
-    .stat-card p {
-        color: var(--text-muted, #94a3b8);
-        font-size: 0.82rem;
+    .stat-content h3 {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: var(--text-color, #0f172a);
+        margin: 0 0 2px 0;
+        line-height: 1.2;
+    }
+
+    .stat-content p {
+        color: var(--text-muted, #64748b);
+        font-size: 0.8rem;
         font-weight: 500;
         margin: 0;
     }
 
-    .how-it-works {
-        background: rgba(16, 185, 129, 0.08);
-        border: 1px solid rgba(16, 185, 129, 0.2);
-        border-radius: 12px;
-        padding: 1.25rem;
-        margin-bottom: 1.75rem;
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 1.25rem;
-    }
-
-    .step-item {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
-
-    .step-number {
-        background: #10b981;
-        color: #ffffff;
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
+    /* How It Works Steps */
+    .steps-section-title {
         font-size: 0.85rem;
-        flex-shrink: 0;
-    }
-
-    .step-text h5 {
-        font-size: 0.9rem;
         font-weight: 700;
-        color: #10b981;
-        margin-bottom: 0.15rem;
+        color: var(--text-muted, #64748b);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
     }
 
-    .step-text p {
-        font-size: 0.78rem;
+    .how-it-works-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.25rem;
+        margin-bottom: 2rem;
+    }
+
+    .step-card {
+        background: var(--card-bg, #ffffff);
+        border: 1px solid var(--border-color, #e2e8f0);
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+
+    .step-label {
+        font-size: 0.75rem;
+        font-weight: 700;
         color: var(--text-muted, #94a3b8);
-        margin: 0;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        margin-bottom: 0.5rem;
     }
 
+    .step-card h5 {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: var(--text-color, #0f172a);
+        margin-bottom: 0.5rem;
+    }
+
+    .step-card p {
+        font-size: 0.85rem;
+        color: var(--text-muted, #64748b);
+        margin: 0;
+        line-height: 1.4;
+    }
+
+    /* Existing Sections Dynamic Styles */
     .section-title {
         font-size: 1.1rem;
         font-weight: 700;
@@ -154,12 +187,11 @@
     }
 
     .filter-bar {
-        background: var(--card-bg, #111827);
+        background: var(--card-bg, #ffffff);
         padding: 1rem;
-        border-radius: 10px;
-        border: 1px solid var(--border-color, #1f2937);
+        border-radius: 12px;
+        border: 1px solid var(--border-color, #e2e8f0);
         margin-bottom: 1.5rem;
-        transition: background-color 0.2s ease, border-color 0.2s ease;
     }
 
     .grid-container {
@@ -170,14 +202,13 @@
     }
 
     .info-card {
-        background: var(--card-bg, #111827);
-        border-radius: 10px;
+        background: var(--card-bg, #ffffff);
+        border-radius: 12px;
         padding: 1.1rem;
-        border: 1px solid var(--border-color, #1f2937);
+        border: 1px solid var(--border-color, #e2e8f0);
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        transition: background-color 0.2s ease, border-color 0.2s ease;
     }
 
     .info-card h4 {
@@ -214,12 +245,11 @@
     }
 
     .scroll-container {
-        background: var(--card-bg, #111827);
-        border: 1px solid var(--border-color, #1f2937);
+        background: var(--card-bg, #ffffff);
+        border: 1px solid var(--border-color, #e2e8f0);
         border-radius: 12px;
         padding: 1rem;
         margin-bottom: 1.5rem;
-        transition: background-color 0.2s ease, border-color 0.2s ease;
     }
 
     .scroll-box {
@@ -236,7 +266,7 @@
         border-radius: 10px;
     }
     .scroll-box::-webkit-scrollbar-thumb {
-        background: var(--border-color, #1f2937);
+        background: var(--border-color, #e2e8f0);
         border-radius: 10px;
     }
 
@@ -274,6 +304,22 @@
         text-align: right;
     }
 
+    .btn-custom-secondary {
+        background-color: rgba(16, 185, 129, 0.12);
+        color: #10b981;
+        font-weight: 600;
+        padding: 0.5rem 1.25rem;
+        border-radius: 50px;
+        text-decoration: none;
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        transition: all 0.2s ease;
+    }
+
+    .btn-custom-secondary:hover {
+        background-color: rgba(16, 185, 129, 0.2);
+        color: #10b981;
+    }
+
     .loading-text {
         grid-column: 1/-1;
         text-align: center;
@@ -283,55 +329,96 @@
     }
 </style>
 
+<!-- Hero Section -->
 <section class="hero">
-    <h1>Recycle Smarter, Earn Rewards</h1>
+    <div class="hero-title-container">
+        <svg class="hero-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 19H4.815a1.83 1.83 0 0 1-1.57-.91 1.78 1.78 0 0 1-.06-1.78l1.73-3c.33-.57 1-1 1.67-1h3.76m2.59 0h3.76c.67 0 1.34.43 1.67 1l1.73 3c.4.7.35 1.55-.06 1.78a1.83 1.83 0 0 1-1.57.91H17M7 19l-1.5-3m11.5 3l1.5-3M12 4.5l-2.5 4.5h5L12 4.5zm0 0V2"/>
+            <path d="M7 19l2.5-4.5M17 19l-2.5-4.5"/>
+        </svg>
+        <h1>Recycle Smarter, Earn Rewards</h1>
+    </div>
     <p>Convert household recyclables into payouts while lowering carbon emissions in Malaysia.</p>
+    
     <div class="cta-buttons">
-        <a href="/contribute" class="btn-custom-primary">Submit Recycling</a>
-        <a href="/chat" class="btn-custom-secondary">Ask AI Assistant</a>
+        <a href="/chat" class="pill-btn-group">
+            <span class="pill-btn-text">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#10b981;">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    <path d="M8 9h.01"></path>
+                    <path d="M12 9h.01"></path>
+                    <path d="M16 9h.01"></path>
+                </svg>
+                Ask Eco assistant
+            </span>
+            <span class="pill-btn-badge">Open</span>
+        </a>
     </div>
 </section>
 
+<!-- Stats Grid -->
 <section class="stats-grid">
     <div class="stat-card">
-        <h3 id="stat-weight">0.0 kg</h3>
-        <p>Total Recycled</p>
+        <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+        </svg>
+        <div class="stat-content">
+            <h3 id="stat-weight">0.0 kg</h3>
+            <p>Total Recycled</p>
+        </div>
     </div>
     <div class="stat-card">
-        <h3 id="stat-earnings">RM 0.00</h3>
-        <p>Payouts Distributed</p>
+        <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="6" width="20" height="12" rx="2"/>
+            <circle cx="12" cy="12" r="2"/>
+            <path d="M6 12h.01M18 12h.01"/>
+        </svg>
+        <div class="stat-content">
+            <h3 id="stat-earnings">RM 0.00</h3>
+            <p>Payouts Distributed</p>
+        </div>
     </div>
     <div class="stat-card">
-        <h3 id="stat-hubs">0</h3>
-        <p>Active Hubs</p>
+        <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+            <circle cx="12" cy="10" r="3"/>
+        </svg>
+        <div class="stat-content">
+            <h3 id="stat-hubs">0</h3>
+            <p>Active Hubs</p>
+        </div>
     </div>
     <div class="stat-card">
-        <h3 id="stat-co2">0.0 kg</h3>
-        <p>Estimated CO₂ Offset</p>
+        <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
+            <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+        </svg>
+        <div class="stat-content">
+            <h3 id="stat-co2">0.0 kg</h3>
+            <p>Estimated CO₂ Offset</p>
+        </div>
     </div>
 </section>
 
-<section class="how-it-works">
-    <div class="step-item">
-        <div class="step-number">1</div>
-        <div class="step-text">
-            <h5>Collect & Prepare</h5>
-            <p>Clean and categorize your paper, plastic, aluminum, or glass.</p>
-        </div>
+<!-- How It Works Steps -->
+<div class="steps-section-title">
+    <span>✦</span> Follow this steps
+</div>
+<section class="how-it-works-grid">
+    <div class="step-card">
+        <div class="step-label">Step 1</div>
+        <h5>Collect & Prepare</h5>
+        <p>Clean and categorize your paper, plastic, aluminum, or glass.</p>
     </div>
-    <div class="step-item">
-        <div class="step-number">2</div>
-        <div class="step-text">
-            <h5>Drop Off at Hub</h5>
-            <p>Bring materials to any of our registered partner locations.</p>
-        </div>
+    <div class="step-card">
+        <div class="step-label">Step 2</div>
+        <h5>Drop Off at Hub</h5>
+        <p>Bring materials to any of our registered partner locations.</p>
     </div>
-    <div class="step-item">
-        <div class="step-number">3</div>
-        <div class="step-text">
-            <h5>Get Paid</h5>
-            <p>Submit your log to earn direct digital cash payouts.</p>
-        </div>
+    <div class="step-card">
+        <div class="step-label">Step 3</div>
+        <h5>Get Paid</h5>
+        <p>Submit your log to earn direct digital cash payouts.</p>
     </div>
 </section>
 
@@ -340,25 +427,19 @@
     <div class="row g-3 align-items-center">
         <div class="col-md-4">
             <label for="filter-city" class="form-label small text-muted mb-1 fw-bold">Select City / Area</label>
-
             <select id="filter-city" class="form-select form-select-sm">
-
                 <option value="">All Cities / Areas</option>
             </select>
         </div>
         <div class="col-md-4">
             <label for="filter-hub" class="form-label small text-muted mb-1 fw-bold">Select Recycling Hub</label>
-
             <select id="filter-hub" class="form-select form-select-sm">
-
                 <option value="">All Partner Hubs</option>
             </select>
         </div>
         <div class="col-md-4">
             <label for="calc-weight" class="form-label small text-muted mb-1 fw-bold">Estimated Weight (kg)</label>
-
             <input type="number" id="calc-weight" class="form-control form-control-sm" value="1.0" min="0.1" step="0.5">
-
         </div>
     </div>
 </div>
@@ -578,7 +659,6 @@
         loadMoreBtnContainer.style.display = currentHubsData.length > hubDisplayLimit ? 'block' : 'none';
     }
 
-    // --- Strictly Database Fetch for Recent Contributions ---
     async function fetchRecentContributions() {
         const container = document.getElementById('contributions-list');
         const loadMoreBtnContainer = document.getElementById('load-more-contributions-container');
