@@ -37,20 +37,17 @@
                     </div>
                 </div>
                 
-                <!-- Input Area Container (Matching Seamless Background) -->
+                <!-- Input Area Container -->
                 <div class="card-footer chat-history-bg border-0 p-3 pt-0">
                     <div class="bg-body-tertiary border rounded-4 p-3 shadow-sm position-relative custom-input-box">
-                        <!-- Multiline Textarea Input (Transparent to match container background) -->
                         <textarea id="chatInput" class="form-control border-0 shadow-none p-0 text-body custom-textarea-bg" rows="2" placeholder="Ask AI anything about recycling..."></textarea>
                         
                         <!-- Bottom Action Row -->
                         <div class="d-flex justify-content-between align-items-center mt-2">
-                            <!-- Rounded 'X' Clear Input Button -->
                             <button class="btn btn-body-tertiary rounded-circle p-0 text-secondary border-0 icon-hover-btn d-inline-flex align-items-center justify-content-center" id="resetInputBtn" type="button" title="Clear input text" style="width: 36px; height: 36px;">
                                 <i class="bi bi-x-lg fs-6 lh-1"></i>
                             </button>
                             
-                            <!-- Circular Arrow Send Button -->
                             <button class="btn btn-success rounded-circle p-0 shadow-sm d-inline-flex align-items-center justify-content-center" id="sendBtn" type="button" title="Send message" style="width: 40px; height: 40px;">
                                 <i class="bi bi-arrow-up-short fs-3 text-white lh-1"></i>
                             </button>
@@ -66,7 +63,6 @@
 <script>
     const STORAGE_KEY = 'eco_ai_chat_history';
 
-    // Load saved messages on page load
     document.addEventListener('DOMContentLoaded', () => {
         loadSavedHistory();
     });
@@ -87,7 +83,8 @@
                 if (item.role === 'user') {
                     renderUserBubble(item.content);
                 } else if (item.role === 'ai') {
-                    renderAiBubble(item.content);
+                    // Instantly render saved history without typing effect
+                    renderAiBubble(item.content, false);
                 }
             });
             scrollToBottom();
@@ -110,16 +107,46 @@
         `;
     }
 
-    function renderAiBubble(markdownContent) {
+    // Updated renderAiBubble supporting an optional typing effect
+    function renderAiBubble(markdownContent, animate = true) {
         const box = document.getElementById('chatBox');
-        const parsedHtml = marked.parse(markdownContent);
-        box.innerHTML += `
-            <div class="d-flex justify-content-start mb-3 animate-fade-in">
-                <div class="ai-bubble p-3 bg-body border shadow-sm ai-reply-content text-body" style="max-width: 85%; font-size: 0.95rem;">
-                    ${parsedHtml}
+        const bubbleId = 'ai-msg-' + Date.now();
+        
+        if (!animate) {
+            const parsedHtml = marked.parse(markdownContent);
+            box.innerHTML += `
+                <div class="d-flex justify-content-start mb-3 animate-fade-in">
+                    <div class="ai-bubble p-3 bg-body border shadow-sm ai-reply-content text-body" style="max-width: 85%; font-size: 0.95rem;">
+                        ${parsedHtml}
+                    </div>
                 </div>
-            </div>
+            `;
+            return;
+        }
+
+        // Create empty container for typing animation
+        const wrapper = document.createElement('div');
+        wrapper.className = 'd-flex justify-content-start mb-3 animate-fade-in';
+        wrapper.innerHTML = `
+            <div id="${bubbleId}" class="ai-bubble p-3 bg-body border shadow-sm ai-reply-content text-body" style="max-width: 85%; font-size: 0.95rem;"></div>
         `;
+        box.appendChild(wrapper);
+
+        const targetElem = document.getElementById(bubbleId);
+        let index = 0;
+        const typingSpeed = 12; // Controls speed: lower = faster (12ms is fast but readable)
+
+        function typeChar() {
+            if (index < markdownContent.length) {
+                index++;
+                const currentText = markdownContent.substring(0, index);
+                targetElem.innerHTML = marked.parse(currentText);
+                scrollToBottom();
+                setTimeout(typeChar, typingSpeed);
+            }
+        }
+
+        typeChar();
     }
 
     async function sendMessage() {
@@ -132,14 +159,12 @@
 
         const userMsg = input.value.trim();
         
-        // Render & Save User Message
         renderUserBubble(userMsg);
         saveMessageToHistory('user', userMsg);
 
         input.value = '';
         scrollToBottom();
 
-        // Render Animated Thinking Indicator
         const loadingId = 'loading-' + Date.now();
         box.innerHTML += `
             <div id="${loadingId}" class="d-flex justify-content-start mb-3 animate-fade-in">
@@ -165,8 +190,7 @@
             document.getElementById(loadingId)?.remove();
 
             if (data.status === 'success') {
-                // Render & Save AI Response
-                renderAiBubble(data.reply);
+                renderAiBubble(data.reply, true);
                 saveMessageToHistory('ai', data.reply);
             } else {
                 box.innerHTML += `
@@ -192,13 +216,11 @@
 
     document.getElementById('sendBtn').addEventListener('click', sendMessage);
 
-    // Clear input field with the 'X' button
     document.getElementById('resetInputBtn').addEventListener('click', () => {
         document.getElementById('chatInput').value = '';
         document.getElementById('chatInput').focus();
     });
 
-    // Handle Enter to send (Shift+Enter for newline)
     document.getElementById('chatInput').addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
@@ -220,17 +242,14 @@
 </script>
 
 <style>
-    /* --- Unified Dynamic Background for History Container --- */
     .chat-history-bg {
         background-color: var(--bs-tertiary-bg);
     }
 
-    /* --- Force Textarea Background to match container --- */
     .custom-textarea-bg {
         background-color: transparent !important;
     }
 
-    /* --- Input Box Focus Ring Styling --- */
     .custom-input-box {
         transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
@@ -245,7 +264,6 @@
         color: var(--bs-secondary-color);
     }
 
-    /* --- Action Button Hover state --- */
     .icon-hover-btn {
         background-color: transparent;
     }
@@ -253,7 +271,6 @@
         background-color: var(--bs-secondary-bg);
     }
 
-    /* --- Modern Chat Bubble Shapes --- */
     .user-bubble {
         border-radius: 1.2rem 1.2rem 0.2rem 1.2rem;
     }
@@ -261,7 +278,6 @@
         border-radius: 1.2rem 1.2rem 1.2rem 0.2rem;
     }
 
-    /* --- Custom Scrollbar for Chatbox --- */
     .custom-scrollbar::-webkit-scrollbar {
         width: 6px;
     }
@@ -276,7 +292,6 @@
         background-color: var(--bs-secondary-color);
     }
 
-    /* --- Fade-in Animation for New Messages --- */
     .animate-fade-in {
         animation: fadeIn 0.3s ease-out forwards;
     }
@@ -286,7 +301,6 @@
         to { opacity: 1; transform: translateY(0); }
     }
 
-    /* --- Styling for rendered AI Markdown content --- */
     .ai-reply-content {
         line-height: 1.5;
     }
@@ -314,7 +328,6 @@
         color: #d63384;
     }
 
-    /* --- Thinking state animation styles --- */
     .thinking-bubble {
         animation: pulseBorder 2s infinite ease-in-out;
     }
