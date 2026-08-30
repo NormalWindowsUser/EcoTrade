@@ -11,19 +11,20 @@
             <!-- Main Chat Card -->
             <div class="card bg-body border shadow-sm rounded-4 overflow-hidden">
                 
-                <!-- Header -->
-                <div class="card-header bg-body border-bottom p-3 d-flex justify-content-between align-items-center">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="bg-success rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                            <i class="bi bi-robot text-white fs-5 d-flex align-items-center justify-content-center"></i>
-                        </div>
-                        <div>
-                            <h5 class="fw-bold text-success mb-0" style="font-size: 1.1rem;">Eco Assistant</h5>
-                            <small class="text-secondary" style="font-size: 0.8rem;">AI-powered recycling guide</small>
+                <!-- Centered Header with Trash Icon Action -->
+                <div class="card-header bg-body border-bottom p-3 position-relative d-flex align-items-center justify-content-center">
+                    <!-- Centered Title & Icon -->
+                    <div class="d-flex align-items-center gap-2 text-center">
+                        <i class="bi bi-robot text-success fs-4"></i>
+                        <div class="d-flex flex-column align-items-start">
+                            <h5 class="fw-bold text-success mb-0" style="font-size: 1.1rem; line-height: 1.2;">Eco Assistant</h5>
+                            <small class="text-secondary" style="font-size: 0.75rem;">AI-powered recycling guide</small>
                         </div>
                     </div>
-                    <button class="btn btn-outline-danger btn-sm rounded-pill px-3" id="clearBtn">
-                        <i class="bi bi-trash me-1"></i> Clear
+                    
+                    <!-- Clear Trash Icon Button on the Far Right -->
+                    <button class="btn btn-link text-secondary p-0 border-0 position-absolute end-0 me-3 icon-hover-btn" id="clearBtn" title="Clear chat history" style="font-size: 1.25rem;">
+                        <i class="bi bi-trash"></i>
                     </button>
                 </div>
                 
@@ -83,7 +84,6 @@
                 if (item.role === 'user') {
                     renderUserBubble(item.content);
                 } else if (item.role === 'ai') {
-                    // Instantly render saved history without typing effect
                     renderAiBubble(item.content, false);
                 }
             });
@@ -107,7 +107,6 @@
         `;
     }
 
-    // Updated renderAiBubble supporting an optional typing effect
     function renderAiBubble(markdownContent, animate = true) {
         const box = document.getElementById('chatBox');
         const bubbleId = 'ai-msg-' + Date.now();
@@ -124,7 +123,6 @@
             return;
         }
 
-        // Create empty container for typing animation
         const wrapper = document.createElement('div');
         wrapper.className = 'd-flex justify-content-start mb-3 animate-fade-in';
         wrapper.innerHTML = `
@@ -134,7 +132,7 @@
 
         const targetElem = document.getElementById(bubbleId);
         let index = 0;
-        const typingSpeed = 12; // Controls speed: lower = faster (12ms is fast but readable)
+        const typingSpeed = 12;
 
         function typeChar() {
             if (index < markdownContent.length) {
@@ -265,10 +263,11 @@
     }
 
     .icon-hover-btn {
-        background-color: transparent;
+        transition: opacity 0.2s ease, color 0.2s ease;
     }
     .icon-hover-btn:hover {
-        background-color: var(--bs-secondary-bg);
+        color: #dc3545 !important;
+        opacity: 0.8;
     }
 
     .user-bubble {
