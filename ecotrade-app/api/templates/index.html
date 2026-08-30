@@ -3,12 +3,12 @@
 {% block content %}
 <style>
     .hero {
-        background: var(--card-bg);
+        background: var(--card-bg, #1f2937);
         border-radius: 12px;
         padding: 2rem 1.5rem;
         text-align: center;
         margin-bottom: 1.5rem;
-        border: 1px solid var(--border-color);
+        border: 1px solid var(--border-color, #374151);
     }
 
     .hero h1 {
@@ -20,7 +20,7 @@
 
     .hero p {
         font-size: 0.95rem;
-        color: var(--text-muted);
+        color: var(--text-muted, #9ca3af);
         max-width: 600px;
         margin: 0 auto 1.25rem;
     }
@@ -70,11 +70,11 @@
     }
 
     .stat-card {
-        background: var(--card-bg);
+        background: var(--card-bg, #1f2937);
         padding: 1.2rem 1rem;
         border-radius: 12px;
         text-align: center;
-        border: 1px solid var(--border-color);
+        border: 1px solid var(--border-color, #374151);
     }
 
     .stat-card h3 {
@@ -85,7 +85,7 @@
     }
 
     .stat-card p {
-        color: var(--text-muted);
+        color: var(--text-muted, #9ca3af);
         font-size: 0.82rem;
         font-weight: 500;
         margin: 0;
@@ -131,7 +131,7 @@
 
     .step-text p {
         font-size: 0.78rem;
-        color: var(--text-muted);
+        color: var(--text-muted, #9ca3af);
         margin: 0;
     }
 
@@ -139,7 +139,7 @@
         font-size: 1.1rem;
         font-weight: 700;
         margin-bottom: 0.85rem;
-        color: var(--text-color);
+        color: var(--text-color, #ffffff);
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -147,15 +147,15 @@
 
     .section-title span.sub-text {
         font-size: 0.78rem;
-        color: var(--text-muted);
+        color: var(--text-muted, #9ca3af);
         font-weight: normal;
     }
 
     .filter-bar {
-        background: var(--card-bg);
+        background: var(--card-bg, #1f2937);
         padding: 1rem;
         border-radius: 10px;
-        border: 1px solid var(--border-color);
+        border: 1px solid var(--border-color, #374151);
         margin-bottom: 1.5rem;
     }
 
@@ -167,10 +167,10 @@
     }
 
     .info-card {
-        background: var(--card-bg);
+        background: var(--card-bg, #1f2937);
         border-radius: 10px;
         padding: 1.1rem;
-        border: 1px solid var(--border-color);
+        border: 1px solid var(--border-color, #374151);
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -184,7 +184,7 @@
     }
 
     .info-card p {
-        color: var(--text-muted);
+        color: var(--text-muted, #9ca3af);
         font-size: 0.82rem;
         margin-bottom: 0.3rem;
     }
@@ -209,10 +209,10 @@
         border: 1px dashed rgba(16, 185, 129, 0.3);
     }
 
-    /* Shared Scrollable List UI for Hubs & Contributions */
+    /* Shared Scrollable List UI */
     .scroll-container {
-        background: var(--card-bg);
-        border: 1px solid var(--border-color);
+        background: var(--card-bg, #1f2937);
+        border: 1px solid var(--border-color, #374151);
         border-radius: 12px;
         padding: 1rem;
         margin-bottom: 1.5rem;
@@ -259,15 +259,23 @@
     }
 
     .list-details p {
-        color: var(--text-muted);
+        color: var(--text-muted, #9ca3af);
         margin: 0;
         font-size: 0.8rem;
     }
 
     .list-right-col {
         font-size: 0.85rem;
-        color: var(--text-muted);
+        color: var(--text-muted, #9ca3af);
         text-align: right;
+    }
+
+    .loading-text {
+        grid-column: 1/-1;
+        text-align: center;
+        color: var(--text-muted, #9ca3af);
+        font-size: 0.85rem;
+        padding-top: 1rem;
     }
 </style>
 
@@ -351,7 +359,7 @@
     <span class="sub-text" id="rate-summary-tag">Based on community reports</span>
 </div>
 <div class="grid-container" id="materials-list">
-    <p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); font-size: 0.85rem;">Loading material rates...</p>
+    <p class="loading-text">Loading material rates...</p>
 </div>
 
 <!-- Hubs Display (Scrollable List) -->
@@ -361,7 +369,7 @@
 </div>
 <div class="scroll-container">
     <div class="scroll-box" id="hubs-list">
-        <p style="text-align: center; color: var(--text-muted); font-size: 0.85rem; padding-top: 1rem;">Loading hub locations...</p>
+        <p class="loading-text">Loading hub locations...</p>
     </div>
     <div class="text-center mt-3" id="load-more-hubs-container" style="display: none;">
         <button id="load-more-hubs-btn" class="btn-custom-secondary" style="border-radius: 50px; cursor: pointer; padding: 0.3rem 1rem; font-size: 0.85rem;">
@@ -380,7 +388,7 @@
         <input type="text" id="search-contributions" class="form-control bg-dark text-light border-secondary form-control-sm" placeholder="Search by material or hub name...">
     </div>
     <div class="scroll-box" id="contributions-list">
-        <p style="text-align: center; color: var(--text-muted); font-size: 0.85rem; padding-top: 1rem;">Loading recent contributions...</p>
+        <p class="loading-text">Loading recent contributions...</p>
     </div>
     <div class="text-center mt-3" id="load-more-contributions-container" style="display: none;">
         <button id="load-more-contributions-btn" class="btn-custom-secondary" style="border-radius: 50px; cursor: pointer; padding: 0.3rem 1rem; font-size: 0.85rem;">
@@ -389,20 +397,19 @@
     </div>
 </div>
 
-<footer class="text-center py-3 border-top border-secondary mt-4" style="font-size: 0.82rem; color: var(--text-muted);">
+<footer class="text-center py-3 border-top border-secondary mt-4" style="font-size: 0.82rem; color: var(--text-muted, #9ca3af);">
     <p class="mb-0">&copy; 2026 EcoTrade Malaysia. Empowering Sustainable Recycling.</p>
 </footer>
 
 <script>
     // Global States
     let currentMaterialsData = [];
-    
     let currentHubsData = [];
     let hubDisplayLimit = 10;
-    
     let allContributions = [];
     let filteredContributions = [];
     let contribDisplayLimit = 10;
+    let searchTimeout = null;
 
     // --- Helper function for dynamic DB time ---
     function formatTimeAgo(seconds) {
@@ -448,11 +455,11 @@
                 currentMaterialsData = data.data;
                 renderMaterials();
             } else {
-                document.getElementById('materials-list').innerHTML = '<p style="grid-column: 1/-1; text-align: center; font-size: 0.85rem;">No active materials found.</p>';
+                document.getElementById('materials-list').innerHTML = '<p class="loading-text">No active materials found.</p>';
             }
         } catch (err) {
             console.error("Failed to fetch materials:", err);
-            document.getElementById('materials-list').innerHTML = '<p style="grid-column: 1/-1; text-align: center; font-size: 0.85rem;">Unable to load materials.</p>';
+            document.getElementById('materials-list').innerHTML = '<p class="loading-text">Unable to load materials.</p>';
         }
     }
 
@@ -462,7 +469,7 @@
 
         if (currentMaterialsData.length > 0) {
             container.innerHTML = currentMaterialsData.map(m => {
-                const estimatedPayout = (m.avg_reported_rate * weightInput).toFixed(2);
+                const estimatedPayout = ((m.avg_reported_rate || 0) * weightInput).toFixed(2);
                 const reportBadge = m.report_count > 0 
                     ? `<span class="badge bg-secondary ms-1">${m.report_count} user report${m.report_count > 1 ? 's' : ''}</span>`
                     : `<span class="badge bg-dark border border-secondary text-secondary ms-1">Base Rate</span>`;
@@ -470,13 +477,13 @@
                 return `
                     <div class="info-card">
                         <div>
-                            <h4>${m.name}</h4>
-                            <p><strong>Category:</strong> ${m.category}</p>
+                            <h4>${m.name || 'Unknown Material'}</h4>
+                            <p><strong>Category:</strong> ${m.category || 'General'}</p>
                             <p>${m.tips || 'Clean and prepare materials prior to drop-off.'}</p>
                         </div>
                         <div>
                             <div class="price-badge">
-                                RM ${m.avg_reported_rate.toFixed(2)} / kg ${reportBadge}
+                                RM ${(m.avg_reported_rate || 0).toFixed(2)} / kg ${reportBadge}
                             </div>
                             <div class="payout-estimate-box">
                                 <small class="text-muted d-block">Estimated Payout for <strong>${weightInput} kg</strong>:</small>
@@ -487,11 +494,10 @@
                 `;
             }).join('');
         } else {
-            container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; font-size: 0.85rem;">No active materials found.</p>';
+            container.innerHTML = '<p class="loading-text">No active materials found.</p>';
         }
     }
 
-    // --- Hubs Functions ---
     async function fetchHubs(city = '') {
         try {
             const url = city ? `/api/hubs?city=${encodeURIComponent(city)}` : '/api/hubs';
@@ -529,7 +535,7 @@
             renderHubs();
         } catch (err) {
             console.error("Failed to fetch hubs:", err);
-            document.getElementById('hubs-list').innerHTML = '<p class="text-center text-muted" style="font-size: 0.85rem; padding-top: 1rem;">Unable to load hub locations.</p>';
+            document.getElementById('hubs-list').innerHTML = '<p class="loading-text">Unable to load hub locations.</p>';
             document.getElementById('load-more-hubs-container').style.display = 'none';
         }
     }
@@ -541,7 +547,7 @@
         const toDisplay = currentHubsData.slice(0, hubDisplayLimit);
 
         if (toDisplay.length === 0) {
-            container.innerHTML = '<p class="text-center text-muted" style="font-size: 0.85rem; padding-top: 1rem;">No recycling hubs found for selected filters.</p>';
+            container.innerHTML = '<p class="loading-text">No recycling hubs found for selected filters.</p>';
             loadMoreBtnContainer.style.display = 'none';
             return;
         }
@@ -550,7 +556,7 @@
             <div class="list-row-item">
                 <div class="list-details">
                     <h6>${h.name}</h6>
-                    <p>📍 ${h.address}, ${h.city}</p>
+                    <p>📍 ${h.address || 'Address not provided'}, ${h.city}</p>
                 </div>
                 <div class="list-right-col">
                     <div style="margin-bottom: 0.15rem;">🕒 ${h.hours || 'N/A'}</div>
@@ -559,32 +565,25 @@
             </div>
         `).join('');
 
-        if (currentHubsData.length > hubDisplayLimit) {
-            loadMoreBtnContainer.style.display = 'block';
-        } else {
-            loadMoreBtnContainer.style.display = 'none';
-        }
+        loadMoreBtnContainer.style.display = currentHubsData.length > hubDisplayLimit ? 'block' : 'none';
     }
 
-    // --- Contributions Feed Functions (Updated logic) ---
     async function fetchRecentContributions() {
         try {
             const res = await fetch('/api/recent_contributions');
             if (res.ok) {
                 const data = await res.json();
                 if (data.status === 'success') {
-                    // Extract data and format time based on DB seconds_ago
                     allContributions = data.data.map(c => ({
-                        material_name: c.material_name,
-                        hub_name: c.hub_name,
+                        material_name: c.material_name || 'Unknown Material',
+                        hub_name: c.hub_name || 'Unknown Hub',
                         weight: parseFloat(c.weight || 0).toFixed(1),
                         payout: parseFloat(c.payout || 0).toFixed(2),
-                        // Uses the SQL EXTRACT(EPOCH) logic. Fallback to parsing created_at if seconds_ago isn't ready.
                         time_ago: c.seconds_ago !== undefined ? formatTimeAgo(c.seconds_ago) : formatTimeAgo((new Date() - new Date(c.created_at)) / 1000)
                     }));
                 }
             } else {
-                allContributions = generateMockContributions(); // Fallback for local testing
+                allContributions = generateMockContributions();
             }
         } catch (err) {
             allContributions = generateMockContributions();
@@ -593,7 +592,6 @@
         renderContributions();
     }
 
-    // Fallback logic if the DB route isn't finished yet
     function generateMockContributions() {
         const mats = ['PET Plastic Bottles', 'Corrugated Cardboard', 'Aluminum Drink Cans', 'Used Cooking Oil (UCO)'];
         const hubs = ['EcoHub PJ', 'KL City Recycling', 'Subang Green Drop', 'Cheras Scrap Center'];
@@ -601,7 +599,7 @@
         for(let i = 0; i < 45; i++) {
             let weight = (Math.random() * 8 + 0.5).toFixed(1);
             let payout = (weight * 0.8).toFixed(2);
-            let randomSecondsAgo = Math.floor(Math.random() * 86400); // within the last 24 hrs
+            let randomSecondsAgo = Math.floor(Math.random() * 86400);
             mock.push({
                 material_name: mats[Math.floor(Math.random() * mats.length)],
                 hub_name: hubs[Math.floor(Math.random() * hubs.length)],
@@ -620,7 +618,7 @@
         const toDisplay = filteredContributions.slice(0, contribDisplayLimit);
         
         if (toDisplay.length === 0) {
-            container.innerHTML = '<p class="text-center text-muted" style="font-size: 0.85rem; padding-top: 1rem;">No contributions found.</p>';
+            container.innerHTML = '<p class="loading-text">No contributions found.</p>';
             loadMoreBtnContainer.style.display = 'none';
             return;
         }
@@ -637,11 +635,7 @@
             </div>
         `).join('');
         
-        if (filteredContributions.length > contribDisplayLimit) {
-            loadMoreBtnContainer.style.display = 'block';
-        } else {
-            loadMoreBtnContainer.style.display = 'none';
-        }
+        loadMoreBtnContainer.style.display = filteredContributions.length > contribDisplayLimit ? 'block' : 'none';
     }
 
     // --- Event Listeners ---
@@ -651,13 +645,16 @@
     });
 
     document.getElementById('search-contributions').addEventListener('input', (e) => {
-        const query = e.target.value.toLowerCase();
-        filteredContributions = allContributions.filter(c => 
-            c.material_name.toLowerCase().includes(query) || 
-            c.hub_name.toLowerCase().includes(query)
-        );
-        contribDisplayLimit = 10; 
-        renderContributions();
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            const query = e.target.value.toLowerCase();
+            filteredContributions = allContributions.filter(c => 
+                c.material_name.toLowerCase().includes(query) || 
+                c.hub_name.toLowerCase().includes(query)
+            );
+            contribDisplayLimit = 10; 
+            renderContributions();
+        }, 300); // 300ms debounce
     });
 
     document.getElementById('load-more-contributions-btn').addEventListener('click', () => {
