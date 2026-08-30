@@ -62,7 +62,7 @@
         border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
         gap: 8px;
         text-decoration: none;
-        transition: transform 0.2s ease;
+        transition: transform 0.2s ease, background-color 0.2s ease;
     }
 
     .pill-btn-group:hover {
@@ -344,21 +344,21 @@
 <!-- Hero Section -->
 <section class="hero">
     <div class="hero-title-container">
-        <span class="hero-emoji">♻️</span>
+        <span class="hero-emoji" role="img" aria-label="recycle emoji">♻️</span>
         <h1>Recycle Smarter, Earn Rewards</h1>
     </div>
     <p>Convert household recyclables into payouts while lowering carbon emissions in Malaysia.</p>
     
     <div class="cta-buttons">
-        <a href="/chat" class="pill-btn-group">
+        <a href="/chat" class="pill-btn-group" aria-label="Ask Eco Assistant">
             <span class="pill-btn-text">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#10b981;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#10b981;" aria-hidden="true">
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                     <path d="M8 9h.01"></path>
                     <path d="M12 9h.01"></path>
                     <path d="M16 9h.01"></path>
                 </svg>
-                Ask Eco assistant
+                Ask Eco Assistant
             </span>
             <span class="pill-btn-badge">Open</span>
         </a>
@@ -366,9 +366,9 @@
 </section>
 
 <!-- Stats Grid -->
-<section class="stats-grid">
+<section class="stats-grid" aria-label="Recycling Impact Statistics">
     <div class="stat-card">
-        <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
         </svg>
         <div class="stat-content">
@@ -377,7 +377,7 @@
         </div>
     </div>
     <div class="stat-card">
-        <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <rect x="2" y="6" width="20" height="12" rx="2"/>
             <circle cx="12" cy="12" r="2"/>
             <path d="M6 12h.01M18 12h.01"/>
@@ -388,7 +388,7 @@
         </div>
     </div>
     <div class="stat-card">
-        <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
             <circle cx="12" cy="10" r="3"/>
         </svg>
@@ -398,7 +398,7 @@
         </div>
     </div>
     <div class="stat-card">
-        <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
             <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
         </svg>
@@ -411,7 +411,7 @@
 
 <!-- How It Works Steps -->
 <div class="steps-section-title">
-    <span>✦</span> Follow this steps
+    <span aria-hidden="true">✦</span> Follow these steps
 </div>
 <section class="how-it-works-grid">
     <div class="step-card">
@@ -485,7 +485,7 @@
 </div>
 <div class="scroll-container">
     <div class="mb-3">
-        <input type="text" id="search-contributions" class="form-control form-control-sm" placeholder="Search by material or hub name...">
+        <input type="text" id="search-contributions" class="form-control form-control-sm" placeholder="Search by material or hub name..." aria-label="Search contributions">
     </div>
     <div class="scroll-box" id="contributions-list">
         <p class="loading-text">Loading recent contributions...</p>
@@ -565,7 +565,7 @@
 
     function renderMaterials() {
         const container = document.getElementById('materials-list');
-        const weightInput = parseFloat(document.getElementById('calc-weight').value) || 0;
+        const weightInput = Math.max(0, parseFloat(document.getElementById('calc-weight').value) || 0);
 
         if (currentMaterialsData.length > 0) {
             container.innerHTML = currentMaterialsData.map(m => {
@@ -744,7 +744,7 @@
     document.getElementById('search-contributions').addEventListener('input', (e) => {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
-            const query = e.target.value.toLowerCase();
+            const query = e.target.value.toLowerCase().trim();
             filteredContributions = allContributions.filter(c => 
                 c.material_name.toLowerCase().includes(query) || 
                 c.hub_name.toLowerCase().includes(query)
