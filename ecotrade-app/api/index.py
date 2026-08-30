@@ -447,9 +447,6 @@ All Recycling Hubs Table (id, hub_name, address, city, operating_hours, contact_
 All Contributions Table (id, user_id, material_id, material_name, hub_id, hub_name, weight_kg, calculated_payout, status, notes, created_at, reviewed_by):
 {contributions_context}
 
-Material Prices and Preparation Tips (id, name, category, price_per_kg, unit, preparation_tips, eco_impact_desc, is_active):
-{materials_context}
-
 User Question: {user_prompt}"""
 
         response = client.models.generate_content(
