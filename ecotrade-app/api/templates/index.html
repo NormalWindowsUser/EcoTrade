@@ -2,6 +2,13 @@
 
 {% block content %}
 <style>
+    /* Geist Font Integration */
+    @import url('https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-sans/style.css');
+
+    body, button, input, select, textarea {
+        font-family: 'Geist Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
     /* Hero Section */
     .hero {
         text-align: center;
@@ -14,14 +21,14 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 0.75rem;
+        gap: 0.6rem;
         margin-bottom: 0.5rem;
     }
 
-    .hero-icon {
-        width: 2.2rem;
-        height: 2.2rem;
-        color: #10b981;
+    .hero-emoji {
+        font-size: 2.1rem;
+        line-height: 1;
+        display: inline-block;
     }
 
     .hero h1 {
@@ -29,7 +36,7 @@
         font-weight: 800;
         color: var(--text-color, #0f172a);
         margin: 0;
-        letter-spacing: -0.02em;
+        letter-spacing: -0.03em;
     }
 
     .hero p {
@@ -37,6 +44,7 @@
         color: var(--text-muted, #64748b);
         max-width: 600px;
         margin: 0 auto 1.5rem;
+        letter-spacing: -0.01em;
     }
 
     .cta-buttons {
@@ -111,6 +119,7 @@
         color: var(--text-color, #0f172a);
         margin: 0 0 2px 0;
         line-height: 1.2;
+        letter-spacing: -0.02em;
     }
 
     .stat-content p {
@@ -129,6 +138,7 @@
         display: flex;
         align-items: center;
         gap: 0.35rem;
+        letter-spacing: -0.01em;
     }
 
     .how-it-works-grid {
@@ -160,6 +170,7 @@
         font-weight: 800;
         color: var(--text-color, #0f172a);
         margin-bottom: 0.5rem;
+        letter-spacing: -0.02em;
     }
 
     .step-card p {
@@ -169,7 +180,7 @@
         line-height: 1.4;
     }
 
-    /* Existing Sections Dynamic Styles */
+    /* Dynamic Components Styles */
     .section-title {
         font-size: 1.1rem;
         font-weight: 700;
@@ -178,6 +189,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+        letter-spacing: -0.02em;
     }
 
     .section-title span.sub-text {
@@ -332,10 +344,7 @@
 <!-- Hero Section -->
 <section class="hero">
     <div class="hero-title-container">
-        <svg class="hero-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M7 19H4.815a1.83 1.83 0 0 1-1.57-.91 1.78 1.78 0 0 1-.06-1.78l1.73-3c.33-.57 1-1 1.67-1h3.76m2.59 0h3.76c.67 0 1.34.43 1.67 1l1.73 3c.4.7.35 1.55-.06 1.78a1.83 1.83 0 0 1-1.57.91H17M7 19l-1.5-3m11.5 3l1.5-3M12 4.5l-2.5 4.5h5L12 4.5zm0 0V2"/>
-            <path d="M7 19l2.5-4.5M17 19l-2.5-4.5"/>
-        </svg>
+        <span class="hero-emoji">♻️</span>
         <h1>Recycle Smarter, Earn Rewards</h1>
     </div>
     <p>Convert household recyclables into payouts while lowering carbon emissions in Malaysia.</p>
