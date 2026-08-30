@@ -28,7 +28,7 @@
                 </div>
                 
                 <!-- Chat History Area -->
-                <div id="chatBox" class="card-body p-4 flex-grow-1 custom-scrollbar chat-history-bg" style="overflow-y: auto;">
+                <div id="chatBox" class="card-body px-4 py-3 flex-grow-1 custom-scrollbar chat-history-bg" style="overflow-y: auto;">
                     <div class="text-center mt-5" id="defaultWelcome">
                         <div class="badge bg-secondary bg-opacity-10 text-body border px-3 py-2 rounded-pill mb-2">
                             👋 Welcome!
@@ -61,6 +61,7 @@
 
 <script>
     const STORAGE_KEY = 'eco_ai_chat_history';
+    let isGenerating = false;
 
     document.addEventListener('DOMContentLoaded', () => {
         loadSavedHistory();
@@ -89,6 +90,24 @@
         }
     }
 
+    function setInputState(disabled) {
+        isGenerating = disabled;
+        const sendBtn = document.getElementById('sendBtn');
+        const chatInput = document.getElementById('chatInput');
+        const resetBtn = document.getElementById('resetInputBtn');
+
+        sendBtn.disabled = disabled;
+        chatInput.disabled = disabled;
+        resetBtn.disabled = disabled;
+
+        if (disabled) {
+            sendBtn.classList.add('opacity-50');
+        } else {
+            sendBtn.classList.remove('opacity-50');
+            chatInput.focus();
+        }
+    }
+
     function scrollToBottom() {
         const box = document.getElementById('chatBox');
         box.scrollTop = box.scrollHeight;
@@ -97,8 +116,8 @@
     function renderUserBubble(text) {
         const box = document.getElementById('chatBox');
         box.innerHTML += `
-            <div class="d-flex justify-content-end mb-4 animate-fade-in">
-                <div class="user-bubble px-4 py-2" style="max-width: 75%; font-size: 0.95rem; background-color: #BBD9D0; color: #1a2e28; border-radius: 20px;">
+            <div class="d-flex justify-content-end mb-4 animate-fade-in pe-2">
+                <div class="user-bubble px-4 py-2" style="max-width: 80%; font-size: 0.95rem; background-color: #BBD9D0; color: #1a2e28; border-radius: 20px; word-break: break-word;">
                     ${escapeHtml(text)}
                 </div>
             </div>
@@ -111,10 +130,10 @@
         const copyBtnId = 'copy-btn-' + Date.now();
         
         const wrapper = document.createElement('div');
-        wrapper.className = 'd-flex justify-content-start mb-4 animate-fade-in';
+        wrapper.className = 'd-flex justify-content-start mb-4 animate-fade-in ps-2';
         wrapper.innerHTML = `
-            <div class="d-flex flex-column align-items-start" style="max-width: 85%;">
-                <div id="${bubbleId}" class="ai-reply-content text-body" style="font-size: 0.95rem;"></div>
+            <div class="d-flex flex-column align-items-start" style="max-width: 90%; word-break: break-word;">
+                <div id="${bubbleId}" class="ai-reply-content text-body" style="font-size: 0.95rem; line-height: 1.6;"></div>
                 <div class="mt-1">
                     <button class="btn btn-link text-secondary p-0 border-0 me-2" id="${copyBtnId}" title="Copy message" style="font-size: 0.9rem;">
                         <i class="bi bi-copy"></i>
@@ -144,6 +163,7 @@
                 setTimeout(typeChar, typingSpeed);
             } else {
                 attachCopyHandler(copyBtnId, markdownContent);
+                setInputState(false);
             }
         }
 
@@ -163,9 +183,13 @@
     }
 
     async function sendMessage() {
+        if (isGenerating) return;
+
         const input = document.getElementById('chatInput');
         const box = document.getElementById('chatBox');
         if (!input.value.trim()) return;
+
+        setInputState(true);
 
         const defaultWelcome = document.getElementById('defaultWelcome');
         if (defaultWelcome) defaultWelcome.remove();
@@ -180,7 +204,7 @@
 
         const loadingId = 'loading-' + Date.now();
         box.innerHTML += `
-            <div id="${loadingId}" class="d-flex justify-content-start mb-4 animate-fade-in">
+            <div id="${loadingId}" class="d-flex justify-content-start mb-4 animate-fade-in ps-2">
                 <div class="text-secondary thinking-bubble py-1" style="font-size: 0.9rem;">
                     <span class="spinner-grow spinner-grow-sm text-success me-2" role="status"></span>
                     <span class="me-1">Eco AI is thinking</span>
@@ -211,6 +235,7 @@
                         <div class="alert alert-danger py-2 small mb-0 rounded-pill shadow-sm">${data.reply || 'AI service error.'}</div>
                     </div>
                 `;
+                setInputState(false);
             }
         } catch (err) {
             document.getElementById(loadingId)?.remove();
@@ -219,6 +244,7 @@
                     <div class="alert alert-danger py-2 small mb-0 rounded-pill shadow-sm"><i class="bi bi-exclamation-triangle"></i> Connection error. Please try again.</div>
                 </div>
             `;
+            setInputState(false);
         }
         scrollToBottom();
     }
@@ -230,6 +256,7 @@
     document.getElementById('sendBtn').addEventListener('click', sendMessage);
 
     document.getElementById('resetInputBtn').addEventListener('click', () => {
+        if (isGenerating) return;
         document.getElementById('chatInput').value = '';
         document.getElementById('chatInput').focus();
     });
@@ -242,6 +269,7 @@
     });
 
     document.getElementById('clearBtn').addEventListener('click', () => {
+        if (isGenerating) return;
         localStorage.removeItem(STORAGE_KEY);
         document.getElementById('chatBox').innerHTML = `
             <div class="text-center mt-5" id="defaultWelcome">
@@ -310,6 +338,8 @@
 
     .ai-reply-content {
         line-height: 1.6;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
     }
     .ai-reply-content p:last-child {
         margin-bottom: 0;
