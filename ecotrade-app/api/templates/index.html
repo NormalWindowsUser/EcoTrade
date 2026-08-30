@@ -1,153 +1,1364 @@
 {% extends "base.html" %}
 
+
+
 {% block content %}
+
 <style>
-    /* LOCAL COMPONENT STYLES WITH FULL THEME VARIABLE SUPPORT */
-    .eco-card {
-        background-color: var(--card-bg);
-        border: 1px solid var(--border-color);
-        border-radius: 16px;
-        transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+
+    .hero {
+
+        background: var(--card-bg, #1f2937);
+
+        border-radius: 12px;
+
+        padding: 2rem 1.5rem;
+
+        text-align: center;
+
+        margin-bottom: 1.5rem;
+
+        border: 1px solid var(--border-color, #374151);
+
     }
 
-    .eco-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-    }
 
-    .stat-badge {
-        background-color: var(--bg-color);
-        border: 1px solid var(--border-color);
-        color: var(--text-muted);
-        border-radius: 30px;
-        padding: 4px 12px;
-        font-size: 0.8rem;
-    }
 
-    .search-filter-box {
-        background-color: var(--card-bg);
-        border: 1px solid var(--border-color);
-        border-radius: 16px;
-    }
+    .hero h1 {
 
-    .modal-content {
-        background-color: var(--card-bg) !important;
-        border: 1px solid var(--border-color) !important;
-        color: var(--text-color) !important;
-    }
+        font-size: 1.9rem;
 
-    .modal-header, .modal-footer {
-        border-color: var(--border-color) !important;
-    }
+        font-weight: 700;
 
-    /* Badge Contrast Fixes */
-    .badge-theme-subtle {
-        background-color: rgba(16, 185, 129, 0.15);
         color: #10b981;
-        border: 1px solid rgba(16, 185, 129, 0.3);
+
+        margin-bottom: 0.5rem;
+
     }
 
-    .badge-secondary-subtle {
-        background-color: var(--bg-color);
-        color: var(--text-muted);
-        border: 1px solid var(--border-color);
+
+
+    .hero p {
+
+        font-size: 0.95rem;
+
+        color: var(--text-muted, #9ca3af);
+
+        max-width: 600px;
+
+        margin: 0 auto 1.25rem;
+
     }
+
+
+
+    .cta-buttons {
+
+        display: flex;
+
+        justify-content: center;
+
+        gap: 0.75rem;
+
+    }
+
+
+
+    .btn-custom-primary {
+
+        background-color: #10b981;
+
+        color: #0b0f19;
+
+        font-weight: 700;
+
+        padding: 0.5rem 1.25rem;
+
+        border-radius: 50px;
+
+        text-decoration: none;
+
+        transition: all 0.2s ease;
+
+    }
+
+
+
+    .btn-custom-primary:hover {
+
+        background-color: #059669;
+
+        color: #ffffff;
+
+    }
+
+
+
+    .btn-custom-secondary {
+
+        background-color: rgba(16, 185, 129, 0.12);
+
+        color: #10b981;
+
+        font-weight: 600;
+
+        padding: 0.5rem 1.25rem;
+
+        border-radius: 50px;
+
+        text-decoration: none;
+
+        border: 1px solid rgba(16, 185, 129, 0.3);
+
+        transition: all 0.2s ease;
+
+    }
+
+
+
+    .btn-custom-secondary:hover {
+
+        background-color: rgba(16, 185, 129, 0.2);
+
+        color: #10b981;
+
+    }
+
+
+
+    .stats-grid {
+
+        display: grid;
+
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+
+        gap: 1rem;
+
+        margin-bottom: 1.5rem;
+
+    }
+
+
+
+    .stat-card {
+
+        background: var(--card-bg, #1f2937);
+
+        padding: 1.2rem 1rem;
+
+        border-radius: 12px;
+
+        text-align: center;
+
+        border: 1px solid var(--border-color, #374151);
+
+    }
+
+
+
+    .stat-card h3 {
+
+        font-size: 1.6rem;
+
+        font-weight: 700;
+
+        color: #10b981;
+
+        margin-bottom: 0.2rem;
+
+    }
+
+
+
+    .stat-card p {
+
+        color: var(--text-muted, #9ca3af);
+
+        font-size: 0.82rem;
+
+        font-weight: 500;
+
+        margin: 0;
+
+    }
+
+
+
+    .how-it-works {
+
+        background: rgba(16, 185, 129, 0.08);
+
+        border: 1px solid rgba(16, 185, 129, 0.2);
+
+        border-radius: 12px;
+
+        padding: 1.25rem;
+
+        margin-bottom: 1.75rem;
+
+        display: grid;
+
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+
+        gap: 1.25rem;
+
+    }
+
+
+
+    .step-item {
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 0.75rem;
+
+    }
+
+
+
+    .step-number {
+
+        background: #10b981;
+
+        color: #0b0f19;
+
+        width: 30px;
+
+        height: 30px;
+
+        border-radius: 50%;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        font-weight: 700;
+
+        font-size: 0.85rem;
+
+        flex-shrink: 0;
+
+    }
+
+
+
+    .step-text h5 {
+
+        font-size: 0.9rem;
+
+        font-weight: 700;
+
+        color: #10b981;
+
+        margin-bottom: 0.15rem;
+
+    }
+
+
+
+    .step-text p {
+
+        font-size: 0.78rem;
+
+        color: var(--text-muted, #9ca3af);
+
+        margin: 0;
+
+    }
+
+
+
+    .section-title {
+
+        font-size: 1.1rem;
+
+        font-weight: 700;
+
+        margin-bottom: 0.85rem;
+
+        color: var(--text-color, #ffffff);
+
+        display: flex;
+
+        justify-content: space-between;
+
+        align-items: center;
+
+    }
+
+
+
+    .section-title span.sub-text {
+
+        font-size: 0.78rem;
+
+        color: var(--text-muted, #9ca3af);
+
+        font-weight: normal;
+
+    }
+
+
+
+    .filter-bar {
+
+        background: var(--card-bg, #1f2937);
+
+        padding: 1rem;
+
+        border-radius: 10px;
+
+        border: 1px solid var(--border-color, #374151);
+
+        margin-bottom: 1.5rem;
+
+    }
+
+
+
+    .grid-container {
+
+        display: grid;
+
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+
+        gap: 1rem;
+
+        margin-bottom: 1.5rem;
+
+    }
+
+
+
+    .info-card {
+
+        background: var(--card-bg, #1f2937);
+
+        border-radius: 10px;
+
+        padding: 1.1rem;
+
+        border: 1px solid var(--border-color, #374151);
+
+        display: flex;
+
+        flex-direction: column;
+
+        justify-content: space-between;
+
+    }
+
+
+
+    .info-card h4 {
+
+        font-size: 1rem;
+
+        font-weight: 700;
+
+        color: #10b981;
+
+        margin-bottom: 0.4rem;
+
+    }
+
+
+
+    .info-card p {
+
+        color: var(--text-muted, #9ca3af);
+
+        font-size: 0.82rem;
+
+        margin-bottom: 0.3rem;
+
+    }
+
+
+
+    .price-badge {
+
+        display: inline-block;
+
+        background: rgba(16, 185, 129, 0.12);
+
+        color: #10b981;
+
+        font-weight: 700;
+
+        font-size: 0.82rem;
+
+        padding: 0.25rem 0.6rem;
+
+        border-radius: 6px;
+
+        margin-top: 0.4rem;
+
+        border: 1px solid rgba(16, 185, 129, 0.2);
+
+    }
+
+
+
+    .payout-estimate-box {
+
+        margin-top: 0.6rem;
+
+        padding: 0.5rem 0.75rem;
+
+        background: rgba(16, 185, 129, 0.05);
+
+        border-radius: 6px;
+
+        border: 1px dashed rgba(16, 185, 129, 0.3);
+
+    }
+
+
+
+    .scroll-container {
+
+        background: var(--card-bg, #1f2937);
+
+        border: 1px solid var(--border-color, #374151);
+
+        border-radius: 12px;
+
+        padding: 1rem;
+
+        margin-bottom: 1.5rem;
+
+    }
+
+
+
+    .scroll-box {
+
+        max-height: 350px;
+
+        overflow-y: auto;
+
+        padding-right: 0.5rem;
+
+    }
+
+
+
+    .scroll-box::-webkit-scrollbar {
+
+        width: 6px;
+
+    }
+
+    .scroll-box::-webkit-scrollbar-track {
+
+        background: rgba(0,0,0,0.1);
+
+        border-radius: 10px;
+
+    }
+
+    .scroll-box::-webkit-scrollbar-thumb {
+
+        background: #374151; 
+
+        border-radius: 10px;
+
+    }
+
+
+
+    .list-row-item {
+
+        background: rgba(16, 185, 129, 0.05);
+
+        border: 1px solid rgba(16, 185, 129, 0.1);
+
+        border-radius: 8px;
+
+        padding: 0.75rem 1rem;
+
+        margin-bottom: 0.6rem;
+
+        display: flex;
+
+        justify-content: space-between;
+
+        align-items: center;
+
+    }
+
+
+
+    .list-row-item:last-child {
+
+        margin-bottom: 0;
+
+    }
+
+
+
+    .list-details h6 {
+
+        color: #10b981;
+
+        margin: 0 0 0.2rem 0;
+
+        font-weight: 600;
+
+        font-size: 0.95rem;
+
+    }
+
+
+
+    .list-details p {
+
+        color: var(--text-muted, #9ca3af);
+
+        margin: 0;
+
+        font-size: 0.8rem;
+
+    }
+
+
+
+    .list-right-col {
+
+        font-size: 0.85rem;
+
+        color: var(--text-muted, #9ca3af);
+
+        text-align: right;
+
+    }
+
+
+
+    .loading-text {
+
+        grid-column: 1/-1;
+
+        text-align: center;
+
+        color: var(--text-muted, #9ca3af);
+
+        font-size: 0.85rem;
+
+        padding-top: 1rem;
+
+    }
+
 </style>
 
-<div class="container py-2">
-    <!-- HERO / BANNER SECTION -->
-    <div class="eco-card p-4 mb-4 text-center">
-        <h1 class="fw-bold mb-2">Community Exchange Hub</h1>
-        <p class="text-muted mb-3 mx-auto" style="max-width: 600px;">
-            Trade, recycle, and share resources with local community members to reduce waste and build a greener ecosystem.
-        </p>
-        <div class="d-flex justify-content-center gap-2 flex-wrap">
-            <span class="stat-badge">
-                <i class="bi bi-arrow-repeat text-success me-1"></i> Active Trades
-            </span>
-            <span class="stat-badge">
-                <i class="bi bi-tree-fill text-success me-1"></i> Eco Impact
-            </span>
-            <span class="stat-badge">
-                <i class="bi bi-people-fill text-success me-1"></i> Local Network
-            </span>
+
+
+<section class="hero">
+
+    <h1>Recycle Smarter, Earn Rewards</h1>
+
+    <p>Convert household recyclables into payouts while lowering carbon emissions in Malaysia.</p>
+
+    <div class="cta-buttons">
+
+        <a href="/contribute" class="btn-custom-primary">Submit Recycling</a>
+
+        <a href="/chat" class="btn-custom-secondary">Ask AI Assistant</a>
+
+    </div>
+
+</section>
+
+
+
+<section class="stats-grid">
+
+    <div class="stat-card">
+
+        <h3 id="stat-weight">0.0 kg</h3>
+
+        <p>Total Recycled</p>
+
+    </div>
+
+    <div class="stat-card">
+
+        <h3 id="stat-earnings">RM 0.00</h3>
+
+        <p>Payouts Distributed</p>
+
+    </div>
+
+    <div class="stat-card">
+
+        <h3 id="stat-hubs">0</h3>
+
+        <p>Active Hubs</p>
+
+    </div>
+
+    <div class="stat-card">
+
+        <h3 id="stat-co2">0.0 kg</h3>
+
+        <p>Estimated CO₂ Offset</p>
+
+    </div>
+
+</section>
+
+
+
+<section class="how-it-works">
+
+    <div class="step-item">
+
+        <div class="step-number">1</div>
+
+        <div class="step-text">
+
+            <h5>Collect & Prepare</h5>
+
+            <p>Clean and categorize your paper, plastic, aluminum, or glass.</p>
+
         </div>
+
     </div>
 
-    <!-- SEARCH AND FILTER BAR -->
-    <div class="search-filter-box p-3 mb-4">
-        <form method="GET" action="/" class="row g-2 align-items-center">
-            <div class="col-md-6">
-                <div class="input-group">
-                    <span class="input-group-text border-end-0 bg-transparent" style="color: var(--text-muted); border-color: var(--border-color);">
-                        <i class="bi bi-search"></i>
-                    </span>
-                    <input type="text" name="q" class="form-control border-start-0 ps-0" placeholder="Search items, materials, or posts..." value="{{ request.args.get('q', '') }}">
-                </div>
-            </div>
-            <div class="col-md-4">
-                <select name="category" class="form-select">
-                    <option value="">All Categories</option>
-                    <option value="electronics" {% if request.args.get('category') == 'electronics' %}selected{% endif %}>Electronics</option>
-                    <option value="furniture" {% if request.args.get('category') == 'furniture' %}selected{% endif %}>Furniture</option>
-                    <option value="organics" {% if request.args.get('category') == 'organics' %}selected{% endif %}>Organics & Compost</option>
-                    <option value="clothing" {% if request.args.get('category') == 'clothing' %}selected{% endif %}>Clothing & Textiles</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-success w-100 fw-semibold">Filter</button>
-            </div>
-        </form>
+    <div class="step-item">
+
+        <div class="step-number">2</div>
+
+        <div class="step-text">
+
+            <h5>Drop Off at Hub</h5>
+
+            <p>Bring materials to any of our registered partner locations.</p>
+
+        </div>
+
     </div>
 
-    <!-- MAIN FEED / LISTINGS -->
-    <div class="row g-4">
-        {% if listings %}
-            {% for item in listings %}
-            <div class="col-12 col-md-6 col-lg-4">
-                <div class="eco-card h-100 d-flex flex-column p-3">
-                    {% if item.image_url %}
-                    <img src="{{ item.image_url }}" class="rounded mb-3 w-100" style="height: 180px; object-fit: cover;" alt="{{ item.title }}">
-                    {% endif %}
+    <div class="step-item">
 
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <span class="badge badge-theme-subtle rounded-pill small">
-                            {{ item.category | capitalize if item.category else 'General' }}
-                        </span>
-                        <span class="small text-muted">
-                            <i class="bi bi-clock me-1"></i>{{ item.created_at_formatted or 'Recently' }}
-                        </span>
-                    </div>
+        <div class="step-number">3</div>
 
-                    <h5 class="fw-bold mb-2">{{ item.title }}</h5>
-                    <p class="text-muted small flex-grow-1 mb-3">
-                        {{ item.description | truncate(110) }}
-                    </p>
+        <div class="step-text">
 
-                    <div class="pt-2 mt-auto border-top" style="border-color: var(--border-color) !important;">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="small text-muted">
-                                <i class="bi bi-person me-1"></i>{{ item.user_name or 'Community Member' }}
-                            </span>
-                            <a href="/listing/{{ item.id }}" class="btn btn-outline-success btn-sm rounded-pill px-3">View Details</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        {% else %}
-            <!-- EMPTY STATE -->
-            <div class="col-12">
-                <div class="eco-card p-5 text-center">
-                    <i class="bi bi-inbox text-muted display-4 mb-3 d-block"></i>
-                    <h4 class="fw-bold mb-2">No listings found</h4>
-                    <p class="text-muted mb-4">Be the first to offer or request item exchanges in your area.</p>
-                    <a href="/contribute" class="btn btn-success rounded-pill px-4">
-                        <i class="bi bi-plus-lg me-1"></i> Create Listing
-                    </a>
-                </div>
-            </div>
-        {% endif %}
+            <h5>Get Paid</h5>
+
+            <p>Submit your log to earn direct digital cash payouts.</p>
+
+        </div>
+
     </div>
+
+</section>
+
+
+
+<!-- Filter and Calculator Section -->
+
+<div class="filter-bar">
+
+    <div class="row g-3 align-items-center">
+
+        <div class="col-md-4">
+
+            <label for="filter-city" class="form-label small text-muted mb-1 fw-bold">Select City / Area</label>
+
+            <select id="filter-city" class="form-select bg-dark text-light border-secondary form-select-sm">
+
+                <option value="">All Cities / Areas</option>
+
+            </select>
+
+        </div>
+
+        <div class="col-md-4">
+
+            <label for="filter-hub" class="form-label small text-muted mb-1 fw-bold">Select Recycling Hub</label>
+
+            <select id="filter-hub" class="form-select bg-dark text-light border-secondary form-select-sm">
+
+                <option value="">All Partner Hubs</option>
+
+            </select>
+
+        </div>
+
+        <div class="col-md-4">
+
+            <label for="calc-weight" class="form-label small text-muted mb-1 fw-bold">Estimated Weight (kg)</label>
+
+            <input type="number" id="calc-weight" class="form-control bg-dark text-light border-secondary form-control-sm" value="1.0" min="0.1" step="0.5">
+
+        </div>
+
+    </div>
+
 </div>
-{% endblock %}
+
+
+
+<!-- Materials Display -->
+
+<div class="section-title">
+
+    <span>Accepted Materials & User-Reported Live Rates</span>
+
+    <span class="sub-text" id="rate-summary-tag">Based on community reports</span>
+
+</div>
+
+<div class="grid-container" id="materials-list">
+
+    <p class="loading-text">Loading material rates...</p>
+
+</div>
+
+
+
+<!-- Hubs Display (Scrollable List) -->
+
+<div class="section-title">
+
+    <span>Partner Hub Locations</span>
+
+    <span class="sub-text">Verified Drop-offs</span>
+
+</div>
+
+<div class="scroll-container">
+
+    <div class="scroll-box" id="hubs-list">
+
+        <p class="loading-text">Loading hub locations...</p>
+
+    </div>
+
+    <div class="text-center mt-3" id="load-more-hubs-container" style="display: none;">
+
+        <button id="load-more-hubs-btn" class="btn-custom-secondary" style="border-radius: 50px; cursor: pointer; padding: 0.3rem 1rem; font-size: 0.85rem;">
+
+            Show More Hubs
+
+        </button>
+
+    </div>
+
+</div>
+
+
+
+<!-- Recent Community Contributions Feed -->
+
+<div class="section-title mt-4">
+
+    <span>Recent Community Contributions</span>
+
+    <span class="sub-text">Live updates</span>
+
+</div>
+
+<div class="scroll-container">
+
+    <div class="mb-3">
+
+        <input type="text" id="search-contributions" class="form-control bg-dark text-light border-secondary form-control-sm" placeholder="Search by material or hub name...">
+
+    </div>
+
+    <div class="scroll-box" id="contributions-list">
+
+        <p class="loading-text">Loading recent contributions...</p>
+
+    </div>
+
+    <div class="text-center mt-3" id="load-more-contributions-container" style="display: none;">
+
+        <button id="load-more-contributions-btn" class="btn-custom-secondary" style="border-radius: 50px; cursor: pointer; padding: 0.3rem 1rem; font-size: 0.85rem;">
+
+            Show More Contributions
+
+        </button>
+
+    </div>
+
+</div>
+
+
+
+<footer class="text-center py-3 border-top border-secondary mt-4" style="font-size: 0.82rem; color: var(--text-muted, #9ca3af);">
+
+    <p class="mb-0">&copy; 2026 EcoTrade Malaysia. Empowering Sustainable Recycling.</p>
+
+</footer>
+
+
+
+<script>
+
+    // Global States
+
+    let currentMaterialsData = [];
+
+    let currentHubsData = [];
+
+    let hubDisplayLimit = 10;
+
+    let allContributions = [];
+
+    let filteredContributions = [];
+
+    let contribDisplayLimit = 10;
+
+    let searchTimeout = null;
+
+
+
+    // --- Helper function for dynamic DB time ---
+
+    function formatTimeAgo(seconds) {
+
+        if (!seconds && seconds !== 0) return "Just now";
+
+        if (seconds < 60) return `${Math.floor(seconds)} secs ago`;
+
+        const minutes = Math.floor(seconds / 60);
+
+        if (minutes < 60) return `${minutes} mins ago`;
+
+        const hours = Math.floor(minutes / 60);
+
+        if (hours < 24) return `${hours} hours ago`;
+
+        const days = Math.floor(hours / 24);
+
+        return `${days} days ago`;
+
+    }
+
+
+
+    async function fetchStats() {
+
+        try {
+
+            const res = await fetch('/api/stats');
+
+            const data = await res.json();
+
+            if (data.status === 'success') {
+
+                const weight = data.total_weight || 0;
+
+                document.getElementById('stat-weight').innerText = `${weight.toFixed(1)} kg`;
+
+                document.getElementById('stat-earnings').innerText = `RM ${(data.total_earnings || 0).toFixed(2)}`;
+
+                document.getElementById('stat-hubs').innerText = data.active_hubs || 0;
+
+                document.getElementById('stat-co2').innerText = `${(weight * 1.5).toFixed(1)} kg`;
+
+            }
+
+        } catch (err) {
+
+            console.error("Failed to fetch statistics:", err);
+
+        }
+
+    }
+
+
+
+    async function fetchMaterials() {
+
+        const city = document.getElementById('filter-city').value;
+
+        const hubId = document.getElementById('filter-hub').value;
+
+        
+
+        try {
+
+            const queryParams = new URLSearchParams();
+
+            if (city) queryParams.append('city', city);
+
+            if (hubId) queryParams.append('hub_id', hubId);
+
+
+
+            const res = await fetch(`/api/materials?${queryParams.toString()}`);
+
+            const data = await res.json();
+
+            
+
+            if (data.status === 'success' && data.data) {
+
+                currentMaterialsData = data.data;
+
+                renderMaterials();
+
+            } else {
+
+                document.getElementById('materials-list').innerHTML = '<p class="loading-text">No active materials found.</p>';
+
+            }
+
+        } catch (err) {
+
+            console.error("Failed to fetch materials:", err);
+
+            document.getElementById('materials-list').innerHTML = '<p class="loading-text">Unable to load materials.</p>';
+
+        }
+
+    }
+
+
+
+    function renderMaterials() {
+
+        const container = document.getElementById('materials-list');
+
+        const weightInput = parseFloat(document.getElementById('calc-weight').value) || 0;
+
+
+
+        if (currentMaterialsData.length > 0) {
+
+            container.innerHTML = currentMaterialsData.map(m => {
+
+                const estimatedPayout = ((m.avg_reported_rate || 0) * weightInput).toFixed(2);
+
+                const reportBadge = m.report_count > 0 
+
+                    ? `<span class="badge bg-secondary ms-1">${m.report_count} user report${m.report_count > 1 ? 's' : ''}</span>`
+
+                    : `<span class="badge bg-dark border border-secondary text-secondary ms-1">Base Rate</span>`;
+
+
+
+                return `
+
+                    <div class="info-card">
+
+                        <div>
+
+                            <h4>${m.name || 'Unknown Material'}</h4>
+
+                            <p><strong>Category:</strong> ${m.category || 'General'}</p>
+
+                            <p>${m.tips || 'Clean and prepare materials prior to drop-off.'}</p>
+
+                        </div>
+
+                        <div>
+
+                            <div class="price-badge">
+
+                                RM ${(m.avg_reported_rate || 0).toFixed(2)} / kg ${reportBadge}
+
+                            </div>
+
+                            <div class="payout-estimate-box">
+
+                                <small class="text-muted d-block">Estimated Payout for <strong>${weightInput} kg</strong>:</small>
+
+                                <span class="fw-bold text-success fs-6">RM ${estimatedPayout}</span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                `;
+
+            }).join('');
+
+        } else {
+
+            container.innerHTML = '<p class="loading-text">No active materials found.</p>';
+
+        }
+
+    }
+
+
+
+    async function fetchHubs(city = '') {
+
+        try {
+
+            const url = city ? `/api/hubs?city=${encodeURIComponent(city)}` : '/api/hubs';
+
+            const res = await fetch(url);
+
+            const data = await res.json();
+
+            
+
+            const citySelect = document.getElementById('filter-city');
+
+            if (citySelect.options.length <= 1 && data.cities) {
+
+                data.cities.forEach(c => {
+
+                    const opt = document.createElement('option');
+
+                    opt.value = c;
+
+                    opt.textContent = c;
+
+                    citySelect.appendChild(opt);
+
+                });
+
+            }
+
+
+
+            const hubSelect = document.getElementById('filter-hub');
+
+            const previousHubValue = hubSelect.value;
+
+            hubSelect.innerHTML = '<option value="">All Partner Hubs</option>';
+
+            
+
+            if (data.status === 'success' && data.data) {
+
+                data.data.forEach(h => {
+
+                    const opt = document.createElement('option');
+
+                    opt.value = h.id;
+
+                    opt.textContent = `${h.name} (${h.city})`;
+
+                    hubSelect.appendChild(opt);
+
+                });
+
+                if (previousHubValue) hubSelect.value = previousHubValue;
+
+                currentHubsData = data.data;
+
+            } else {
+
+                currentHubsData = [];
+
+            }
+
+            
+
+            hubDisplayLimit = 10;
+
+            renderHubs();
+
+        } catch (err) {
+
+            console.error("Failed to fetch hubs:", err);
+
+            document.getElementById('hubs-list').innerHTML = '<p class="loading-text">Unable to load hub locations.</p>';
+
+            document.getElementById('load-more-hubs-container').style.display = 'none';
+
+        }
+
+    }
+
+
+
+    function renderHubs() {
+
+        const container = document.getElementById('hubs-list');
+
+        const loadMoreBtnContainer = document.getElementById('load-more-hubs-container');
+
+        
+
+        const toDisplay = currentHubsData.slice(0, hubDisplayLimit);
+
+
+
+        if (toDisplay.length === 0) {
+
+            container.innerHTML = '<p class="loading-text">No recycling hubs found for selected filters.</p>';
+
+            loadMoreBtnContainer.style.display = 'none';
+
+            return;
+
+        }
+
+
+
+        container.innerHTML = toDisplay.map(h => `
+
+            <div class="list-row-item">
+
+                <div class="list-details">
+
+                    <h6>${h.name}</h6>
+
+                    <p>📍 ${h.address || 'Address not provided'}, ${h.city}</p>
+
+                </div>
+
+                <div class="list-right-col">
+
+                    <div style="margin-bottom: 0.15rem;">🕒 ${h.hours || 'N/A'}</div>
+
+                    <div>📞 ${h.phone || 'N/A'}</div>
+
+                </div>
+
+            </div>
+
+        `).join('');
+
+
+
+        loadMoreBtnContainer.style.display = currentHubsData.length > hubDisplayLimit ? 'block' : 'none';
+
+    }
+
+
+
+    // --- Strictly Database Fetch for Recent Contributions ---
+
+    async function fetchRecentContributions() {
+
+        const container = document.getElementById('contributions-list');
+
+        const loadMoreBtnContainer = document.getElementById('load-more-contributions-container');
+
+
+
+        try {
+
+            const res = await fetch('/api/recent_contributions');
+
+            
+
+            if (!res.ok) {
+
+                throw new Error(`Server returned HTTP ${res.status}`);
+
+            }
+
+
+
+            const data = await res.json();
+
+            
+
+            if (data.status === 'success' && Array.isArray(data.data) && data.data.length > 0) {
+
+                allContributions = data.data.map(c => ({
+
+                    material_name: c.material_name || 'Unknown Material',
+
+                    hub_name: c.hub_name || 'Unknown Hub',
+
+                    weight: parseFloat(c.weight || 0).toFixed(1),
+
+                    payout: parseFloat(c.payout || 0).toFixed(2),
+
+                    time_ago: c.seconds_ago !== undefined 
+
+                        ? formatTimeAgo(c.seconds_ago) 
+
+                        : (c.created_at ? formatTimeAgo((new Date() - new Date(c.created_at)) / 1000) : 'Just now')
+
+                }));
+
+                filteredContributions = [...allContributions];
+
+                renderContributions();
+
+            } else {
+
+                allContributions = [];
+
+                filteredContributions = [];
+
+                container.innerHTML = '<p class="loading-text">No recent contributions found in database.</p>';
+
+                loadMoreBtnContainer.style.display = 'none';
+
+            }
+
+        } catch (err) {
+
+            console.error("Failed to fetch contributions from DB:", err);
+
+            allContributions = [];
+
+            filteredContributions = [];
+
+            container.innerHTML = '<p class="loading-text">Unable to load database contributions.</p>';
+
+            loadMoreBtnContainer.style.display = 'none';
+
+        }
+
+    }
+
+
+
+    function renderContributions() {
+
+        const container = document.getElementById('contributions-list');
+
+        const loadMoreBtnContainer = document.getElementById('load-more-contributions-container');
+
+        
+
+        const toDisplay = filteredContributions.slice(0, contribDisplayLimit);
+
+        
+
+        if (toDisplay.length === 0) {
+
+            container.innerHTML = '<p class="loading-text">No matching contributions found.</p>';
+
+            loadMoreBtnContainer.style.display = 'none';
+
+            return;
+
+        }
+
+        
+
+        container.innerHTML = toDisplay.map(c => `
+
+            <div class="list-row-item">
+
+                <div class="list-details">
+
+                    <h6>${c.material_name} (${c.weight} kg)</h6>
+
+                    <p>Dropped off at <strong>${c.hub_name}</strong> • ${c.time_ago}</p>
+
+                </div>
+
+                <div class="list-right-col">
+
+                    <span class="text-success fw-bold" style="font-size: 0.95rem;">+RM ${c.payout}</span>
+
+                </div>
+
+            </div>
+
+        `).join('');
+
+        
+
+        loadMoreBtnContainer.style.display = filteredContributions.length > contribDisplayLimit ? 'block' : 'none';
+
+    }
+
+
+
+    // --- Event Listeners ---
+
+    document.getElementById('load-more-hubs-btn').addEventListener('click', () => {
+
+        hubDisplayLimit += 10;
+
+        renderHubs();
+
+    });
+
+
+
+    document.getElementById('search-contributions').addEventListener('input', (e) => {
+
+        clearTimeout(searchTimeout);
+
+        searchTimeout = setTimeout(() => {
+
+            const query = e.target.value.toLowerCase();
+
+            filteredContributions = allContributions.filter(c => 
+
+                c.material_name.toLowerCase().includes(query) || 
+
+                c.hub_name.toLowerCase().includes(query)
+
+            );
+
+            contribDisplayLimit = 10; 
+
+            renderContributions();
+
+        }, 300);
+
+    });
+
+
+
+    document.getElementById('load-more-contributions-btn').addEventListener('click', () => {
+
+        contribDisplayLimit += 10;
+
+        renderContributions();
+
+    });
+
+
+
+    document.getElementById('filter-city').addEventListener('change', async () => {
+
+        await fetchHubs(document.getElementById('filter-city').value);
+
+        fetchMaterials();
+
+    });
+
+
+
+    document.getElementById('filter-hub').addEventListener('change', () => {
+
+        fetchMaterials();
+
+    });
+
+
+
+    document.getElementById('calc-weight').addEventListener('input', () => {
+
+        renderMaterials();
+
+    });
+
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+
+        fetchStats();
+
+        fetchHubs();
+
+        fetchMaterials();
+
+        fetchRecentContributions();
+
+    });
+
+</script>
+
+{% endblock %} 
+
