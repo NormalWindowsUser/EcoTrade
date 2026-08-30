@@ -6,8 +6,8 @@
     
     <title>EcoTrade - Community</title>
     
-    <!-- Browser Tab Icon -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>♻️</text></svg>">
+    <!-- Browser Tab Icon (Clean Recycling Arrow SVG) -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2310b981' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67'/></svg>">
     
     <!-- Google Fonts: Geist -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -111,7 +111,7 @@
             color: #10b981;
         }
 
-        /* FLOATING GLASS NAVIGATION */
+        /* FLOATING NAVIGATION */
         .bottom-nav-container {
             position: fixed;
             bottom: 20px;
@@ -200,15 +200,16 @@
             transition: background-color 0.2s ease, border-color 0.2s ease;
         }
 
-        /* STAT ICON CONTAINER FIX */
+        /* STAT ICON WRAPPER FIX */
         .stat-icon-wrapper {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
             background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
             flex-shrink: 0;
         }
 
@@ -267,7 +268,10 @@
 
     <header class="header-bar">
         <a href="/" class="brand-logo text-decoration-none d-flex align-items-center gap-2">
-            <i class="bi bi-recycle text-success" style="font-size: 1.5rem;"></i>
+            <!-- Updated Brand Icon to Circular Arrow -->
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+            </svg>
             <span class="fs-5 fw-bold" style="color: var(--text-color);">EcoTrade</span>
         </a>
 
