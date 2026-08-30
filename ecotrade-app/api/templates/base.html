@@ -6,11 +6,13 @@
     
     <title>EcoTrade - Community</title>
     
-    <!-- Updated Browser Tab Icon (Uses a built-in recycle emoji so it never fails to load) -->
+    <!-- Browser Tab Icon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>♻️</text></svg>">
     
+    <!-- Bootstrap & Lucide Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
     
     <style>
         :root {
@@ -18,11 +20,16 @@
             --header-bg: #111827;
             --card-bg: #111827;
             --border-color: #1f2937;
-            --text-color: #e2e8f0;
-            --text-muted: #94a3b8;
+            --text-color: #f3f4f6;
+            --text-muted: #9ca3af;
+            
+            /* Catalyst Dark Variables */
             --nav-bg: rgba(17, 24, 39, 0.85);
             --nav-border: rgba(255, 255, 255, 0.12);
-            --nav-text: #94a3b8;
+            --nav-hover: rgba(255, 255, 255, 0.06);
+            --nav-active: rgba(16, 185, 129, 0.15);
+            --nav-text: #9ca3af;
+            --nav-text-active: #10b981;
         }
 
         body.light-mode {
@@ -32,9 +39,317 @@
             --border-color: #e2e8f0;
             --text-color: #0f172a;
             --text-muted: #64748b;
-            --nav-bg: rgba(255, 255, 255, 0.85);
-            --nav-border: rgba(0, 0, 0, 0.12);
+            
+            /* Catalyst Light Variables */
+            --nav-bg: rgba(255, 255, 255, 0.88);
+            --nav-border: rgba(0, 0, 0, 0.1);
+            --nav-hover: rgba(0, 0, 0, 0.04);
+            --nav-active: rgba(16, 185, 129, 0.12);
             --nav-text: #475569;
+            --nav-text-active: #059669;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            padding-bottom: 110px;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .header-bar {
+            background: var(--header-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .brand-logo {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .theme-toggle-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 50px;
+            padding: 4px 12px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .theme-toggle-btn:hover {
+            border-color: #10b981;
+            color: #10b981;
+        }
+
+        /* CATALYST-STYLE NAV DOCK */
+        .bottom-nav-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1050;
+            width: max-content;
+            max-width: calc(100vw - 32px);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .bottom-nav {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--nav-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 6px;
+            border-radius: 9999px;
+            border: 1px solid var(--nav-border);
+            box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.18), 0 4px 12px -2px rgba(0, 0, 0, 0.08);
+            transition: all 0.25s ease;
+        }
+
+        .nav-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: var(--nav-text);
+            text-decoration: none;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            letter-spacing: -0.01em;
+            padding: 8px 14px;
+            border-radius: 9999px;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+        }
+
+        .nav-btn i, 
+        .nav-btn svg {
+            width: 18px;
+            height: 18px;
+            stroke-width: 2px;
+            flex-shrink: 0;
+        }
+
+        .nav-btn:hover {
+            color: var(--text-color);
+            background: var(--nav-hover);
+        }
+
+        .nav-btn.active {
+            color: var(--nav-text-active);
+            background: var(--nav-active);
+            font-weight: 600;
+        }
+
+        /* Catalyst CTA Accent Button */
+        .nav-btn.btn-action {
+            background-color: #10b981;
+            color: #ffffff;
+            padding: 8px 16px;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
+        }
+
+        .nav-btn.btn-action:hover {
+            background-color: #059669;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+        }
+
+        /* RESPONSIVE MOBILE BAR (Snaps to edges on small screens) */
+        @media (max-width: 576px) {
+            body {
+                padding-bottom: 90px;
+            }
+
+            .bottom-nav-container {
+                bottom: 0;
+                left: 0;
+                right: 0;
+                transform: none;
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .bottom-nav {
+                border-radius: 0;
+                border-bottom: none;
+                border-left: none;
+                border-right: none;
+                border-top: 1px solid var(--nav-border);
+                justify-content: space-around;
+                padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px));
+                background: var(--nav-bg);
+            }
+
+            .nav-btn {
+                flex-direction: column;
+                gap: 3px;
+                padding: 6px 8px;
+                font-size: 0.6875rem;
+                border-radius: 12px;
+                flex: 1;
+            }
+
+            .nav-btn i, 
+            .nav-btn svg {
+                width: 20px;
+                height: 20px;
+            }
+
+            .nav-btn.btn-action {
+                border-radius: 16px;
+                padding: 6px 8px;
+            }
+        }
+
+        .card-custom {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+
+        /* Light Mode Utility Overrides */
+        body.light-mode .text-light { color: #0f172a !important; }
+        body.light-mode .text-secondary { color: #475569 !important; }
+        body.light-mode .text-muted { color: #64748b !important; }
+        body.light-mode .bg-dark { background-color: #f1f5f9 !important; }
+        body.light-mode .border-secondary { border-color: #cbd5e1 !important; }
+        body.light-mode .form-control, 
+        body.light-mode .form-select {
+            background-color: #ffffff !important;
+            color: #0f172a !important;
+            border-color: #cbd5e1 !important;
+        }
+
+        body.light-mode .table {
+            color: #0f172a !important;
+            border-color: #cbd5e1 !important;
+        }
+        body.light-mode .table th,
+        body.light-mode .table td {
+            background-color: #ffffff !important;
+            color: #0f172a !important;
+            border-color: #cbd5e1 !important;
+        }
+        body.light-mode .table-hover tbody tr:hover td {
+            background-color: #f1f5f9 !important;
+            color: #0f172a !important;
+        }
+    </style>
+</head>
+<body class="light-mode">
+
+    <header class="header-bar">
+        <a href="/" class="brand-logo text-decoration-none d-flex align-items-center gap-2">
+            <i class="bi bi-recycle text-success" style="font-size: 1.5rem;"></i>
+            <span class="fs-5 fw-bold" style="color: var(--text-color);">EcoTrade</span>
+        </a>
+
+        <div class="d-flex align-items-center gap-2">
+            {% if session.get('user_id') %}
+                <span class="badge bg-dark border border-secondary text-light px-2 py-1 small">
+                    <i class="bi bi-person-circle text-success me-1"></i> {{ session.get('user_name') }}
+                </span>
+                <a href="/logout" class="btn btn-outline-danger btn-sm rounded-pill px-2 py-0" style="font-size: 0.75rem;">Logout</a>
+            {% else %}
+                <a href="/login" class="btn btn-outline-success btn-sm rounded-pill px-3 py-1" style="font-size: 0.75rem;">Log In</a>
+            {% endif %}
+
+            <!-- Dark/Light Theme Toggle -->
+            <button id="themeToggleBtn" class="theme-toggle-btn ms-1" onclick="toggleTheme()">
+                <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
+                <span id="themeLabel">Dark</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="container py-3" style="max-width: 960px;">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Catalyst Floating / Edge-Connected Glass Navigation -->
+    <div class="bottom-nav-container">
+        <nav class="bottom-nav">
+            <a href="/" class="nav-btn {% if request.path == '/' %}active{% endif %}">
+                <i data-lucide="house"></i>
+                <span>Home</span>
+            </a>
+
+            {% if session.get('user_role') == 'admin' %}
+            <a href="/admin" class="nav-btn {% if request.path == '/admin' %}active{% endif %}">
+                <i data-lucide="user-shield"></i>
+                <span>Admin</span>
+            </a>
+            {% endif %}
+
+            <a href="/contribute" class="nav-btn btn-action">
+                <i class="bi bi-plus-circle-fill"></i>
+                <span>Contribute</span>
+            </a>
+
+            <a href="/chat" class="nav-btn {% if request.path == '/chat' %}active{% endif %}">
+                <i class="bi bi-robot"></i>
+                <span>AI Chat</span>
+            </a>
+
+            <a href="/account" class="nav-btn {% if request.path == '/account' %}active{% endif %}">
+                <i data-lucide="user-round"></i>
+                <span>Account</span>
+            </a>
+        </nav>
+    </div>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Apply saved theme preference on page load (defaults to light mode)
+        (function initTheme() {
+            const savedTheme = localStorage.getItem('ecotrade-theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.remove('light-mode');
+                updateThemeUI(false);
+            } else {
+                document.body.classList.add('light-mode');
+                updateThemeUI(true);
+            }
+        })();
+
+        function toggleTheme() {
+            const isLight = document.body.classList.toggle('light-mode');
+            localStorage.setItem('ecotrade-theme', isLight ? 'light' : 'dark');
+            updateThemeUI(isLight);
+        }
+
+        function updateThemeUI(isLight) {
+            const icon = document.getElementById('themeIcon');
+            const label = document.getElementById('themeLabel');
+            if (isLight) {
+                icon.className = 'bi bi-moon-stars-fill';
+                label.innerText = 'Dark';
+            } else {
+                icon.className = 'bi bi-sun-fill';
+                label.innerText = 'Light';
+            }
+        }
+    </script>
+
+</body>
+</html>            --nav-text: #475569;
         }
 
         body {
