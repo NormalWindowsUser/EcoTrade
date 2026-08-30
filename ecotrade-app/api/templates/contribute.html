@@ -30,25 +30,7 @@
                 <div class="mb-3">
                     <label class="form-label small fw-semibold text-light">Material Type</label>
                     <select class="form-select bg-dark text-light border-secondary" id="materialSelect" required>
-                        <option value="" disabled selected>Select a material...</option>
-                        
-                        <optgroup label="Plastics">
-                            <option value="PET Plastic Bottles">PET Plastic Bottles</option>
-                            <option value="HDPE Detergent Containers">HDPE Detergent Containers</option>
-                        </optgroup>
-                        
-                        <optgroup label="Paper">
-                            <option value="Corrugated Cardboard">Corrugated Cardboard</option>
-                        </optgroup>
-                        
-                        <optgroup label="Metals">
-                            <option value="Aluminum Drink Cans">Aluminum Drink Cans</option>
-                            <option value="Copper Wiring (Bare)">Copper Wiring (Bare)</option>
-                        </optgroup>
-                        
-                        <optgroup label="Oil">
-                            <option value="Used Cooking Oil (UCO)">Used Cooking Oil (UCO)</option>
-                        </optgroup>
+                        <option value="" disabled selected>Loading materials...</option>
                     </select>
                 </div>
 
@@ -60,7 +42,7 @@
                     </div>
                     <div class="col-6">
                         <label class="form-label small fw-semibold text-light">Rate (RM/kg)</label>
-                        <input type="number" step="0.1" class="form-control bg-dark text-light border-secondary" id="priceInput" value="0.50" required>
+                        <input type="number" step="0.1" class="form-control bg-dark text-light border-secondary" id="priceInput" value="0.00" required>
                     </div>
                 </div>
 
@@ -79,8 +61,9 @@
 
 <script>
     let hubsList = [];
+    let materialsList = [];
 
-    // Load available recycling hubs from API
+    // --- HUB LOGIC ---
     async function fetchHubs() {
         try {
             const res = await fetch('/api/hubs');
@@ -104,7 +87,6 @@
             list.map(h => `<option value="${h.id}">${h.name} (${h.city})</option>`).join('');
     }
 
-    // Filter hubs dynamically by user input
     document.getElementById('hubSearchInput').addEventListener('input', (e) => {
         const query = e.target.value.toLowerCase();
         const filtered = hubsList.filter(h => 
@@ -115,7 +97,6 @@
         renderHubOptions(filtered);
     });
 
-    // Display location details upon hub selection
     document.getElementById('hubSelect').addEventListener('change', (e) => {
         const selectedId = parseInt(e.target.value);
         const hub = hubsList.find(h => h.id === selectedId);
@@ -130,12 +111,60 @@
         }
     });
 
-    // Handle Form Submission with Turnstile Token
+    // --- MATERIAL LOGIC ---
+    async function fetchMaterials() {
+        try {
+            const res = await fetch('/api/materials');
+            const data = await res.json();
+            if (data.status === 'success') {
+                materialsList = data.data;
+                renderMaterialOptions(materialsList);
+            }
+        } catch (e) {
+            console.error('Error fetching materials:', e);
+        }
+    }
+
+    function renderMaterialOptions(list) {
+        const select = document.getElementById('materialSelect');
+        
+        // Group materials by their category
+        const groupedMaterials = list.reduce((acc, material) => {
+            if (!acc[material.category]) acc[material.category] = [];
+            acc[material.category].push(material);
+            return acc;
+        }, {});
+
+        let html = '<option value="" disabled selected>Select a material...</option>';
+        
+        // Generate optgroups and options dynamically
+        for (const category in groupedMaterials) {
+            html += `<optgroup label="${category}">`;
+            groupedMaterials[category].forEach(m => {
+                // Store the base_price in a data attribute
+                html += `<option value="${m.name}" data-price="${m.base_price}">${m.name}</option>`;
+            });
+            html += `</optgroup>`;
+        }
+        
+        select.innerHTML = html;
+    }
+
+    // Automatically update the price rate when a material is selected
+    document.getElementById('materialSelect').addEventListener('change', (e) => {
+        const selectedOption = e.target.options[e.target.selectedIndex];
+        const basePrice = selectedOption.getAttribute('data-price');
+        
+        if (basePrice) {
+            document.getElementById('priceInput').value = parseFloat(basePrice).toFixed(2);
+        }
+    });
+
+    // --- FORM SUBMISSION ---
     document.getElementById('contribForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const msgDiv = document.getElementById('resultMsg');
         
-        // Get Cloudflare Turnstile token
         const turnstileResponse = turnstile.getResponse();
         if (!turnstileResponse) {
             msgDiv.innerHTML = `<div class="alert alert-warning py-2 small">Please complete the anti-bot verification.</div>`;
@@ -176,6 +205,10 @@
         }
     });
 
-    document.addEventListener('DOMContentLoaded', fetchHubs);
+    // --- INITIALIZATION ---
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchHubs();
+        fetchMaterials(); // Fetch materials on load
+    });
 </script>
 {% endblock %}
