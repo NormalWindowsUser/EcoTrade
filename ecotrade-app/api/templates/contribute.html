@@ -15,10 +15,11 @@
                     <label class="form-label small fw-semibold text-light">Select Recycling Hub Location</label>
                     <div class="position-relative mb-2">
                         <input type="text" id="hubSearchInput" class="form-control bg-dark text-light border-secondary form-control-sm pe-4" placeholder="Search hub name or city...">
-                        <!-- SVG Search Icon Matching Image Style (Right Aligned) -->
+                        <!-- Rounded Search Icon with Shorter Line -->
                         <span class="position-absolute end-0 top-50 translate-middle-y me-2 d-flex align-items-center pointer-events-none text-secondary">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16">
-                                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="7.5"></circle>
+                                <line x1="16.5" y1="16.5" x2="19.5" y2="19.5"></line>
                             </svg>
                         </span>
                     </div>
@@ -54,7 +55,7 @@
                     </div>
                 </div>
 
-                <!-- Cloudflare Turnstile Anti-Bot Widget with Callbacks -->
+                <!-- Cloudflare Turnstile Anti-Bot Widget with Automatic Submission -->
                 <div class="mb-3 text-center d-flex justify-content-center">
                     <div class="cf-turnstile" 
                          data-sitekey="0x4AAAAAAEh_P3q35b1X2GRM" 
@@ -77,13 +78,21 @@
     let materialsList = [];
     let turnstileToken = '';
 
-    // Turnstile Callbacks to guarantee reliable verification handling
+    // Turnstile Callback with Auto-Submit trigger
     function onTurnstileSuccess(token) {
         turnstileToken = token;
+        
+        // Check form validity before auto-submitting
+        const form = document.getElementById('contribForm');
+        if (form.checkValidity()) {
+            form.requestSubmit();
+        }
     }
+    
     function onTurnstileExpired() {
         turnstileToken = '';
     }
+    
     function onTurnstileError() {
         turnstileToken = '';
     }
@@ -182,7 +191,6 @@
         e.preventDefault();
         const msgDiv = document.getElementById('resultMsg');
         
-        // Fallback to turnstile.getResponse() if callback token wasn't populated
         const responseToken = turnstileToken || (window.turnstile ? turnstile.getResponse() : '');
 
         if (!responseToken) {
