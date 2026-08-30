@@ -32,7 +32,6 @@
             --input-bg: #1f2937;
             --input-text: #f8fafc;
 
-            /* Map custom properties to Bootstrap 5 CSS variables */
             --bs-body-bg: var(--bg-color);
             --bs-body-color: var(--text-color);
             --bs-card-bg: var(--card-bg);
@@ -56,7 +55,6 @@
             --input-bg: #ffffff;
             --input-text: #0f172a;
 
-            /* Map custom light properties to Bootstrap 5 CSS variables */
             --bs-body-bg: var(--bg-color);
             --bs-body-color: var(--text-color);
             --bs-card-bg: var(--card-bg);
@@ -74,7 +72,6 @@
             transition: background-color 0.2s ease, color 0.2s ease;
         }
 
-        /* Ensure heading text dynamically responds to dark/light theme */
         h1, h2, h3, h4, h5, h6 {
             color: var(--text-color);
         }
@@ -203,6 +200,18 @@
             transition: background-color 0.2s ease, border-color 0.2s ease;
         }
 
+        /* STAT ICON CONTAINER FIX */
+        .stat-icon-wrapper {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(16, 185, 129, 0.1);
+            flex-shrink: 0;
+        }
+
         /* DYNAMIC UTILITY OVERRIDES */
         .text-muted, .text-secondary {
             color: var(--text-muted) !important;
@@ -227,7 +236,7 @@
             opacity: 0.7;
         }
 
-        /* ALWAYS-VISIBLE WEIGHT STEPPER BUTTONS */
+        /* ALWAYS-VISIBLE WEIGHT STEPPER CONTROLS */
         .show-stepper-always,
         .weight-input-container .btn-stepper,
         .weight-control-btn,
@@ -236,28 +245,6 @@
             opacity: 1 !important;
             visibility: visible !important;
             display: inline-flex !important;
-        }
-
-        /* LOCK EMOJI + RECYCLE TOGETHER */
-        .title-recycle-wrapper {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.35rem;
-            white-space: nowrap;
-        }
-
-        /* STAT CARD ICON STYLING */
-        .stat-icon-wrapper {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background-color: rgba(16, 185, 129, 0.12);
-            color: #10b981;
-            font-size: 1.1rem;
-            flex-shrink: 0;
         }
 
         /* Table Overrides */
@@ -304,28 +291,6 @@
     </header>
 
     <main class="container py-3" style="max-width: 960px;">
-        
-        <!-- MAIN TITLE WITH LOCKED EMOJI -->
-        <h1 class="fw-bold mb-2">
-            <span class="title-recycle-wrapper">♻️ Recycle</span> Smarter, Earn Rewards
-        </h1>
-        <p class="text-muted mb-4">Convert household recyclables into payouts while lowering carbon emissions in Malaysia.</p>
-
-        <!-- STAT CARDS WITH PROPER RECYCLED ICON -->
-        <div class="row g-3 mb-4">
-            <div class="col-6 col-md-3">
-                <div class="card card-custom p-3 h-100">
-                    <div class="d-flex align-items-center gap-2 mb-1">
-                        <div class="stat-icon-wrapper">
-                            <i class="bi bi-arrow-repeat"></i>
-                        </div>
-                        <span class="fs-5 fw-bold">7.0 kg</span>
-                    </div>
-                    <small class="text-muted">Total Recycled</small>
-                </div>
-            </div>
-        </div>
-
         {% block content %}{% endblock %}
     </main>
 
