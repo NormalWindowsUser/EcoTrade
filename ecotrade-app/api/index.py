@@ -219,6 +219,48 @@ def get_user_contributions():
         if conn:
             conn.close()
 
+@app.route("/api/recent_contributions", methods=["GET"])
+def get_recent_contributions():
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+            SELECT 
+                COALESCE(m.name, 'Unknown Material') AS material_name,
+                COALESCE(h.hub_name, 'Unknown Hub') AS hub_name,
+                c.weight_kg,
+                c.calculated_payout,
+                EXTRACT(EPOCH FROM (NOW() - c.created_at)) AS seconds_ago
+            FROM contributions c
+            LEFT JOIN materials m ON c.material_id = m.id
+            LEFT JOIN recycling_hubs h ON c.hub_id = h.id
+            ORDER BY c.created_at DESC
+            LIMIT 50;
+        """)
+        rows = cursor.fetchall()
+
+        contributions = [{
+            "material_name": r[0],
+            "hub_name": r[1],
+            "weight": float(r[2]) if r[2] else 0.0,
+            "payout": float(r[3]) if r[3] else 0.0,
+            "seconds_ago": float(r[4]) if r[4] is not None else 0
+        } for r in rows]
+
+        return jsonify({"status": "success", "data": contributions})
+    
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+    
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
 @app.route("/api/hubs", methods=["GET"])
 def get_hubs():
     city_filter = request.args.get("city", "").strip()
