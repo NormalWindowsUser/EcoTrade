@@ -5,73 +5,60 @@
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
 <div class="row justify-content-center py-3">
-    <div class="col-md-8 col-lg-6">
+    <div class="col-md-7 col-lg-6">
         <div class="card bg-body border shadow-sm rounded-4 p-4">
+            <h4 class="fw-bold text-success mb-3 d-flex align-items-center gap-2">
+                <i class="bi bi-plus-circle-fill"></i> Submit Contribution
+            </h4>
             
-            <!-- Header Section -->
-            <div class="d-flex align-items-center gap-2 mb-4 pb-2 border-bottom">
-                <i class="bi bi-plus-circle-fill text-success fs-4"></i>
-                <div>
-                    <h5 class="fw-bold mb-0">Submit Contribution</h5>
-                    <small class="text-secondary">Log your recycling activity and view estimated payouts</small>
-                </div>
-            </div>
-
             <form id="contribForm">
-                <!-- Section 1: Location Selection -->
-                <div class="mb-4">
-                    <label class="form-label small fw-semibold text-body-secondary text-uppercase tracking-wide">1. Location</label>
-                    <div class="position-relative mb-2">
-                        <input type="text" id="hubSearchInput" class="form-control form-control-sm bg-body-tertiary border-secondary-subtle ps-4" placeholder="Search hub name or city...">
-                        <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-2 text-secondary small"></i>
+                <!-- Recycling Center Search & Selection -->
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold text-secondary">Select Recycling Hub Location</label>
+                    <div class="input-group mb-2">
+                        <input type="text" id="hubSearchInput" class="form-control bg-body-tertiary border-end-0 rounded-start-pill text-body shadow-none px-3" placeholder="Search hub name or city...">
+                        <button class="btn btn-outline-secondary border-start-0 rounded-end-pill px-3" type="button" tabIndex="-1">
+                            <i class="bi bi-search text-success"></i>
+                        </button>
                     </div>
-                    <select class="form-select bg-body-tertiary border-secondary-subtle" id="hubSelect" required>
+                    <select class="form-select bg-body-tertiary text-body border rounded-3 shadow-none" id="hubSelect" required>
                         <option value="" disabled selected>Loading locations...</option>
                     </select>
                 </div>
 
                 <!-- Selected Hub Location Info Card -->
-                <div id="hubInfoCard" class="card bg-success-subtle border-success border-opacity-25 p-3 mb-4 d-none rounded-3">
-                    <div class="small text-success fw-bold mb-1 d-flex align-items-center gap-1" id="hubInfoName">--</div>
-                    <div class="small text-body-secondary mb-1" id="hubInfoAddress"><i class="bi bi-geo-alt me-1"></i> --</div>
-                    <div class="small text-body-tertiary" id="hubInfoHours"><i class="bi bi-clock me-1"></i> --</div>
+                <div id="hubInfoCard" class="p-3 mb-3 d-none bg-body-tertiary border rounded-3 transition-all">
+                    <div class="small text-success fw-bold mb-1" id="hubInfoName">--</div>
+                    <div class="small text-secondary mb-1" id="hubInfoAddress"><i class="bi bi-geo-alt me-1"></i> --</div>
+                    <div class="small text-muted" id="hubInfoHours"><i class="bi bi-clock me-1"></i> --</div>
                 </div>
 
-                <!-- Section 2: Material & Weight Details -->
-                <div class="mb-4">
-                    <label class="form-label small fw-semibold text-body-secondary text-uppercase tracking-wide">2. Recyclable Details</label>
-                    <div class="mb-3">
-                        <select class="form-select bg-body-tertiary border-secondary-subtle" id="materialSelect" required>
-                            <option value="" disabled selected>Loading materials...</option>
-                        </select>
-                    </div>
+                <!-- Material Type Selection -->
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold text-secondary">Material Type</label>
+                    <select class="form-select bg-body-tertiary text-body border rounded-3 shadow-none" id="materialSelect" required>
+                        <option value="" disabled selected>Loading materials...</option>
+                    </select>
+                </div>
 
-                    <div class="row g-2">
-                        <div class="col-6">
-                            <label class="form-label small fw-semibold text-body-secondary">Weight (kg)</label>
-                            <div class="input-group">
-                                <input type="number" step="0.1" class="form-control bg-body-tertiary border-secondary-subtle" id="weightInput" placeholder="0.0" required>
-                                <span class="input-group-text bg-body-tertiary text-secondary border-secondary-subtle">kg</span>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <label class="form-label small fw-semibold text-body-secondary">Rate (RM/kg)</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-body-tertiary text-secondary border-secondary-subtle">RM</span>
-                                <input type="number" step="0.01" class="form-control bg-body-tertiary border-secondary-subtle" id="priceInput" value="0.00" required>
-                            </div>
-                        </div>
+                <!-- Weight and Price Rate -->
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <label class="form-label small fw-semibold text-secondary">Weight (kg)</label>
+                        <input type="number" step="0.1" min="0.1" class="form-control bg-body-tertiary text-body border rounded-3 shadow-none" id="weightInput" placeholder="e.g. 2.5" required>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label small fw-semibold text-secondary">Rate (RM/kg)</label>
+                        <input type="number" step="0.01" min="0" class="form-control bg-body-tertiary text-body border rounded-3 shadow-none" id="priceInput" value="0.00" required>
                     </div>
                 </div>
 
-                <!-- Section 3: Security & Submission -->
-                <div class="mb-3 text-center">
-                    <div class="cf-turnstile d-inline-block" data-sitekey="0x4AAAAAAEh_P3q35b1X2GRM"></div>
+                <!-- Cloudflare Turnstile Anti-Bot Widget -->
+                <div class="mb-3 text-center d-flex justify-content-center">
+                    <div class="cf-turnstile" data-sitekey="0x4AAAAAAEh_P3q35b1X2GRM" data-theme="auto"></div>
                 </div>
 
-                <button type="submit" class="btn btn-success w-100 fw-bold py-2.5 rounded-3 shadow-sm">
-                    Submit Recycling Batch
-                </button>
+                <button type="submit" id="submitBtn" class="btn btn-success w-100 fw-bold py-2 rounded-pill shadow-sm">Submit Recycling Batch</button>
             </form>
 
             <div id="resultMsg" class="mt-3"></div>
@@ -122,7 +109,7 @@
         const hub = hubsList.find(h => h.id === selectedId);
         const infoCard = document.getElementById('hubInfoCard');
         if (hub) {
-            document.getElementById('hubInfoName').innerHTML = `<i class="bi bi-building me-1"></i> ${hub.name}`;
+            document.getElementById('hubInfoName').innerText = hub.name;
             document.getElementById('hubInfoAddress').innerHTML = `<i class="bi bi-geo-alt me-1"></i> ${hub.address}, ${hub.city}`;
             document.getElementById('hubInfoHours').innerHTML = `<i class="bi bi-clock me-1"></i> ${hub.hours}`;
             infoCard.classList.remove('d-none');
@@ -147,15 +134,13 @@
 
     function renderMaterialOptions(list) {
         const select = document.getElementById('materialSelect');
-        
         const groupedMaterials = list.reduce((acc, material) => {
             if (!acc[material.category]) acc[material.category] = [];
             acc[material.category].push(material);
             return acc;
         }, {});
 
-        let html = '<option value="" disabled selected>Select material type...</option>';
-        
+        let html = '<option value="" disabled selected>Select a material...</option>';
         for (const category in groupedMaterials) {
             html += `<optgroup label="${category}">`;
             groupedMaterials[category].forEach(m => {
@@ -163,14 +148,12 @@
             });
             html += `</optgroup>`;
         }
-        
         select.innerHTML = html;
     }
 
     document.getElementById('materialSelect').addEventListener('change', (e) => {
         const selectedOption = e.target.options[e.target.selectedIndex];
         const basePrice = selectedOption.getAttribute('data-price');
-        
         if (basePrice) {
             document.getElementById('priceInput').value = parseFloat(basePrice).toFixed(2);
         }
@@ -181,15 +164,18 @@
         e.preventDefault();
         const msgDiv = document.getElementById('resultMsg');
         
-        const turnstileResponse = turnstile.getResponse();
+        // Retrieve turnstile response directly from the widget token or fallback to API getter
+        const turnstileInput = document.querySelector('[name="cf-turnstile-response"]');
+        const turnstileResponse = turnstileInput ? turnstileInput.value : (window.turnstile ? turnstile.getResponse() : '');
+
         if (!turnstileResponse) {
-            msgDiv.innerHTML = `<div class="alert alert-warning py-2 small border-0 shadow-sm">Please complete the anti-bot verification.</div>`;
+            msgDiv.innerHTML = `<div class="alert alert-warning py-2 small rounded-3"><i class="bi bi-shield-exclamation me-1"></i> Please complete the anti-bot verification.</div>`;
             return;
         }
 
         const hubId = document.getElementById('hubSelect').value;
         if (!hubId) {
-            msgDiv.innerHTML = `<div class="alert alert-warning py-2 small border-0 shadow-sm">Please select a recycling center.</div>`;
+            msgDiv.innerHTML = `<div class="alert alert-warning py-2 small rounded-3"><i class="bi bi-exclamation-triangle me-1"></i> Please select a recycling center.</div>`;
             return;
         }
 
@@ -207,20 +193,21 @@
             });
             const data = await res.json();
             if (data.status === 'success') {
-                msgDiv.innerHTML = `<div class="alert alert-success py-2 small border-0 shadow-sm">Contribution recorded! Calculated Payout: <strong>RM ${data.payout.toFixed(2)}</strong></div>`;
+                msgDiv.innerHTML = `<div class="alert alert-success py-2 small rounded-3"><i class="bi bi-check-circle me-1"></i> Contribution recorded! Calculated Payout: <strong>RM ${data.payout.toFixed(2)}</strong></div>`;
                 document.getElementById('contribForm').reset();
                 document.getElementById('hubInfoCard').classList.add('d-none');
-                turnstile.reset();
+                if (window.turnstile) turnstile.reset();
             } else {
-                msgDiv.innerHTML = `<div class="alert alert-danger py-2 small border-0 shadow-sm">${data.message}</div>`;
-                turnstile.reset();
+                msgDiv.innerHTML = `<div class="alert alert-danger py-2 small rounded-3">${data.message}</div>`;
+                if (window.turnstile) turnstile.reset();
             }
         } catch (err) {
-            msgDiv.innerHTML = `<div class="alert alert-danger py-2 small border-0 shadow-sm">Submission error. Please try again.</div>`;
-            turnstile.reset();
+            msgDiv.innerHTML = `<div class="alert alert-danger py-2 small rounded-3"><i class="bi bi-exclamation-octagon me-1"></i> Submission error. Please try again.</div>`;
+            if (window.turnstile) turnstile.reset();
         }
     });
 
+    // --- INITIALIZATION ---
     document.addEventListener('DOMContentLoaded', () => {
         fetchHubs();
         fetchMaterials();
