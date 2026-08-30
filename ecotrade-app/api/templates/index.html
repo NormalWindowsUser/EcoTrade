@@ -209,7 +209,6 @@
         border: 1px dashed rgba(16, 185, 129, 0.3);
     }
 
-    /* Shared Scrollable List UI */
     .scroll-container {
         background: var(--card-bg, #1f2937);
         border: 1px solid var(--border-color, #374151);
@@ -413,7 +412,7 @@
 
     // --- Helper function for dynamic DB time ---
     function formatTimeAgo(seconds) {
-        if (!seconds && seconds !== 0) return "Just now"; // fallback if null
+        if (!seconds && seconds !== 0) return "Just now";
         if (seconds < 60) return `${Math.floor(seconds)} secs ago`;
         const minutes = Math.floor(seconds / 60);
         if (minutes < 60) return `${minutes} mins ago`;
@@ -568,47 +567,45 @@
         loadMoreBtnContainer.style.display = currentHubsData.length > hubDisplayLimit ? 'block' : 'none';
     }
 
+    // --- Strictly Database Fetch for Recent Contributions ---
     async function fetchRecentContributions() {
+        const container = document.getElementById('contributions-list');
+        const loadMoreBtnContainer = document.getElementById('load-more-contributions-container');
+
         try {
             const res = await fetch('/api/recent_contributions');
-            if (res.ok) {
-                const data = await res.json();
-                if (data.status === 'success') {
-                    allContributions = data.data.map(c => ({
-                        material_name: c.material_name || 'Unknown Material',
-                        hub_name: c.hub_name || 'Unknown Hub',
-                        weight: parseFloat(c.weight || 0).toFixed(1),
-                        payout: parseFloat(c.payout || 0).toFixed(2),
-                        time_ago: c.seconds_ago !== undefined ? formatTimeAgo(c.seconds_ago) : formatTimeAgo((new Date() - new Date(c.created_at)) / 1000)
-                    }));
-                }
+            
+            if (!res.ok) {
+                throw new Error(`Server returned HTTP ${res.status}`);
+            }
+
+            const data = await res.json();
+            
+            if (data.status === 'success' && Array.isArray(data.data) && data.data.length > 0) {
+                allContributions = data.data.map(c => ({
+                    material_name: c.material_name || 'Unknown Material',
+                    hub_name: c.hub_name || 'Unknown Hub',
+                    weight: parseFloat(c.weight || 0).toFixed(1),
+                    payout: parseFloat(c.payout || 0).toFixed(2),
+                    time_ago: c.seconds_ago !== undefined 
+                        ? formatTimeAgo(c.seconds_ago) 
+                        : (c.created_at ? formatTimeAgo((new Date() - new Date(c.created_at)) / 1000) : 'Just now')
+                }));
+                filteredContributions = [...allContributions];
+                renderContributions();
             } else {
-                allContributions = generateMockContributions();
+                allContributions = [];
+                filteredContributions = [];
+                container.innerHTML = '<p class="loading-text">No recent contributions found in database.</p>';
+                loadMoreBtnContainer.style.display = 'none';
             }
         } catch (err) {
-            allContributions = generateMockContributions();
+            console.error("Failed to fetch contributions from DB:", err);
+            allContributions = [];
+            filteredContributions = [];
+            container.innerHTML = '<p class="loading-text">Unable to load database contributions.</p>';
+            loadMoreBtnContainer.style.display = 'none';
         }
-        filteredContributions = [...allContributions];
-        renderContributions();
-    }
-
-    function generateMockContributions() {
-        const mats = ['PET Plastic Bottles', 'Corrugated Cardboard', 'Aluminum Drink Cans', 'Used Cooking Oil (UCO)'];
-        const hubs = ['EcoHub PJ', 'KL City Recycling', 'Subang Green Drop', 'Cheras Scrap Center'];
-        let mock = [];
-        for(let i = 0; i < 45; i++) {
-            let weight = (Math.random() * 8 + 0.5).toFixed(1);
-            let payout = (weight * 0.8).toFixed(2);
-            let randomSecondsAgo = Math.floor(Math.random() * 86400);
-            mock.push({
-                material_name: mats[Math.floor(Math.random() * mats.length)],
-                hub_name: hubs[Math.floor(Math.random() * hubs.length)],
-                weight: weight,
-                payout: payout,
-                time_ago: formatTimeAgo(randomSecondsAgo)
-            });
-        }
-        return mock;
     }
 
     function renderContributions() {
@@ -618,7 +615,7 @@
         const toDisplay = filteredContributions.slice(0, contribDisplayLimit);
         
         if (toDisplay.length === 0) {
-            container.innerHTML = '<p class="loading-text">No contributions found.</p>';
+            container.innerHTML = '<p class="loading-text">No matching contributions found.</p>';
             loadMoreBtnContainer.style.display = 'none';
             return;
         }
@@ -654,7 +651,7 @@
             );
             contribDisplayLimit = 10; 
             renderContributions();
-        }, 300); // 300ms debounce
+        }, 300);
     });
 
     document.getElementById('load-more-contributions-btn').addEventListener('click', () => {
