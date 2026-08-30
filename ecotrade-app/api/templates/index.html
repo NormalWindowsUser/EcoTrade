@@ -566,22 +566,34 @@
         }
     }
 
-    // --- Contributions Feed Functions (Updated logic) ---
+    // --- Contributions Feed Functions (Updated to reflect SQL schema) ---
     async function fetchRecentContributions() {
         try {
             const res = await fetch('/api/recent_contributions');
             if (res.ok) {
                 const data = await res.json();
                 if (data.status === 'success') {
-                    // Extract data and format time based on DB seconds_ago
-                    allContributions = data.data.map(c => ({
-                        material_name: c.material_name,
-                        hub_name: c.hub_name,
-                        weight: parseFloat(c.weight || 0).toFixed(1),
-                        payout: parseFloat(c.payout || 0).toFixed(2),
-                        // Uses the SQL EXTRACT(EPOCH) logic. Fallback to parsing created_at if seconds_ago isn't ready.
-                        time_ago: c.seconds_ago !== undefined ? formatTimeAgo(c.seconds_ago) : formatTimeAgo((new Date() - new Date(c.created_at)) / 1000)
-                    }));
+                    allContributions = data.data.map(c => {
+                        // Calculate elapsed time securely parsing DB 'created_at' to UTC
+                        let secondsAgo = c.seconds_ago;
+                        if (secondsAgo === undefined && c.created_at) {
+                            // Replace space with 'T' and ensure it ends with 'Z' for UTC parsing
+                            let dateStr = c.created_at.replace(' ', 'T');
+                            if (!dateStr.endsWith('Z')) dateStr += 'Z';
+                            secondsAgo = (Date.now() - new Date(dateStr).getTime()) / 1000;
+                        }
+
+                        return {
+                            material_name: c.material_name || c.name || 'Unknown Material',
+                            hub_name: c.hub_name || 'Unknown Hub',
+                            weight: parseFloat(c.weight_kg || c.weight || 0).toFixed(1),
+                            payout: parseFloat(c.calculated_payout || c.payout || 0).toFixed(2),
+                            status: c.status || 'pending',
+                            time_ago: formatTimeAgo(secondsAgo)
+                        };
+                    });
+                } else {
+                    allContributions = generateMockContributions();
                 }
             } else {
                 allContributions = generateMockContributions(); // Fallback for local testing
@@ -593,7 +605,6 @@
         renderContributions();
     }
 
-    // Fallback logic if the DB route isn't finished yet
     function generateMockContributions() {
         const mats = ['PET Plastic Bottles', 'Corrugated Cardboard', 'Aluminum Drink Cans', 'Used Cooking Oil (UCO)'];
         const hubs = ['EcoHub PJ', 'KL City Recycling', 'Subang Green Drop', 'Cheras Scrap Center'];
@@ -602,12 +613,17 @@
             let weight = (Math.random() * 8 + 0.5).toFixed(1);
             let payout = (weight * 0.8).toFixed(2);
             let randomSecondsAgo = Math.floor(Math.random() * 86400); // within the last 24 hrs
+            
+            // Format to match PostgreSQL "timestamp without time zone" style
+            let pastDateStr = new Date(Date.now() - randomSecondsAgo * 1000).toISOString().replace('T', ' ').substring(0, 19);
+            
             mock.push({
                 material_name: mats[Math.floor(Math.random() * mats.length)],
                 hub_name: hubs[Math.floor(Math.random() * hubs.length)],
-                weight: weight,
-                payout: payout,
-                time_ago: formatTimeAgo(randomSecondsAgo)
+                weight_kg: weight,
+                calculated_payout: payout,
+                status: Math.random() > 0.8 ? 'pending' : 'completed', // Randomize status
+                created_at: pastDateStr
             });
         }
         return mock;
@@ -625,17 +641,24 @@
             return;
         }
         
-        container.innerHTML = toDisplay.map(c => `
-            <div class="list-row-item">
-                <div class="list-details">
-                    <h6>${c.material_name} (${c.weight} kg)</h6>
-                    <p>Dropped off at <strong>${c.hub_name}</strong> • ${c.time_ago}</p>
+        container.innerHTML = toDisplay.map(c => {
+            const statusBadge = c.status === 'pending' 
+                ? `<span class="badge bg-warning text-dark ms-2" style="font-size: 0.65rem;">Pending</span>` 
+                : `<span class="badge bg-success ms-2" style="font-size: 0.65rem;"><i class="bi bi-check-circle"></i> Completed</span>`;
+
+            return `
+                <div class="list-row-item">
+                    <div class="list-details">
+                        <h6>${c.material_name} (${c.weight} kg)</h6>
+                        <p>Dropped off at <strong>${c.hub_name}</strong> • ${c.time_ago}</p>
+                    </div>
+                    <div class="list-right-col text-end">
+                        <span class="text-success fw-bold" style="font-size: 0.95rem;">+RM ${c.payout}</span>
+                        <div class="mt-1">${statusBadge}</div>
+                    </div>
                 </div>
-                <div class="list-right-col">
-                    <span class="text-success fw-bold" style="font-size: 0.95rem;">+RM ${c.payout}</span>
-                </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
         
         if (filteredContributions.length > contribDisplayLimit) {
             loadMoreBtnContainer.style.display = 'block';
