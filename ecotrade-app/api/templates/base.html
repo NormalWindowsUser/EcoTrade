@@ -90,19 +90,27 @@
             align-items: center;
         }
 
-        /* LOGOUT BUTTON WITH SLIGHTLY THICKER BORDER AND NO HOVER FILL */
+        /* LOGOUT BUTTON WITH BORDER THICKENING ON HOVER ONLY */
         .btn-logout {
             display: inline-flex;
             align-items: center;
             gap: 5px;
             background: transparent;
             color: #ef4444;
-            border: 2px solid rgba(239, 68, 68, 0.45);
+            border: 1px solid rgba(239, 68, 68, 0.5);
             border-radius: 50px;
             padding: 4px 14px;
             font-size: 0.8rem;
             font-weight: 600;
             text-decoration: none;
+            transition: border-width 0.15 ease, border-color 0.15s ease;
+            box-sizing: border-box;
+        }
+
+        .btn-logout:hover {
+            color: #ef4444;
+            border: 2.5px solid #ef4444;
+            padding: 2.5px 12.5px; /* Adjust padding slightly to prevent layout shift */
         }
 
         .theme-toggle-btn {
@@ -143,7 +151,7 @@
             background: var(--nav-bg);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            padding: 6px 10px;
+            padding: 6px 6px; /* Equal top, bottom, left, and right outer gaps */
             border-radius: 50px;
             border: 1px solid var(--nav-border);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
@@ -153,7 +161,7 @@
         /* UNIFORM EQUAL SIZE NAV BUTTONS WITH SPACIOUS PADDING */
         .nav-btn {
             flex: 1 1 0px;
-            min-width: 85px; /* Increased width to prevent text from touching edges */
+            min-width: 85px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -162,7 +170,7 @@
             text-decoration: none;
             font-size: 0.65rem;
             font-weight: 600;
-            padding: 6px 16px; /* Generous side padding */
+            padding: 6px 16px;
             border-radius: 50px !important;
             transition: all 0.2s ease;
             text-align: center;
