@@ -400,7 +400,6 @@
     let filteredContributions = [];
     let contribDisplayLimit = 10;
 
-    // --- Helper function for dynamic DB time ---
     function formatTimeAgo(seconds) {
         if (!seconds && seconds !== 0) return "Just now";
         if (seconds < 60) return `${Math.floor(seconds)} secs ago`;
@@ -428,7 +427,6 @@
         }
     }
 
-    // Aligned with `materials` table schema
     async function fetchMaterials() {
         const city = document.getElementById('filter-city').value;
         const hubId = document.getElementById('filter-hub').value;
@@ -459,23 +457,25 @@
 
         if (currentMaterialsData.length > 0) {
             container.innerHTML = currentMaterialsData.map(m => {
-                // Using exact schema columns: price_per_kg, name, category, preparation_tips, unit
-                const price = parseFloat(m.price_per_kg) || 0;
+                // Accepts both direct schema names AND api standard keys
+                const price = parseFloat(m.price_per_kg || m.avg_reported_rate || m.price || 0);
                 const estimatedPayout = (price * weightInput).toFixed(2);
+                const tips = m.preparation_tips || m.tips || 'Clean and prepare materials prior to drop-off.';
+                const unit = m.unit || 'kg';
 
                 return `
                     <div class="info-card">
                         <div>
-                            <h4>${m.name}</h4>
+                            <h4>${m.name || 'Unknown Material'}</h4>
                             <p><strong>Category:</strong> ${m.category || 'N/A'}</p>
-                            <p>${m.preparation_tips || 'Clean and prepare materials prior to drop-off.'}</p>
+                            <p>${tips}</p>
                         </div>
                         <div>
                             <div class="price-badge">
-                                RM ${price.toFixed(2)} / ${m.unit || 'kg'}
+                                RM ${price.toFixed(2)} / ${unit}
                             </div>
                             <div class="payout-estimate-box">
-                                <small class="text-muted d-block">Estimated Payout for <strong>${weightInput} ${m.unit || 'kg'}</strong>:</small>
+                                <small class="text-muted d-block">Estimated Payout for <strong>${weightInput} ${unit}</strong>:</small>
                                 <span class="fw-bold text-success fs-6">RM ${estimatedPayout}</span>
                             </div>
                         </div>
@@ -487,7 +487,6 @@
         }
     }
 
-    // Aligned with `recycling_hubs` table schema
     async function fetchHubs(city = '') {
         try {
             const url = city ? `/api/hubs?city=${encodeURIComponent(city)}` : '/api/hubs';
@@ -512,8 +511,9 @@
                 data.data.forEach(h => {
                     const opt = document.createElement('option');
                     opt.value = h.id;
-                    // Using hub_name from schema
-                    opt.textContent = `${h.hub_name} (${h.city})`;
+                    // Safely looks for hub_name first, falls back to name
+                    const hName = h.hub_name || h.name || 'Unknown Hub';
+                    opt.textContent = `${hName} (${h.city})`;
                     hubSelect.appendChild(opt);
                 });
                 if (previousHubValue) hubSelect.value = previousHubValue;
@@ -543,20 +543,24 @@
             return;
         }
 
-        container.innerHTML = toDisplay.map(h => `
+        container.innerHTML = toDisplay.map(h => {
+            const hName = h.hub_name || h.name || 'Unknown Hub';
+            const opsHours = h.operating_hours || h.hours || 'N/A';
+            const contact = h.contact_phone || h.phone || 'N/A';
+
+            return `
             <div class="list-row-item">
                 <div class="list-details">
-                    <!-- Using hub_name from recycling_hubs -->
-                    <h6>${h.hub_name}</h6>
+                    <h6>${hName}</h6>
                     <p>📍 ${h.address}, ${h.city}</p>
                 </div>
                 <div class="list-right-col">
-                    <!-- Using operating_hours and contact_phone from recycling_hubs -->
-                    <div style="margin-bottom: 0.15rem;">🕒 ${h.operating_hours || 'N/A'}</div>
-                    <div>📞 ${h.contact_phone || 'N/A'}</div>
+                    <div style="margin-bottom: 0.15rem;">🕒 ${opsHours}</div>
+                    <div>📞 ${contact}</div>
                 </div>
             </div>
-        `).join('');
+            `;
+        }).join('');
 
         if (currentHubsData.length > hubDisplayLimit) {
             loadMoreBtnContainer.style.display = 'block';
@@ -565,14 +569,12 @@
         }
     }
 
-    // Aligned with `contributions` table schema 
-    // Assumes SQL query joins: `materials.name as name` and `recycling_hubs.hub_name as hub_name`
     async function fetchRecentContributions() {
         try {
             const res = await fetch('/api/recent_contributions');
             if (res.ok) {
                 const data = await res.json();
-                if (data.status === 'success') {
+                if (data.status === 'success' && data.data) {
                     allContributions = data.data.map(c => {
                         let secondsAgo = c.seconds_ago;
                         if (secondsAgo === undefined && c.created_at) {
@@ -581,49 +583,29 @@
                             secondsAgo = (Date.now() - new Date(dateStr).getTime()) / 1000;
                         }
 
+                        // Added safety fallbacks to read data no matter how the API formats it
                         return {
-                            material_name: c.name || c.material_name || 'Unknown Material',
-                            hub_name: c.hub_name || 'Unknown Hub',
-                            weight: parseFloat(c.weight_kg || 0).toFixed(1), // From contributions.weight_kg
-                            payout: parseFloat(c.calculated_payout || 0).toFixed(2), // From contributions.calculated_payout
-                            status: c.status || 'pending', // From contributions.status
+                            material_name: c.material_name || c.name || 'Unknown Material',
+                            hub_name: c.hub_name || c.hub || 'Unknown Hub',
+                            weight: parseFloat(c.weight_kg || c.weight || 0).toFixed(1), 
+                            payout: parseFloat(c.calculated_payout || c.payout || 0).toFixed(2),
+                            status: c.status || 'pending', 
                             time_ago: formatTimeAgo(secondsAgo)
                         };
                     });
                 } else {
-                    allContributions = generateMockContributions();
+                    allContributions = []; // Empty if no valid data is returned
                 }
             } else {
-                allContributions = generateMockContributions(); 
+                allContributions = []; 
             }
         } catch (err) {
-            allContributions = generateMockContributions();
+            console.error("Failed to load DB contributions:", err);
+            allContributions = []; 
         }
+        
         filteredContributions = [...allContributions];
         renderContributions();
-    }
-
-    function generateMockContributions() {
-        const mats = ['PET Plastic Bottles', 'Corrugated Cardboard', 'Aluminum Drink Cans', 'Used Cooking Oil (UCO)'];
-        const hubs = ['EcoHub PJ', 'KL City Recycling', 'Subang Green Drop', 'Cheras Scrap Center'];
-        let mock = [];
-        for(let i = 0; i < 45; i++) {
-            let weight = (Math.random() * 8 + 0.5).toFixed(1);
-            let payout = (weight * 0.8).toFixed(2);
-            let randomSecondsAgo = Math.floor(Math.random() * 86400); 
-            let pastDateStr = new Date(Date.now() - randomSecondsAgo * 1000).toISOString().replace('T', ' ').substring(0, 19);
-            
-            // Mock objects formatted to map exactly to the joined backend response expectation
-            mock.push({
-                name: mats[Math.floor(Math.random() * mats.length)], // joined from materials
-                hub_name: hubs[Math.floor(Math.random() * hubs.length)], // joined from recycling_hubs
-                weight_kg: weight,
-                calculated_payout: payout,
-                status: Math.random() > 0.8 ? 'pending' : 'completed',
-                created_at: pastDateStr
-            });
-        }
-        return mock;
     }
 
     function renderContributions() {
@@ -633,7 +615,7 @@
         const toDisplay = filteredContributions.slice(0, contribDisplayLimit);
         
         if (toDisplay.length === 0) {
-            container.innerHTML = '<p class="text-center text-muted" style="font-size: 0.85rem; padding-top: 1rem;">No contributions found.</p>';
+            container.innerHTML = '<p class="text-center text-muted" style="font-size: 0.85rem; padding-top: 1rem;">No real database contributions found yet.</p>';
             loadMoreBtnContainer.style.display = 'none';
             return;
         }
@@ -641,7 +623,7 @@
         container.innerHTML = toDisplay.map(c => {
             const statusBadge = c.status === 'pending' 
                 ? `<span class="badge bg-warning text-dark ms-2" style="font-size: 0.65rem;">Pending</span>` 
-                : `<span class="badge bg-success ms-2" style="font-size: 0.65rem;"><i class="bi bi-check-circle"></i> Completed</span>`;
+                : `<span class="badge bg-success ms-2" style="font-size: 0.65rem;"><i class="bi bi-check-circle"></i> ${c.status}</span>`;
 
             return `
                 <div class="list-row-item">
