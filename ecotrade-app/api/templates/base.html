@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- Title with Emoji Always First -->
-    <title>♻️ EcoTrade - Community</title>
+    <title>EcoTrade - Community</title>
     
     <!-- Browser Tab Icon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>♻️</text></svg>">
@@ -86,6 +85,18 @@
             letter-spacing: -0.02em;
         }
 
+        /* ENSURE ICON STAYS INLINE WITH FIRST LINE OF TITLE */
+        .title-with-icon {
+            display: block;
+        }
+        
+        .heading-icon-inline {
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 0.35rem;
+            margin-top: -0.15em;
+        }
+
         /* GLASS HEADER */
         .header-bar {
             background: var(--header-bg);
@@ -114,27 +125,28 @@
             transform: translateY(-1px);
         }
 
-        /* LOGOUT BUTTON WITH MODERN SHADOW & HOVER EFFECTS */
+        /* LOGOUT BUTTON - NO SHADOW ON HOVER */
         .btn-logout {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
             background: transparent;
             color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.4);
+            border: 1px solid rgba(239, 68, 68, 0.5);
             border-radius: 50px;
-            padding: 5px 16px;
+            padding: 4px 14px;
             font-size: 0.8rem;
             font-weight: 600;
             text-decoration: none;
-            transition: all 0.2s ease;
+            transition: border-width 0.15s ease, border-color 0.15s ease;
+            box-sizing: border-box;
         }
 
         .btn-logout:hover {
-            color: #ffffff;
-            background-color: #ef4444;
-            border-color: #ef4444;
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            border: 2.5px solid #ef4444;
+            padding: 2.5px 12.5px;
+            box-shadow: none !important;
         }
 
         .theme-toggle-btn {
@@ -246,7 +258,7 @@
             }
         }
 
-        /* MODERNOUS CARD STYLING */
+        /* CARD STYLING */
         .card-custom {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -258,7 +270,40 @@
         .card-custom:hover {
             border-color: rgba(16, 185, 129, 0.3);
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        /* WEIGHT STEPPER CONTROLS (+ / -) */
+        .weight-stepper-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stepper-btn {
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s ease;
+        }
+
+        .stepper-btn:hover {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+            background: var(--accent-green-glow);
+        }
+
+        .stepper-btn:active {
+            transform: scale(0.95);
         }
 
         /* DYNAMIC UTILITY OVERRIDES */
@@ -408,6 +453,17 @@
             } else {
                 icon.className = 'bi bi-sun-fill';
                 label.innerText = 'Light';
+            }
+        }
+
+        // Global Helper for Weight Increment/Decrement buttons
+        function adjustWeight(inputId, amount) {
+            const input = document.getElementById(inputId);
+            if (input) {
+                let val = parseFloat(input.value) || 0;
+                val = Math.max(0, parseFloat((val + amount).toFixed(1)));
+                input.value = val;
+                input.dispatchEvent(new Event('change'));
             }
         }
     </script>
