@@ -79,6 +79,14 @@
             color: var(--text-color);
         }
 
+        /* INLINE TITLE EMOJI FIX */
+        .page-header-title {
+            display: inline-flex;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+
         .header-bar {
             background: var(--header-bg);
             border-bottom: 1px solid var(--border-color);
@@ -95,27 +103,15 @@
             align-items: center;
         }
 
-        /* LOGOUT BUTTON WITH BORDER THICKENING ON HOVER ONLY */
-        .btn-logout {
+        /* LOGOUT BUTTON MATCHES LOGIN BUTTON DESIGN EXACTLY */
+        .btn-auth {
+            font-size: 0.75rem;
+            border-radius: 50px;
+            padding: 0.25rem 0.75rem;
+            font-weight: 500;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
-            background: transparent;
-            color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.5);
-            border-radius: 50px;
-            padding: 4px 14px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-decoration: none;
-            transition: border-width 0.15s ease, border-color 0.15s ease;
-            box-sizing: border-box;
-        }
-
-        .btn-logout:hover {
-            color: #ef4444;
-            border: 2.5px solid #ef4444;
-            padding: 2.5px 12.5px; /* Adjust padding slightly to prevent layout shift */
+            gap: 4px;
         }
 
         .theme-toggle-btn {
@@ -156,14 +152,13 @@
             background: var(--nav-bg);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            padding: 6px 6px; /* Equal top, bottom, left, and right outer gaps */
+            padding: 6px 6px;
             border-radius: 50px;
             border: 1px solid var(--nav-border);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             transition: background 0.2s ease, border-color 0.2s ease;
         }
 
-        /* UNIFORM EQUAL SIZE NAV BUTTONS WITH SPACIOUS PADDING */
         .nav-btn {
             flex: 1 1 0px;
             min-width: 85px;
@@ -223,8 +218,37 @@
         .card-custom {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 10px;
+            border-radius: 12px;
             transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+
+        /* WEIGHT STEPPER CONTROL (ALWAYS VISIBLE) */
+        .weight-stepper {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-stepper {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 1px solid var(--border-color);
+            background: var(--input-bg);
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-stepper:hover {
+            background: #10b981;
+            color: #ffffff;
+            border-color: #10b981;
         }
 
         /* DYNAMIC UTILITY OVERRIDES */
@@ -251,7 +275,6 @@
             opacity: 0.7;
         }
 
-        /* Table Overrides */
         .table {
             color: var(--text-color) !important;
             border-color: var(--border-color) !important;
@@ -280,11 +303,11 @@
                 <span class="badge bg-dark border border-secondary text-light px-2 py-1 small me-1">
                     <i class="bi bi-person-circle text-success me-1"></i> {{ session.get('user_name') }}
                 </span>
-                <a href="/logout" class="btn-logout">
+                <a href="/logout" class="btn btn-outline-danger btn-auth">
                     <i class="bi bi-box-arrow-right"></i> Logout
                 </a>
             {% else %}
-                <a href="/login" class="btn btn-outline-success btn-sm rounded-pill px-3 py-1" style="font-size: 0.75rem;">Log In</a>
+                <a href="/login" class="btn btn-outline-success btn-auth">Log In</a>
             {% endif %}
 
             <button id="themeToggleBtn" class="theme-toggle-btn ms-1" onclick="toggleTheme()">
@@ -295,6 +318,33 @@
     </header>
 
     <main class="container py-3" style="max-width: 960px;">
+        <!-- EXAMPLE INLINE TITLE & STAT CARD USAGE -->
+        <div class="mb-4">
+            <h1 class="fw-bold page-header-title">
+                <i class="bi bi-recycle text-success"></i> Recycle Smarter, Earn Rewards
+            </h1>
+            <p class="text-muted">Convert household recyclables into payouts while lowering carbon emissions in Malaysia.</p>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <!-- RECYCLED STAT CARD WITH ALWAYS VISIBLE STEPPER CONTROLS -->
+            <div class="col-6 col-md-3">
+                <div class="card-custom p-3">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <div class="weight-stepper">
+                            <i class="bi bi-recycle text-success me-1 fs-5"></i>
+                            <span class="fw-bold fs-5" id="totalRecycledVal">7.0 kg</span>
+                        </div>
+                        <div class="weight-stepper">
+                            <button class="btn-stepper" onclick="adjustWeight(-0.5)" title="Decrease weight">-</button>
+                            <button class="btn-stepper" onclick="adjustWeight(0.5)" title="Increase weight">+</button>
+                        </div>
+                    </div>
+                    <div class="text-muted small">Total Recycled</div>
+                </div>
+            </div>
+        </div>
+
         {% block content %}{% endblock %}
     </main>
 
@@ -364,6 +414,12 @@
                 icon.className = 'bi bi-sun-fill';
                 label.innerText = 'Light';
             }
+        }
+
+        let currentWeight = 7.0;
+        function adjustWeight(amount) {
+            currentWeight = Math.max(0, currentWeight + amount);
+            document.getElementById('totalRecycledVal').innerText = currentWeight.toFixed(1) + ' kg';
         }
     </script>
 
