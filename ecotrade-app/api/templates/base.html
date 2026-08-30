@@ -4,10 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <title>EcoTrade - Community</title>
+    <!-- Title with Emoji Always First -->
+    <title>♻️ EcoTrade - Community</title>
     
     <!-- Browser Tab Icon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>♻️</text></svg>">
+    
+    <!-- Google Fonts: Geist -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -16,16 +22,18 @@
         /* DARK MODE DEFAULTS */
         :root, body {
             --bg-color: #0b0f19;
-            --header-bg: #111827;
+            --header-bg: rgba(17, 24, 39, 0.85);
             --card-bg: #111827;
             --border-color: #1f2937;
             --text-color: #f8fafc;
             --text-muted: #94a3b8;
-            --nav-bg: rgba(17, 24, 39, 0.85);
+            --nav-bg: rgba(17, 24, 39, 0.75);
             --nav-border: rgba(255, 255, 255, 0.12);
             --nav-text: #94a3b8;
             --input-bg: #1f2937;
             --input-text: #f8fafc;
+            --accent-green: #10b981;
+            --accent-green-glow: rgba(16, 185, 129, 0.15);
 
             /* Map custom properties to Bootstrap 5 CSS variables */
             --bs-body-bg: var(--bg-color);
@@ -40,16 +48,18 @@
         /* LIGHT MODE OVERRIDES */
         body.light-mode {
             --bg-color: #f8fafc;
-            --header-bg: #ffffff;
+            --header-bg: rgba(255, 255, 255, 0.85);
             --card-bg: #ffffff;
             --border-color: #e2e8f0;
             --text-color: #0f172a;
             --text-muted: #64748b;
-            --nav-bg: rgba(255, 255, 255, 0.85);
-            --nav-border: rgba(0, 0, 0, 0.12);
+            --nav-bg: rgba(255, 255, 255, 0.75);
+            --nav-border: rgba(0, 0, 0, 0.08);
             --nav-text: #475569;
             --input-bg: #ffffff;
             --input-text: #0f172a;
+            --accent-green: #059669;
+            --accent-green-glow: rgba(5, 150, 105, 0.12);
 
             /* Map custom light properties to Bootstrap 5 CSS variables */
             --bs-body-bg: var(--bg-color);
@@ -64,53 +74,67 @@
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-family: 'Geist', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            letter-spacing: -0.01em;
             padding-bottom: 140px;
-            transition: background-color 0.2s ease, color 0.2s ease;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        /* Ensure heading text dynamically responds to dark/light theme */
         h1, h2, h3, h4, h5, h6 {
             color: var(--text-color);
+            font-weight: 600;
+            letter-spacing: -0.02em;
         }
 
+        /* GLASS HEADER */
         .header-bar {
             background: var(--header-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border-bottom: 1px solid var(--border-color);
-            padding: 0.75rem 1.5rem;
+            padding: 0.85rem 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: background-color 0.2s ease, border-color 0.2s ease;
+            position: sticky;
+            top: 0;
+            z-index: 1040;
+            transition: background 0.3s ease, border-color 0.3s ease;
         }
 
         .brand-logo {
             text-decoration: none;
             display: flex;
             align-items: center;
+            font-weight: 700;
+            transition: transform 0.2s ease;
+        }
+        
+        .brand-logo:hover {
+            transform: translateY(-1px);
         }
 
-        /* LOGOUT BUTTON WITH BORDER THICKENING ON HOVER ONLY */
+        /* LOGOUT BUTTON WITH MODERN SHADOW & HOVER EFFECTS */
         .btn-logout {
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
             background: transparent;
             color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.5);
+            border: 1px solid rgba(239, 68, 68, 0.4);
             border-radius: 50px;
-            padding: 4px 14px;
+            padding: 5px 16px;
             font-size: 0.8rem;
             font-weight: 600;
             text-decoration: none;
-            transition: border-width 0.15s ease, border-color 0.15s ease;
-            box-sizing: border-box;
+            transition: all 0.2s ease;
         }
 
         .btn-logout:hover {
-            color: #ef4444;
-            border: 2.5px solid #ef4444;
-            padding: 2.5px 12.5px; /* Adjust padding slightly to prevent layout shift */
+            color: #ffffff;
+            background-color: #ef4444;
+            border-color: #ef4444;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
         }
 
         .theme-toggle-btn {
@@ -118,8 +142,9 @@
             border: 1px solid var(--border-color);
             color: var(--text-color);
             border-radius: 50px;
-            padding: 4px 12px;
+            padding: 5px 14px;
             font-size: 0.8rem;
+            font-weight: 500;
             display: flex;
             align-items: center;
             gap: 6px;
@@ -128,19 +153,20 @@
         }
 
         .theme-toggle-btn:hover {
-            border-color: #10b981;
-            color: #10b981;
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+            background: var(--accent-green-glow);
         }
 
         /* FLOATING GLASS NAVIGATION */
         .bottom-nav-container {
             position: fixed;
-            bottom: 20px;
+            bottom: 24px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 1050;
             width: auto;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
         }
 
         .bottom-nav {
@@ -149,16 +175,15 @@
             justify-content: center;
             gap: 0.4rem;
             background: var(--nav-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            padding: 6px 6px; /* Equal top, bottom, left, and right outer gaps */
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 6px;
             border-radius: 50px;
             border: 1px solid var(--nav-border);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            transition: background 0.2s ease, border-color 0.2s ease;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+            transition: background 0.3s ease, border-color 0.3s ease;
         }
 
-        /* UNIFORM EQUAL SIZE NAV BUTTONS WITH SPACIOUS PADDING */
         .nav-btn {
             flex: 1 1 0px;
             min-width: 85px;
@@ -170,9 +195,10 @@
             text-decoration: none;
             font-size: 0.65rem;
             font-weight: 600;
-            padding: 6px 16px;
+            letter-spacing: 0.04em;
+            padding: 8px 16px;
             border-radius: 50px !important;
-            transition: all 0.2s ease;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             text-align: center;
             white-space: nowrap;
         }
@@ -182,13 +208,18 @@
         }
 
         .nav-btn i {
-            font-size: 1.1rem;
-            margin-bottom: 2px;
+            font-size: 1.15rem;
+            margin-bottom: 3px;
+            transition: transform 0.2s ease;
+        }
+
+        .nav-btn:hover i {
+            transform: translateY(-2px);
         }
 
         .nav-btn:hover, .nav-btn.active {
-            color: #10b981;
-            background: rgba(16, 185, 129, 0.12);
+            color: var(--accent-green);
+            background: var(--accent-green-glow);
         }
 
         @media (max-width: 576px) {
@@ -215,11 +246,19 @@
             }
         }
 
+        /* MODERNOUS CARD STYLING */
         .card-custom {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 10px;
-            transition: background-color 0.2s ease, border-color 0.2s ease;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card-custom:hover {
+            border-color: rgba(16, 185, 129, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
         }
 
         /* DYNAMIC UTILITY OVERRIDES */
@@ -240,7 +279,17 @@
             background-color: var(--input-bg) !important;
             color: var(--input-text) !important;
             border-color: var(--border-color) !important;
+            border-radius: 10px;
+            padding: 0.6rem 1rem;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
         }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--accent-green) !important;
+            box-shadow: 0 0 0 3px var(--accent-green-glow) !important;
+        }
+
         .form-control::placeholder {
             color: var(--text-muted) !important;
             opacity: 0.7;
@@ -255,6 +304,7 @@
             background-color: var(--card-bg) !important;
             color: var(--text-color) !important;
             border-color: var(--border-color) !important;
+            padding: 0.85rem 1rem;
         }
         .table-hover tbody tr:hover td {
             background-color: var(--bg-color) !important;
@@ -272,14 +322,14 @@
 
         <div class="d-flex align-items-center gap-2">
             {% if session.get('user_id') %}
-                <span class="badge bg-dark border border-secondary text-light px-2 py-1 small me-1">
+                <span class="badge bg-dark border border-secondary text-light px-3 py-2 rounded-pill small me-1 fw-medium">
                     <i class="bi bi-person-circle text-success me-1"></i> {{ session.get('user_name') }}
                 </span>
                 <a href="/logout" class="btn-logout">
                     <i class="bi bi-box-arrow-right"></i> Logout
                 </a>
             {% else %}
-                <a href="/login" class="btn btn-outline-success btn-sm rounded-pill px-3 py-1" style="font-size: 0.75rem;">Log In</a>
+                <a href="/login" class="btn btn-outline-success btn-sm rounded-pill px-3 py-1 fw-semibold" style="font-size: 0.75rem;">Log In</a>
             {% endif %}
 
             <button id="themeToggleBtn" class="theme-toggle-btn ms-1" onclick="toggleTheme()">
@@ -289,7 +339,7 @@
         </div>
     </header>
 
-    <main class="container py-3" style="max-width: 960px;">
+    <main class="container py-4" style="max-width: 960px;">
         {% block content %}{% endblock %}
     </main>
 
