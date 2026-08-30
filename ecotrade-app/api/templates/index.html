@@ -354,7 +354,7 @@
     <p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); font-size: 0.85rem;">Loading material rates...</p>
 </div>
 
-<!-- Hubs Display (UPDATED to Scrollable List) -->
+<!-- Hubs Display (Scrollable List) -->
 <div class="section-title">
     <span>Partner Hub Locations</span>
     <span class="sub-text">Verified Drop-offs</span>
@@ -403,6 +403,18 @@
     let allContributions = [];
     let filteredContributions = [];
     let contribDisplayLimit = 10;
+
+    // --- Helper function for dynamic DB time ---
+    function formatTimeAgo(seconds) {
+        if (!seconds && seconds !== 0) return "Just now"; // fallback if null
+        if (seconds < 60) return `${Math.floor(seconds)} secs ago`;
+        const minutes = Math.floor(seconds / 60);
+        if (minutes < 60) return `${minutes} mins ago`;
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24) return `${hours} hours ago`;
+        const days = Math.floor(hours / 24);
+        return `${days} days ago`;
+    }
 
     async function fetchStats() {
         try {
@@ -479,7 +491,7 @@
         }
     }
 
-    // --- Hubs Functions (Updated UI) ---
+    // --- Hubs Functions ---
     async function fetchHubs(city = '') {
         try {
             const url = city ? `/api/hubs?city=${encodeURIComponent(city)}` : '/api/hubs';
@@ -513,7 +525,7 @@
                 currentHubsData = [];
             }
             
-            hubDisplayLimit = 10; // Reset pagination on new fetch
+            hubDisplayLimit = 10;
             renderHubs();
         } catch (err) {
             console.error("Failed to fetch hubs:", err);
@@ -554,17 +566,25 @@
         }
     }
 
-    // --- Contributions Feed Functions ---
+    // --- Contributions Feed Functions (Updated logic) ---
     async function fetchRecentContributions() {
         try {
             const res = await fetch('/api/recent_contributions');
             if (res.ok) {
                 const data = await res.json();
                 if (data.status === 'success') {
-                    allContributions = data.data;
+                    // Extract data and format time based on DB seconds_ago
+                    allContributions = data.data.map(c => ({
+                        material_name: c.material_name,
+                        hub_name: c.hub_name,
+                        weight: parseFloat(c.weight || 0).toFixed(1),
+                        payout: parseFloat(c.payout || 0).toFixed(2),
+                        // Uses the SQL EXTRACT(EPOCH) logic. Fallback to parsing created_at if seconds_ago isn't ready.
+                        time_ago: c.seconds_ago !== undefined ? formatTimeAgo(c.seconds_ago) : formatTimeAgo((new Date() - new Date(c.created_at)) / 1000)
+                    }));
                 }
             } else {
-                allContributions = generateMockContributions();
+                allContributions = generateMockContributions(); // Fallback for local testing
             }
         } catch (err) {
             allContributions = generateMockContributions();
@@ -573,6 +593,7 @@
         renderContributions();
     }
 
+    // Fallback logic if the DB route isn't finished yet
     function generateMockContributions() {
         const mats = ['PET Plastic Bottles', 'Corrugated Cardboard', 'Aluminum Drink Cans', 'Used Cooking Oil (UCO)'];
         const hubs = ['EcoHub PJ', 'KL City Recycling', 'Subang Green Drop', 'Cheras Scrap Center'];
@@ -580,12 +601,13 @@
         for(let i = 0; i < 45; i++) {
             let weight = (Math.random() * 8 + 0.5).toFixed(1);
             let payout = (weight * 0.8).toFixed(2);
+            let randomSecondsAgo = Math.floor(Math.random() * 86400); // within the last 24 hrs
             mock.push({
                 material_name: mats[Math.floor(Math.random() * mats.length)],
                 hub_name: hubs[Math.floor(Math.random() * hubs.length)],
                 weight: weight,
                 payout: payout,
-                time_ago: `${Math.floor(Math.random() * 59) + 1} mins ago`
+                time_ago: formatTimeAgo(randomSecondsAgo)
             });
         }
         return mock;
