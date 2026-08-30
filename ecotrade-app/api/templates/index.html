@@ -209,8 +209,8 @@
         border: 1px dashed rgba(16, 185, 129, 0.3);
     }
 
-    /* New CSS for Recent Contributions Feed */
-    .contributions-container {
+    /* Shared Scrollable List UI for Hubs & Contributions */
+    .scroll-container {
         background: var(--card-bg);
         border: 1px solid var(--border-color);
         border-radius: 12px;
@@ -218,26 +218,25 @@
         margin-bottom: 1.5rem;
     }
 
-    .contributions-scroll-box {
+    .scroll-box {
         max-height: 350px;
         overflow-y: auto;
         padding-right: 0.5rem;
     }
 
-    /* Custom Scrollbar for the container */
-    .contributions-scroll-box::-webkit-scrollbar {
+    .scroll-box::-webkit-scrollbar {
         width: 6px;
     }
-    .contributions-scroll-box::-webkit-scrollbar-track {
+    .scroll-box::-webkit-scrollbar-track {
         background: rgba(0,0,0,0.1);
         border-radius: 10px;
     }
-    .contributions-scroll-box::-webkit-scrollbar-thumb {
+    .scroll-box::-webkit-scrollbar-thumb {
         background: #374151; 
         border-radius: 10px;
     }
 
-    .contribution-item {
+    .list-row-item {
         background: rgba(16, 185, 129, 0.05);
         border: 1px solid rgba(16, 185, 129, 0.1);
         border-radius: 8px;
@@ -248,26 +247,27 @@
         align-items: center;
     }
 
-    .contribution-item:last-child {
+    .list-row-item:last-child {
         margin-bottom: 0;
     }
 
-    .contrib-details h6 {
+    .list-details h6 {
         color: #10b981;
         margin: 0 0 0.2rem 0;
         font-weight: 600;
         font-size: 0.95rem;
     }
 
-    .contrib-details p {
+    .list-details p {
         color: var(--text-muted);
         margin: 0;
         font-size: 0.8rem;
     }
 
-    .contrib-payout {
-        font-weight: 700;
-        font-size: 0.95rem;
+    .list-right-col {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        text-align: right;
     }
 </style>
 
@@ -345,6 +345,7 @@
     </div>
 </div>
 
+<!-- Materials Display -->
 <div class="section-title">
     <span>Accepted Materials & User-Reported Live Rates</span>
     <span class="sub-text" id="rate-summary-tag">Based on community reports</span>
@@ -353,36 +354,37 @@
     <p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); font-size: 0.85rem;">Loading material rates...</p>
 </div>
 
+<!-- Hubs Display (UPDATED to Scrollable List) -->
 <div class="section-title">
     <span>Partner Hub Locations</span>
     <span class="sub-text">Verified Drop-offs</span>
 </div>
-<div class="grid-container" id="hubs-list">
-    <p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); font-size: 0.85rem;">Loading hub locations...</p>
-</div>
-<div class="text-center mb-4" id="expand-hubs-container" style="display: none;">
-    <button id="toggle-hubs-btn" class="btn-custom-secondary" style="border-radius: 50px; cursor: pointer;">
-        Show All Hubs
-    </button>
+<div class="scroll-container">
+    <div class="scroll-box" id="hubs-list">
+        <p style="text-align: center; color: var(--text-muted); font-size: 0.85rem; padding-top: 1rem;">Loading hub locations...</p>
+    </div>
+    <div class="text-center mt-3" id="load-more-hubs-container" style="display: none;">
+        <button id="load-more-hubs-btn" class="btn-custom-secondary" style="border-radius: 50px; cursor: pointer; padding: 0.3rem 1rem; font-size: 0.85rem;">
+            Show More Hubs
+        </button>
+    </div>
 </div>
 
-<!-- NEW: Recent Community Contributions Feed -->
+<!-- Recent Community Contributions Feed -->
 <div class="section-title mt-4">
     <span>Recent Community Contributions</span>
     <span class="sub-text">Live updates</span>
 </div>
-<div class="contributions-container">
+<div class="scroll-container">
     <div class="mb-3">
         <input type="text" id="search-contributions" class="form-control bg-dark text-light border-secondary form-control-sm" placeholder="Search by material or hub name...">
     </div>
-    <!-- Scrollable Box -->
-    <div class="contributions-scroll-box" id="contributions-list">
+    <div class="scroll-box" id="contributions-list">
         <p style="text-align: center; color: var(--text-muted); font-size: 0.85rem; padding-top: 1rem;">Loading recent contributions...</p>
     </div>
-    <!-- Load More Button -->
     <div class="text-center mt-3" id="load-more-contributions-container" style="display: none;">
         <button id="load-more-contributions-btn" class="btn-custom-secondary" style="border-radius: 50px; cursor: pointer; padding: 0.3rem 1rem; font-size: 0.85rem;">
-            Show More
+            Show More Contributions
         </button>
     </div>
 </div>
@@ -392,11 +394,12 @@
 </footer>
 
 <script>
+    // Global States
     let currentMaterialsData = [];
-    let currentHubsData = [];
-    let isHubsExpanded = false;
     
-    // States for Contributions Feed
+    let currentHubsData = [];
+    let hubDisplayLimit = 10;
+    
     let allContributions = [];
     let filteredContributions = [];
     let contribDisplayLimit = 10;
@@ -414,83 +417,6 @@
             }
         } catch (err) {
             console.error("Failed to fetch statistics:", err);
-        }
-    }
-
-    async function fetchHubs(city = '') {
-        try {
-            const url = city ? `/api/hubs?city=${encodeURIComponent(city)}` : '/api/hubs';
-            const res = await fetch(url);
-            const data = await res.json();
-            
-            // Populate City filter options if empty
-            const citySelect = document.getElementById('filter-city');
-            if (citySelect.options.length <= 1 && data.cities) {
-                data.cities.forEach(c => {
-                    const opt = document.createElement('option');
-                    opt.value = c;
-                    opt.textContent = c;
-                    citySelect.appendChild(opt);
-                });
-            }
-
-            // Populate Hub select dropdown
-            const hubSelect = document.getElementById('filter-hub');
-            const previousHubValue = hubSelect.value;
-            hubSelect.innerHTML = '<option value="">All Partner Hubs</option>';
-            if (data.status === 'success' && data.data) {
-                data.data.forEach(h => {
-                    const opt = document.createElement('option');
-                    opt.value = h.id;
-                    opt.textContent = `${h.name} (${h.city})`;
-                    hubSelect.appendChild(opt);
-                });
-                if (previousHubValue) hubSelect.value = previousHubValue;
-            }
-
-            if (data.status === 'success' && data.data) {
-                currentHubsData = data.data;
-                renderHubs();
-            } else {
-                currentHubsData = [];
-                renderHubs();
-            }
-        } catch (err) {
-            console.error("Failed to fetch hubs:", err);
-            document.getElementById('hubs-list').innerHTML = '<p style="grid-column: 1/-1; text-align: center; font-size: 0.85rem;">Unable to load hub locations.</p>';
-            document.getElementById('expand-hubs-container').style.display = 'none';
-        }
-    }
-
-    function renderHubs() {
-        const container = document.getElementById('hubs-list');
-        const expandContainer = document.getElementById('expand-hubs-container');
-        const toggleBtn = document.getElementById('toggle-hubs-btn');
-
-        if (currentHubsData.length > 0) {
-            const hubsToDisplay = isHubsExpanded ? currentHubsData : currentHubsData.slice(0, 3);
-
-            container.innerHTML = hubsToDisplay.map(h => `
-                <div class="info-card">
-                    <div>
-                        <h4>${h.name}</h4>
-                        <p><strong>City:</strong> ${h.city}</p>
-                        <p><strong>Address:</strong> ${h.address}</p>
-                        <p><strong>Hours:</strong> ${h.hours || 'N/A'}</p>
-                        <p><strong>Contact:</strong> ${h.phone || 'N/A'}</p>
-                    </div>
-                </div>
-            `).join('');
-
-            if (currentHubsData.length > 3) {
-                expandContainer.style.display = 'block';
-                toggleBtn.textContent = isHubsExpanded ? 'Show Less Hubs' : `Show All Partner Hubs (${currentHubsData.length})`;
-            } else {
-                expandContainer.style.display = 'none';
-            }
-        } else {
-            container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; font-size: 0.85rem;">No recycling hubs found for selected filters.</p>';
-            expandContainer.style.display = 'none';
         }
     }
 
@@ -553,7 +479,82 @@
         }
     }
 
-    // --- NEW: Recent Contributions Functions ---
+    // --- Hubs Functions (Updated UI) ---
+    async function fetchHubs(city = '') {
+        try {
+            const url = city ? `/api/hubs?city=${encodeURIComponent(city)}` : '/api/hubs';
+            const res = await fetch(url);
+            const data = await res.json();
+            
+            const citySelect = document.getElementById('filter-city');
+            if (citySelect.options.length <= 1 && data.cities) {
+                data.cities.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c;
+                    opt.textContent = c;
+                    citySelect.appendChild(opt);
+                });
+            }
+
+            const hubSelect = document.getElementById('filter-hub');
+            const previousHubValue = hubSelect.value;
+            hubSelect.innerHTML = '<option value="">All Partner Hubs</option>';
+            
+            if (data.status === 'success' && data.data) {
+                data.data.forEach(h => {
+                    const opt = document.createElement('option');
+                    opt.value = h.id;
+                    opt.textContent = `${h.name} (${h.city})`;
+                    hubSelect.appendChild(opt);
+                });
+                if (previousHubValue) hubSelect.value = previousHubValue;
+                currentHubsData = data.data;
+            } else {
+                currentHubsData = [];
+            }
+            
+            hubDisplayLimit = 10; // Reset pagination on new fetch
+            renderHubs();
+        } catch (err) {
+            console.error("Failed to fetch hubs:", err);
+            document.getElementById('hubs-list').innerHTML = '<p class="text-center text-muted" style="font-size: 0.85rem; padding-top: 1rem;">Unable to load hub locations.</p>';
+            document.getElementById('load-more-hubs-container').style.display = 'none';
+        }
+    }
+
+    function renderHubs() {
+        const container = document.getElementById('hubs-list');
+        const loadMoreBtnContainer = document.getElementById('load-more-hubs-container');
+        
+        const toDisplay = currentHubsData.slice(0, hubDisplayLimit);
+
+        if (toDisplay.length === 0) {
+            container.innerHTML = '<p class="text-center text-muted" style="font-size: 0.85rem; padding-top: 1rem;">No recycling hubs found for selected filters.</p>';
+            loadMoreBtnContainer.style.display = 'none';
+            return;
+        }
+
+        container.innerHTML = toDisplay.map(h => `
+            <div class="list-row-item">
+                <div class="list-details">
+                    <h6>${h.name}</h6>
+                    <p>📍 ${h.address}, ${h.city}</p>
+                </div>
+                <div class="list-right-col">
+                    <div style="margin-bottom: 0.15rem;">🕒 ${h.hours || 'N/A'}</div>
+                    <div>📞 ${h.phone || 'N/A'}</div>
+                </div>
+            </div>
+        `).join('');
+
+        if (currentHubsData.length > hubDisplayLimit) {
+            loadMoreBtnContainer.style.display = 'block';
+        } else {
+            loadMoreBtnContainer.style.display = 'none';
+        }
+    }
+
+    // --- Contributions Feed Functions ---
     async function fetchRecentContributions() {
         try {
             const res = await fetch('/api/recent_contributions');
@@ -566,7 +567,6 @@
                 allContributions = generateMockContributions();
             }
         } catch (err) {
-            // Fallback to mock data if API doesn't exist yet
             allContributions = generateMockContributions();
         }
         filteredContributions = [...allContributions];
@@ -579,7 +579,7 @@
         let mock = [];
         for(let i = 0; i < 45; i++) {
             let weight = (Math.random() * 8 + 0.5).toFixed(1);
-            let payout = (weight * 0.8).toFixed(2); // arbitrary math for demo
+            let payout = (weight * 0.8).toFixed(2);
             mock.push({
                 material_name: mats[Math.floor(Math.random() * mats.length)],
                 hub_name: hubs[Math.floor(Math.random() * hubs.length)],
@@ -598,19 +598,19 @@
         const toDisplay = filteredContributions.slice(0, contribDisplayLimit);
         
         if (toDisplay.length === 0) {
-            container.innerHTML = '<p class="text-center text-muted" style="font-size: 0.85rem; margin-top: 1rem;">No contributions found.</p>';
+            container.innerHTML = '<p class="text-center text-muted" style="font-size: 0.85rem; padding-top: 1rem;">No contributions found.</p>';
             loadMoreBtnContainer.style.display = 'none';
             return;
         }
         
         container.innerHTML = toDisplay.map(c => `
-            <div class="contribution-item">
-                <div class="contrib-details">
+            <div class="list-row-item">
+                <div class="list-details">
                     <h6>${c.material_name} (${c.weight} kg)</h6>
                     <p>Dropped off at <strong>${c.hub_name}</strong> • ${c.time_ago}</p>
                 </div>
-                <div class="contrib-payout">
-                    <span class="text-success">+RM ${c.payout}</span>
+                <div class="list-right-col">
+                    <span class="text-success fw-bold" style="font-size: 0.95rem;">+RM ${c.payout}</span>
                 </div>
             </div>
         `).join('');
@@ -622,14 +622,19 @@
         }
     }
 
-    // Event Listeners for new Contributions feed
+    // --- Event Listeners ---
+    document.getElementById('load-more-hubs-btn').addEventListener('click', () => {
+        hubDisplayLimit += 10;
+        renderHubs();
+    });
+
     document.getElementById('search-contributions').addEventListener('input', (e) => {
         const query = e.target.value.toLowerCase();
         filteredContributions = allContributions.filter(c => 
             c.material_name.toLowerCase().includes(query) || 
             c.hub_name.toLowerCase().includes(query)
         );
-        contribDisplayLimit = 10; // reset limit when searching
+        contribDisplayLimit = 10; 
         renderContributions();
     });
 
@@ -638,13 +643,7 @@
         renderContributions();
     });
 
-    document.getElementById('toggle-hubs-btn').addEventListener('click', () => {
-        isHubsExpanded = !isHubsExpanded;
-        renderHubs();
-    });
-
     document.getElementById('filter-city').addEventListener('change', async () => {
-        isHubsExpanded = false;
         await fetchHubs(document.getElementById('filter-city').value);
         fetchMaterials();
     });
@@ -661,7 +660,7 @@
         fetchStats();
         fetchHubs();
         fetchMaterials();
-        fetchRecentContributions(); // Load the new contributions feed
+        fetchRecentContributions();
     });
 </script>
 {% endblock %}
