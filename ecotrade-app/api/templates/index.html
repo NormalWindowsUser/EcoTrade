@@ -208,6 +208,67 @@
         border-radius: 6px;
         border: 1px dashed rgba(16, 185, 129, 0.3);
     }
+
+    /* New CSS for Recent Contributions Feed */
+    .contributions-container {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .contributions-scroll-box {
+        max-height: 350px;
+        overflow-y: auto;
+        padding-right: 0.5rem;
+    }
+
+    /* Custom Scrollbar for the container */
+    .contributions-scroll-box::-webkit-scrollbar {
+        width: 6px;
+    }
+    .contributions-scroll-box::-webkit-scrollbar-track {
+        background: rgba(0,0,0,0.1);
+        border-radius: 10px;
+    }
+    .contributions-scroll-box::-webkit-scrollbar-thumb {
+        background: #374151; 
+        border-radius: 10px;
+    }
+
+    .contribution-item {
+        background: rgba(16, 185, 129, 0.05);
+        border: 1px solid rgba(16, 185, 129, 0.1);
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        margin-bottom: 0.6rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .contribution-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .contrib-details h6 {
+        color: #10b981;
+        margin: 0 0 0.2rem 0;
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+
+    .contrib-details p {
+        color: var(--text-muted);
+        margin: 0;
+        font-size: 0.8rem;
+    }
+
+    .contrib-payout {
+        font-weight: 700;
+        font-size: 0.95rem;
+    }
 </style>
 
 <section class="hero">
@@ -305,6 +366,27 @@
     </button>
 </div>
 
+<!-- NEW: Recent Community Contributions Feed -->
+<div class="section-title mt-4">
+    <span>Recent Community Contributions</span>
+    <span class="sub-text">Live updates</span>
+</div>
+<div class="contributions-container">
+    <div class="mb-3">
+        <input type="text" id="search-contributions" class="form-control bg-dark text-light border-secondary form-control-sm" placeholder="Search by material or hub name...">
+    </div>
+    <!-- Scrollable Box -->
+    <div class="contributions-scroll-box" id="contributions-list">
+        <p style="text-align: center; color: var(--text-muted); font-size: 0.85rem; padding-top: 1rem;">Loading recent contributions...</p>
+    </div>
+    <!-- Load More Button -->
+    <div class="text-center mt-3" id="load-more-contributions-container" style="display: none;">
+        <button id="load-more-contributions-btn" class="btn-custom-secondary" style="border-radius: 50px; cursor: pointer; padding: 0.3rem 1rem; font-size: 0.85rem;">
+            Show More
+        </button>
+    </div>
+</div>
+
 <footer class="text-center py-3 border-top border-secondary mt-4" style="font-size: 0.82rem; color: var(--text-muted);">
     <p class="mb-0">&copy; 2026 EcoTrade Malaysia. Empowering Sustainable Recycling.</p>
 </footer>
@@ -313,6 +395,11 @@
     let currentMaterialsData = [];
     let currentHubsData = [];
     let isHubsExpanded = false;
+    
+    // States for Contributions Feed
+    let allContributions = [];
+    let filteredContributions = [];
+    let contribDisplayLimit = 10;
 
     async function fetchStats() {
         try {
@@ -466,6 +553,91 @@
         }
     }
 
+    // --- NEW: Recent Contributions Functions ---
+    async function fetchRecentContributions() {
+        try {
+            const res = await fetch('/api/recent_contributions');
+            if (res.ok) {
+                const data = await res.json();
+                if (data.status === 'success') {
+                    allContributions = data.data;
+                }
+            } else {
+                allContributions = generateMockContributions();
+            }
+        } catch (err) {
+            // Fallback to mock data if API doesn't exist yet
+            allContributions = generateMockContributions();
+        }
+        filteredContributions = [...allContributions];
+        renderContributions();
+    }
+
+    function generateMockContributions() {
+        const mats = ['PET Plastic Bottles', 'Corrugated Cardboard', 'Aluminum Drink Cans', 'Used Cooking Oil (UCO)'];
+        const hubs = ['EcoHub PJ', 'KL City Recycling', 'Subang Green Drop', 'Cheras Scrap Center'];
+        let mock = [];
+        for(let i = 0; i < 45; i++) {
+            let weight = (Math.random() * 8 + 0.5).toFixed(1);
+            let payout = (weight * 0.8).toFixed(2); // arbitrary math for demo
+            mock.push({
+                material_name: mats[Math.floor(Math.random() * mats.length)],
+                hub_name: hubs[Math.floor(Math.random() * hubs.length)],
+                weight: weight,
+                payout: payout,
+                time_ago: `${Math.floor(Math.random() * 59) + 1} mins ago`
+            });
+        }
+        return mock;
+    }
+
+    function renderContributions() {
+        const container = document.getElementById('contributions-list');
+        const loadMoreBtnContainer = document.getElementById('load-more-contributions-container');
+        
+        const toDisplay = filteredContributions.slice(0, contribDisplayLimit);
+        
+        if (toDisplay.length === 0) {
+            container.innerHTML = '<p class="text-center text-muted" style="font-size: 0.85rem; margin-top: 1rem;">No contributions found.</p>';
+            loadMoreBtnContainer.style.display = 'none';
+            return;
+        }
+        
+        container.innerHTML = toDisplay.map(c => `
+            <div class="contribution-item">
+                <div class="contrib-details">
+                    <h6>${c.material_name} (${c.weight} kg)</h6>
+                    <p>Dropped off at <strong>${c.hub_name}</strong> • ${c.time_ago}</p>
+                </div>
+                <div class="contrib-payout">
+                    <span class="text-success">+RM ${c.payout}</span>
+                </div>
+            </div>
+        `).join('');
+        
+        if (filteredContributions.length > contribDisplayLimit) {
+            loadMoreBtnContainer.style.display = 'block';
+        } else {
+            loadMoreBtnContainer.style.display = 'none';
+        }
+    }
+
+    // Event Listeners for new Contributions feed
+    document.getElementById('search-contributions').addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase();
+        filteredContributions = allContributions.filter(c => 
+            c.material_name.toLowerCase().includes(query) || 
+            c.hub_name.toLowerCase().includes(query)
+        );
+        contribDisplayLimit = 10; // reset limit when searching
+        renderContributions();
+    });
+
+    document.getElementById('load-more-contributions-btn').addEventListener('click', () => {
+        contribDisplayLimit += 10;
+        renderContributions();
+    });
+
     document.getElementById('toggle-hubs-btn').addEventListener('click', () => {
         isHubsExpanded = !isHubsExpanded;
         renderHubs();
@@ -489,6 +661,7 @@
         fetchStats();
         fetchHubs();
         fetchMaterials();
+        fetchRecentContributions(); // Load the new contributions feed
     });
 </script>
 {% endblock %}
