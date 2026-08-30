@@ -135,6 +135,7 @@
             transition: background 0.2s ease, border-color 0.2s ease;
         }
 
+        /* ALL NAV BUTTONS NOW FULLY ROUNDED ON ALL SIDES */
         .nav-btn {
             display: flex;
             flex-direction: column;
@@ -144,22 +145,12 @@
             font-size: 0.68rem;
             font-weight: 600;
             padding: 6px 14px;
-            border-radius: 12px;
+            border-radius: 50px !important; /* Fully rounded on all sides for every option */
             transition: all 0.2s ease;
         }
 
         .nav-btn-activity {
             display: none !important;
-        }
-
-        .nav-btn.nav-first-item {
-            border-radius: 50px 12px 12px 50px;
-            padding-left: 18px;
-        }
-
-        .nav-btn.nav-last-item {
-            border-radius: 12px 50px 50px 12px;
-            padding-right: 18px;
         }
 
         .nav-btn i {
@@ -187,12 +178,10 @@
                 border-bottom: none;
                 justify-content: space-around;
                 padding: 8px 4px;
-                gap: 0;
+                gap: 2px;
             }
 
-            .nav-btn.nav-first-item,
-            .nav-btn.nav-last-item {
-                border-radius: 12px;
+            .nav-btn {
                 padding-left: 10px;
                 padding-right: 10px;
             }
@@ -276,7 +265,7 @@
 
     <div class="bottom-nav-container">
         <nav class="bottom-nav">
-            <a href="/" class="nav-btn nav-first-item {% if request.path == '/' %}active{% endif %}">
+            <a href="/" class="nav-btn {% if request.path == '/' %}active{% endif %}">
                 <i class="bi bi-house-door"></i>
                 <span>HOME</span>
             </a>
@@ -301,7 +290,7 @@
                 <i class="bi bi-robot"></i>
                 <span>AI CHAT</span>
             </a>
-            <a href="/account" class="nav-btn nav-last-item {% if request.path == '/account' %}active{% endif %}">
+            <a href="/account" class="nav-btn {% if request.path == '/account' %}active{% endif %}">
                 <i class="bi bi-person"></i>
                 <span>ACCOUNT</span>
             </a>
