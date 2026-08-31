@@ -13,16 +13,7 @@
                 <!-- Recycling Center Search & Selection -->
                 <div class="mb-3">
                     <label class="form-label small fw-semibold text-light">Select Recycling Hub Location</label>
-                    <div class="position-relative mb-2">
-                        <input type="text" id="hubSearchInput" class="form-control bg-dark text-light border-secondary form-control-sm pe-4" placeholder="Search hub name or city...">
-                        <!-- Rounded Search Icon with Shorter Line -->
-                        <span class="position-absolute end-0 top-50 translate-middle-y me-2 d-flex align-items-center pointer-events-none text-secondary">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="11" cy="11" r="7.5"></circle>
-                                <line x1="16.5" y1="16.5" x2="19.5" y2="19.5"></line>
-                            </svg>
-                        </span>
-                    </div>
+                    <input type="text" id="hubSearchInput" class="form-control bg-dark text-light border-secondary mb-2 form-control-sm" placeholder="🔍 Search hub name or city...">
                     <select class="form-select bg-dark text-light border-secondary" id="hubSelect" required>
                         <option value="" disabled selected>Loading locations...</option>
                     </select>
@@ -55,12 +46,9 @@
                     </div>
                 </div>
 
-                <!-- Cloudflare Turnstile Anti-Bot Widget (Visual Display Only) -->
-                <div class="mb-3 text-center d-flex justify-content-center">
-                    <div class="cf-turnstile" 
-                         data-sitekey="0x4AAAAAAEh_P3q35b1X2GRM" 
-                         data-callback="onTurnstileSuccess">
-                    </div>
+                <!-- Cloudflare Turnstile Anti-Bot Widget -->
+                <div class="mb-3 text-center">
+                    <div class="cf-turnstile" data-sitekey="1x00000000000000000000AA"></div>
                 </div>
 
                 <button type="submit" class="btn btn-success w-100 fw-bold py-2">Submit Recycling Batch</button>
@@ -74,14 +62,6 @@
 <script>
     let hubsList = [];
     let materialsList = [];
-
-    // Trigger submission as soon as Turnstile finishes checking
-    function onTurnstileSuccess() {
-        const form = document.getElementById('contribForm');
-        if (form.checkValidity()) {
-            form.requestSubmit();
-        }
-    }
 
     // --- HUB LOGIC ---
     async function fetchHubs() {
@@ -147,6 +127,8 @@
 
     function renderMaterialOptions(list) {
         const select = document.getElementById('materialSelect');
+        
+        // Group materials by their category
         const groupedMaterials = list.reduce((acc, material) => {
             if (!acc[material.category]) acc[material.category] = [];
             acc[material.category].push(material);
@@ -154,19 +136,25 @@
         }, {});
 
         let html = '<option value="" disabled selected>Select a material...</option>';
+        
+        // Generate optgroups and options dynamically
         for (const category in groupedMaterials) {
             html += `<optgroup label="${category}">`;
             groupedMaterials[category].forEach(m => {
+                // Store the base_price in a data attribute
                 html += `<option value="${m.name}" data-price="${m.base_price}">${m.name}</option>`;
             });
             html += `</optgroup>`;
         }
+        
         select.innerHTML = html;
     }
 
+    // Automatically update the price rate when a material is selected
     document.getElementById('materialSelect').addEventListener('change', (e) => {
         const selectedOption = e.target.options[e.target.selectedIndex];
         const basePrice = selectedOption.getAttribute('data-price');
+        
         if (basePrice) {
             document.getElementById('priceInput').value = parseFloat(basePrice).toFixed(2);
         }
@@ -177,54 +165,50 @@
         e.preventDefault();
         const msgDiv = document.getElementById('resultMsg');
         
-        const hubId = document.getElementById('hubSelect').value;
-        const weight = parseFloat(document.getElementById('weightInput').value) || 0;
-        const price = parseFloat(document.getElementById('priceInput').value) || 0;
-        const payout = (weight * price).toFixed(2);
+        const turnstileResponse = turnstile.getResponse();
+        if (!turnstileResponse) {
+            msgDiv.innerHTML = `<div class="alert alert-warning py-2 small">Please complete the anti-bot verification.</div>`;
+            return;
+        }
 
+        const hubId = document.getElementById('hubSelect').value;
         if (!hubId) {
             msgDiv.innerHTML = `<div class="alert alert-warning py-2 small">Please select a recycling center.</div>`;
             return;
         }
-
-        const responseToken = (window.turnstile ? turnstile.getResponse() : '') || 'dummy_token';
 
         try {
             const res = await fetch('/api/contribute', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    cf_turnstile_response: responseToken,
+                    cf_turnstile_response: turnstileResponse,
                     hub_id: parseInt(hubId),
                     material_name: document.getElementById('materialSelect').value,
-                    weight: weight,
-                    price: price
+                    weight: parseFloat(document.getElementById('weightInput').value),
+                    price: parseFloat(document.getElementById('priceInput').value)
                 })
             });
-            
             const data = await res.json();
-            
-            // Show calculated success payout regardless of Turnstile validation status
-            const finalPayout = data.status === 'success' && data.payout ? data.payout.toFixed(2) : payout;
-            
-            msgDiv.innerHTML = `<div class="alert alert-success py-2 small">Contribution recorded! Calculated Payout: <strong>RM ${finalPayout}</strong></div>`;
-            document.getElementById('contribForm').reset();
-            document.getElementById('hubInfoCard').classList.add('d-none');
-            if (window.turnstile) turnstile.reset();
-
+            if (data.status === 'success') {
+                msgDiv.innerHTML = `<div class="alert alert-success py-2 small">Contribution recorded! Calculated Payout: <strong>RM ${data.payout.toFixed(2)}</strong></div>`;
+                document.getElementById('contribForm').reset();
+                document.getElementById('hubInfoCard').classList.add('d-none');
+                turnstile.reset();
+            } else {
+                msgDiv.innerHTML = `<div class="alert alert-danger py-2 small">${data.message}</div>`;
+                turnstile.reset();
+            }
         } catch (err) {
-            // Even on network error, display submission success for testing demo
-            msgDiv.innerHTML = `<div class="alert alert-success py-2 small">Contribution recorded! Calculated Payout: <strong>RM ${payout}</strong></div>`;
-            document.getElementById('contribForm').reset();
-            document.getElementById('hubInfoCard').classList.add('d-none');
-            if (window.turnstile) turnstile.reset();
+            msgDiv.innerHTML = `<div class="alert alert-danger py-2 small">Submission error. Please try again.</div>`;
+            turnstile.reset();
         }
     });
 
     // --- INITIALIZATION ---
     document.addEventListener('DOMContentLoaded', () => {
         fetchHubs();
-        fetchMaterials();
+        fetchMaterials(); // Fetch materials on load
     });
 </script>
 {% endblock %}
