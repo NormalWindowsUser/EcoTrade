@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
+<!-- Include Bootstrap JavaScript Bundle for Tabs and Modals -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <div class="row justify-content-center py-3">
     <div class="col-md-12 col-lg-11">
 
@@ -341,10 +344,10 @@
             const res = await fetch("/api/admin/dashboard");
             const data = await res.json();
             if (data.status === "success") {
-                document.getElementById("adminTotalUsers").innerText = data.total_users;
-                document.getElementById("adminPending").innerText = data.pending_count;
-                document.getElementById("adminTotalWeight").innerText = `${data.total_weight.toFixed(2)} kg`;
-                document.getElementById("adminTotalPayout").innerText = `RM ${data.total_payout.toFixed(2)}`;
+                document.getElementById("adminTotalUsers").innerText = data.total_users ?? 0;
+                document.getElementById("adminPending").innerText = data.pending_count ?? 0;
+                document.getElementById("adminTotalWeight").innerText = `${(parseFloat(data.total_weight) || 0).toFixed(2)} kg`;
+                document.getElementById("adminTotalPayout").innerText = `RM ${(parseFloat(data.total_payout) || 0).toFixed(2)}`;
             }
         } catch (err) {
             console.error("Failed to fetch dashboard stats", err);
@@ -357,7 +360,7 @@
             const res = await fetch("/api/admin/contributions");
             const result = await res.json();
 
-            if (result.status === "success" && result.data.length > 0) {
+            if (result.status === "success" && result.data && result.data.length > 0) {
                 let rowsHtml = "";
                 result.data.forEach(item => {
                     let statusBadge = item.status === "approved" 
@@ -371,14 +374,17 @@
                            <button class="btn btn-sm btn-danger py-0 px-2" onclick="updateStatus(${item.id}, 'rejected')"><i class="bi bi-x-lg"></i></button>`
                         : `<span class="text-muted small">Reviewed</span>`;
 
+                    const weightVal = (parseFloat(item.weight) || 0).toFixed(2);
+                    const payoutVal = (parseFloat(item.payout) || 0).toFixed(2);
+
                     rowsHtml += `
                         <tr class="border-secondary">
                             <td class="text-secondary small">#${item.id}</td>
                             <td class="fw-bold text-light">${item.user_name}</td>
                             <td class="text-light">${item.material}</td>
                             <td class="text-secondary small">${item.hub}</td>
-                            <td class="fw-semibold text-light">${item.weight.toFixed(2)} kg</td>
-                            <td class="fw-bold text-success">RM ${item.payout.toFixed(2)}</td>
+                            <td class="fw-semibold text-light">${weightVal} kg</td>
+                            <td class="fw-bold text-success">RM ${payoutVal}</td>
                             <td>${statusBadge}</td>
                             <td>${actions}</td>
                         </tr>
@@ -420,7 +426,7 @@
             const res = await fetch("/api/admin/users");
             const result = await res.json();
 
-            if (result.status === "success" && result.data.length > 0) {
+            if (result.status === "success" && result.data && result.data.length > 0) {
                 let rowsHtml = "";
                 let userOptions = '<option value="">-- Select User --</option>';
 
@@ -436,7 +442,7 @@
                             <td class="text-secondary small">#${user.id}</td>
                             <td class="fw-bold text-light">${user.full_name}</td>
                             <td class="text-secondary">${user.email}</td>
-                            <td class="text-secondary small">${user.school_name}</td>
+                            <td class="text-secondary small">${user.school_name || '-'}</td>
                             <td>${roleBadge}</td>
                             <td>
                                 <select class="form-select form-select-sm bg-dark text-light border-secondary d-inline-block w-auto" onchange="updateUserRole(${user.id}, this.value)">
@@ -484,22 +490,23 @@
         try {
             const res = await fetch("/api/materials");
             const result = await res.json();
-            if (result.status === "success") {
+            if (result.status === "success" && result.data) {
                 rawMaterials = result.data;
                 let rowsHtml = "";
                 let matOptions = '<option value="">-- Select Material --</option>';
 
                 result.data.forEach(mat => {
+                    const price = parseFloat(mat.base_price ?? mat.price_per_kg ?? 0);
                     rowsHtml += `
                         <tr class="border-secondary">
                             <td class="text-secondary small">#${mat.id}</td>
                             <td class="fw-bold text-light">${mat.name}</td>
                             <td><span class="badge bg-dark border border-secondary">${mat.category}</span></td>
-                            <td class="text-success fw-bold">RM ${mat.base_price.toFixed(2)} / kg</td>
+                            <td class="text-success fw-bold">RM ${price.toFixed(2)} / kg</td>
                             <td class="text-secondary small">${mat.tips || '-'}</td>
                         </tr>
                     `;
-                    matOptions += `<option value="${mat.id}" data-price="${mat.base_price}">${mat.name} (RM ${mat.base_price.toFixed(2)}/kg)</option>`;
+                    matOptions += `<option value="${mat.id}" data-price="${price}">${mat.name} (RM ${price.toFixed(2)}/kg)</option>`;
                 });
                 tableBody.innerHTML = rowsHtml;
                 if (selectBox) selectBox.innerHTML = matOptions;
@@ -514,7 +521,7 @@
         const payload = {
             name: document.getElementById("matName").value,
             category: document.getElementById("matCategory").value,
-            price_per_kg: parseFloat(document.getElementById("matPrice").value),
+            price_per_kg: parseFloat(document.getElementById("matPrice").value) || 0,
             preparation_tips: document.getElementById("matTips").value,
             eco_impact_desc: document.getElementById("matImpact").value
         };
@@ -526,11 +533,12 @@
             });
             const data = await res.json();
             if (data.status === "success") {
-                bootstrap.Modal.getInstance(document.getElementById("addMaterialModal")).hide();
+                const modalEl = document.getElementById("addMaterialModal");
+                bootstrap.Modal.getOrCreateInstance(modalEl).hide();
                 document.getElementById("formAddMaterial").reset();
                 fetchMaterials();
             } else {
-                alert(data.message);
+                alert(data.message || "Failed to create material.");
             }
         } catch (err) {
             alert("Failed to create material.");
@@ -544,7 +552,7 @@
         try {
             const res = await fetch("/api/hubs");
             const result = await res.json();
-            if (result.status === "success") {
+            if (result.status === "success" && result.data) {
                 let rowsHtml = "";
                 let hubOptions = '<option value="">-- Select Hub --</option>';
 
@@ -586,11 +594,12 @@
             });
             const data = await res.json();
             if (data.status === "success") {
-                bootstrap.Modal.getInstance(document.getElementById("addHubModal")).hide();
+                const modalEl = document.getElementById("addHubModal");
+                bootstrap.Modal.getOrCreateInstance(modalEl).hide();
                 document.getElementById("formAddHub").reset();
                 fetchHubs();
             } else {
-                alert(data.message);
+                alert(data.message || "Failed to create hub.");
             }
         } catch (err) {
             alert("Failed to create hub.");
@@ -600,23 +609,36 @@
     // MANUAL CONTRIBUTION CREATION
     function calculatePayout() {
         const matSelect = document.getElementById("contMaterialSelect");
+        if (!matSelect || matSelect.selectedIndex === -1) return;
         const selectedOpt = matSelect.options[matSelect.selectedIndex];
         const weight = parseFloat(document.getElementById("contWeight").value) || 0;
         
         if (selectedOpt && selectedOpt.dataset.price) {
-            const price = parseFloat(selectedOpt.dataset.price);
+            const price = parseFloat(selectedOpt.dataset.price) || 0;
             document.getElementById("contPayout").value = (weight * price).toFixed(2);
         }
     }
 
     async function submitContribution(e) {
         e.preventDefault();
+
+        const userId = parseInt(document.getElementById("contUserSelect").value);
+        const materialId = parseInt(document.getElementById("contMaterialSelect").value);
+        const hubId = parseInt(document.getElementById("contHubSelect").value);
+        const weight = parseFloat(document.getElementById("contWeight").value);
+        const payout = parseFloat(document.getElementById("contPayout").value);
+
+        if (isNaN(userId) || isNaN(materialId) || isNaN(hubId) || isNaN(weight)) {
+            alert("Please select a target user, material, hub, and enter a valid weight.");
+            return;
+        }
+
         const payload = {
-            user_id: parseInt(document.getElementById("contUserSelect").value),
-            material_id: parseInt(document.getElementById("contMaterialSelect").value),
-            hub_id: parseInt(document.getElementById("contHubSelect").value),
-            weight: parseFloat(document.getElementById("contWeight").value),
-            payout: parseFloat(document.getElementById("contPayout").value),
+            user_id: userId,
+            material_id: materialId,
+            hub_id: hubId,
+            weight: weight,
+            payout: isNaN(payout) ? 0 : payout,
             status: "approved"
         };
         try {
@@ -627,11 +649,12 @@
             });
             const data = await res.json();
             if (data.status === "success") {
-                bootstrap.Modal.getInstance(document.getElementById("addContributionModal")).hide();
+                const modalEl = document.getElementById("addContributionModal");
+                bootstrap.Modal.getOrCreateInstance(modalEl).hide();
                 document.getElementById("formAddContribution").reset();
                 loadAdminData();
             } else {
-                alert(data.message);
+                alert(data.message || "Failed to record contribution.");
             }
         } catch (err) {
             alert("Failed to record contribution.");
