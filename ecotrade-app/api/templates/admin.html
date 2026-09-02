@@ -1,1 +1,165 @@
+{% extends "base.html" %}
 
+{% block content %}
+<div class="row justify-content-center py-3">
+    <div class="col-md-12 col-lg-11">
+
+        <!-- Admin Summary Card -->
+        <div class="card-custom p-4 mb-4">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <div>
+                    <h4 class="fw-bold text-success mb-1">
+                        <i class="bi bi-shield-lock me-2"></i>Admin Dashboard
+                    </h4>
+                    <p class="text-secondary small mb-0">Manage system contributions, users, and overall metrics.</p>
+                </div>
+                <span class="badge bg-danger px-3 py-2 fs-6">Administrator</span>
+            </div>
+            
+            <hr class="border-secondary">
+            
+            <div class="row g-3 text-center">
+                <div class="col-md-3 col-6">
+                    <label class="small text-secondary fw-semibold">Total Users</label>
+                    <div class="text-light fw-bold fs-4" id="adminTotalUsers">0</div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <label class="small text-secondary fw-semibold">Pending Reviews</label>
+                    <div class="text-warning fw-bold fs-4" id="adminPending">0</div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <label class="small text-secondary fw-semibold">Total Recycled</label>
+                    <div class="text-success fw-bold fs-4" id="adminTotalWeight">0.00 kg</div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <label class="small text-secondary fw-semibold">Total Payouts</label>
+                    <div class="text-success fw-bold fs-4" id="adminTotalPayout">RM 0.00</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contributions Management Table -->
+        <div class="card-custom p-4 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold text-light mb-0">
+                    <i class="bi bi-list-check text-success me-2"></i>Contribution Management
+                </h5>
+                <button class="btn btn-outline-secondary btn-sm" onclick="loadAdminData()">
+                    <i class="bi bi-arrow-clockwise"></i> Refresh
+                </button>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr class="text-secondary small border-secondary">
+                            <th>ID</th>
+                            <th>User</th>
+                            <th>Material</th>
+                            <th>Hub</th>
+                            <th>Weight</th>
+                            <th>Payout</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminContributionsTable">
+                        <tr>
+                            <td colspan="8" class="text-center py-4 text-secondary">
+                                <div class="spinner-border spinner-border-sm text-success me-2" role="status"></div>
+                                Loading platform data...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", loadAdminData);
+
+    async function loadAdminData() {
+        await Promise.all([fetchDashboardStats(), fetchContributions()]);
+    }
+
+    async function fetchDashboardStats() {
+        try {
+            const res = await fetch("/api/admin/dashboard");
+            const data = await res.json();
+            if (data.status === "success") {
+                document.getElementById("adminTotalUsers").innerText = data.total_users;
+                document.getElementById("adminPending").innerText = data.pending_count;
+                document.getElementById("adminTotalWeight").innerText = `${data.total_weight.toFixed(2)} kg`;
+                document.getElementById("adminTotalPayout").innerText = `RM ${data.total_payout.toFixed(2)}`;
+            }
+        } catch (err) {
+            console.error("Failed to fetch dashboard stats", err);
+        }
+    }
+
+    async function fetchContributions() {
+        const tableBody = document.getElementById("adminContributionsTable");
+        try {
+            const res = await fetch("/api/admin/contributions");
+            const result = await res.json();
+
+            if (result.status === "success" && result.data.length > 0) {
+                let rowsHtml = "";
+                result.data.forEach(item => {
+                    let statusBadge = item.status === "approved" 
+                        ? '<span class="badge bg-success">Approved</span>'
+                        : item.status === "rejected"
+                        ? '<span class="badge bg-danger">Rejected</span>'
+                        : '<span class="badge bg-warning text-dark">Pending</span>';
+
+                    let actions = item.status === "pending" 
+                        ? `<button class="btn btn-sm btn-success me-1 py-0 px-2" onclick="updateStatus(${item.id}, 'approved')"><i class="bi bi-check2"></i></button>
+                           <button class="btn btn-sm btn-danger py-0 px-2" onclick="updateStatus(${item.id}, 'rejected')"><i class="bi bi-x-lg"></i></button>`
+                        : `<span class="text-muted small">Reviewed</span>`;
+
+                    rowsHtml += `
+                        <tr class="border-secondary">
+                            <td class="text-secondary small">#${item.id}</td>
+                            <td class="fw-bold text-light">${item.user_name}</td>
+                            <td class="text-light">${item.material}</td>
+                            <td class="text-secondary small">${item.hub}</td>
+                            <td class="fw-semibold text-light">${item.weight.toFixed(2)} kg</td>
+                            <td class="fw-bold text-success">RM ${item.payout.toFixed(2)}</td>
+                            <td>${statusBadge}</td>
+                            <td>${actions}</td>
+                        </tr>
+                    `;
+                });
+                tableBody.innerHTML = rowsHtml;
+            } else {
+                tableBody.innerHTML = `<tr><td colspan="8" class="text-center py-4 text-secondary">No contributions found.</td></tr>`;
+            }
+        } catch (err) {
+            tableBody.innerHTML = `<tr><td colspan="8" class="text-center py-3 text-danger">Failed to load contributions.</td></tr>`;
+        }
+    }
+
+    async function updateStatus(id, newStatus) {
+        if (!confirm(`Are you sure you want to mark this as ${newStatus}?`)) return;
+        
+        try {
+            const res = await fetch(`/api/admin/contribution/${id}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ status: newStatus })
+            });
+            const data = await res.json();
+            if (data.status === "success") {
+                loadAdminData(); // Refresh table and stats
+            } else {
+                alert(data.message);
+            }
+        } catch (err) {
+            alert("An error occurred while updating the status.");
+        }
+    }
+</script>
+{% endblock %}
