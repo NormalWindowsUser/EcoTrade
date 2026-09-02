@@ -160,6 +160,9 @@ def api_login():
         if not user or not user[2] or not check_password_hash(user[2], password):
             return jsonify({"status": "error", "message": "Invalid email or password."}), 401
 
+        if user[3] == 'suspended':
+            return jsonify({"status": "error", "message": "This account has been suspended."}), 403
+
         session["user_id"] = user[0]
         session["user_name"] = user[1]
         session["user_role"] = user[3]
@@ -275,6 +278,158 @@ def update_contribution_status(cont_id):
             cursor.close()
         if conn:
             conn.close()
+
+@app.route("/api/admin/users", methods=["GET"])
+def get_admin_users():
+    if session.get("user_role") != "admin":
+        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, full_name, email, role, school_name FROM users ORDER BY id DESC;")
+        rows = cursor.fetchall()
+        users = [{
+            "id": r[0],
+            "full_name": r[1],
+            "email": r[2],
+            "role": r[3],
+            "school_name": r[4] or "N/A"
+        } for r in rows]
+        return jsonify({"status": "success", "data": users})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        if cursor: cursor.close()
+        if conn: conn.close()
+
+@app.route("/api/admin/user/<int:user_id>/role", methods=["POST"])
+def update_user_role(user_id):
+    if session.get("user_role") != "admin":
+        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+
+    data = request.get_json(silent=True) or {}
+    new_role = data.get("role")
+
+    if new_role not in ["public", "admin", "suspended"]:
+        return jsonify({"status": "error", "message": "Invalid role requested."}), 400
+
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("UPDATE users SET role = %s WHERE id = %s;", (new_role, user_id))
+        conn.commit()
+        return jsonify({"status": "success", "message": f"User role updated to '{new_role}'."})
+    except Exception as e:
+        if conn: conn.rollback()
+        return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        if cursor: cursor.close()
+        if conn: conn.close()
+
+@app.route("/api/admin/material", methods=["POST"])
+def admin_add_material():
+    if session.get("user_role") != "admin":
+        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+
+    data = request.get_json(silent=True) or {}
+    name = data.get("name", "").strip()
+    category = data.get("category", "").strip()
+    price = data.get("price_per_kg", 0.0)
+    tips = data.get("preparation_tips", "").strip()
+    impact = data.get("eco_impact_desc", "").strip()
+
+    if not name or not category:
+        return jsonify({"status": "error", "message": "Material name and category are required."}), 400
+
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO materials (name, category, price_per_kg, preparation_tips, eco_impact_desc, is_active) VALUES (%s, %s, %s, %s, %s, TRUE);",
+            (name, category, price, tips, impact)
+        )
+        conn.commit()
+        return jsonify({"status": "success", "message": "New material added successfully."})
+    except Exception as e:
+        if conn: conn.rollback()
+        return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        if cursor: cursor.close()
+        if conn: conn.close()
+
+@app.route("/api/admin/hub", methods=["POST"])
+def admin_add_hub():
+    if session.get("user_role") != "admin":
+        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+
+    data = request.get_json(silent=True) or {}
+    name = data.get("hub_name", "").strip()
+    address = data.get("address", "").strip()
+    city = data.get("city", "").strip()
+    hours = data.get("operating_hours", "").strip()
+    phone = data.get("contact_phone", "").strip()
+
+    if not name or not city:
+        return jsonify({"status": "error", "message": "Hub name and city are required."}), 400
+
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO recycling_hubs (hub_name, address, city, operating_hours, contact_phone, is_active) VALUES (%s, %s, %s, %s, %s, TRUE);",
+            (name, address, city, hours, phone)
+        )
+        conn.commit()
+        return jsonify({"status": "success", "message": "New recycling hub added successfully."})
+    except Exception as e:
+        if conn: conn.rollback()
+        return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        if cursor: cursor.close()
+        if conn: conn.close()
+
+@app.route("/api/admin/contribution", methods=["POST"])
+def admin_add_contribution():
+    if session.get("user_role") != "admin":
+        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+
+    data = request.get_json(silent=True) or {}
+    user_id = data.get("user_id")
+    material_id = data.get("material_id")
+    hub_id = data.get("hub_id")
+    weight = float(data.get("weight", 0))
+    payout = float(data.get("payout", 0))
+    status = data.get("status", "approved")
+
+    if not user_id or not material_id or not hub_id or weight <= 0:
+        return jsonify({"status": "error", "message": "Please complete all required contribution fields."}), 400
+
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO contributions (user_id, material_id, hub_id, weight_kg, calculated_payout, status) VALUES (%s, %s, %s, %s, %s, %s);",
+            (user_id, material_id, hub_id, weight, payout, status)
+        )
+        conn.commit()
+        return jsonify({"status": "success", "message": "Contribution recorded successfully."})
+    except Exception as e:
+        if conn: conn.rollback()
+        return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        if cursor: cursor.close()
+        if conn: conn.close()
 
 # --- DATA API ENDPOINTS ---
 
@@ -500,7 +655,6 @@ def add_contribution():
         mat_row = cursor.fetchone()
         material_id = mat_row[0] if mat_row else 1
 
-        # CHANGED: 'pending' changed to 'approved' so it auto-approves.
         cursor.execute(
             "INSERT INTO contributions (user_id, material_id, hub_id, weight_kg, calculated_payout, status) VALUES (%s, %s, %s, %s, %s, %s) RETURNING id;",
             (session["user_id"], material_id, hub_id, weight, payout, 'approved') 
