@@ -480,7 +480,7 @@ def chat_ai():
 
     try:
         client = genai.Client(api_key=GEMINI_API_KEY)
-        full_prompt = f"""You are an eco-recycling assistant(Your name is Eco AI) for EcoTrade in Malaysia.
+        full_prompt = f"""You are an eco-recycling assistant(Your name is Eco AI) for EcoTrade in Malaysia. If the recycling center near to their location not in the database, then find any other recycling center for them.
 Use the following database context to answer user questions:
 
 All Recycling Hubs Table (id, hub_name, address, city, operating_hours, contact_phone, is_active):
