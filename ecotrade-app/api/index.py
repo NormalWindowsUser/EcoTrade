@@ -934,7 +934,7 @@ All Contributions Table:
 User Question: {user_prompt}"""
 
         response = client.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-3.1-flash-lite",
             contents=full_prompt
         )
         return jsonify({"status": "success", "reply": response.text})
