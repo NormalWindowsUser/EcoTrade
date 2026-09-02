@@ -231,7 +231,7 @@ def get_admin_contributions():
             JOIN users u ON c.user_id = u.id
             LEFT JOIN materials m ON c.material_id = m.id
             LEFT JOIN recycling_hubs h ON c.hub_id = h.id
-            ORDER BY CASE WHEN c.status = 'pending' THEN 1 ELSE 2 END, c.created_at DESC
+            ORDER BY c.id ASC
             LIMIT 100;
         """)
         rows = cursor.fetchall()
@@ -279,6 +279,26 @@ def update_contribution_status(cont_id):
         if conn:
             conn.close()
 
+@app.route("/api/admin/contribution/<int:cont_id>", methods=["DELETE"])
+def delete_admin_contribution(cont_id):
+    if session.get("user_role") != "admin":
+        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM contributions WHERE id = %s;", (cont_id,))
+        conn.commit()
+        return jsonify({"status": "success", "message": "Contribution deleted successfully."})
+    except Exception as e:
+        if conn: conn.rollback()
+        return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        if cursor: cursor.close()
+        if conn: conn.close()
+
 @app.route("/api/admin/users", methods=["GET"])
 def get_admin_users():
     if session.get("user_role") != "admin":
@@ -289,7 +309,7 @@ def get_admin_users():
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT id, full_name, email, role, school_name FROM users ORDER BY id DESC;")
+        cursor.execute("SELECT id, full_name, email, role, school_name FROM users ORDER BY id ASC;")
         rows = cursor.fetchall()
         users = [{
             "id": r[0],
@@ -364,6 +384,59 @@ def admin_add_material():
         if cursor: cursor.close()
         if conn: conn.close()
 
+@app.route("/api/admin/material/<int:mat_id>", methods=["PUT"])
+def update_admin_material(mat_id):
+    if session.get("user_role") != "admin":
+        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+
+    data = request.get_json(silent=True) or {}
+    name = data.get("name", "").strip()
+    category = data.get("category", "").strip()
+    price = data.get("price_per_kg", 0.0)
+    tips = data.get("preparation_tips", "").strip()
+    impact = data.get("eco_impact_desc", "").strip()
+
+    if not name or not category:
+        return jsonify({"status": "error", "message": "Material name and category are required."}), 400
+
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            "UPDATE materials SET name = %s, category = %s, price_per_kg = %s, preparation_tips = %s, eco_impact_desc = %s WHERE id = %s;",
+            (name, category, price, tips, impact, mat_id)
+        )
+        conn.commit()
+        return jsonify({"status": "success", "message": "Material updated successfully."})
+    except Exception as e:
+        if conn: conn.rollback()
+        return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        if cursor: cursor.close()
+        if conn: conn.close()
+
+@app.route("/api/admin/material/<int:mat_id>", methods=["DELETE"])
+def delete_admin_material(mat_id):
+    if session.get("user_role") != "admin":
+        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("UPDATE materials SET is_active = FALSE WHERE id = %s;", (mat_id,))
+        conn.commit()
+        return jsonify({"status": "success", "message": "Material deactivated successfully."})
+    except Exception as e:
+        if conn: conn.rollback()
+        return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        if cursor: cursor.close()
+        if conn: conn.close()
+
 @app.route("/api/admin/hub", methods=["POST"])
 def admin_add_hub():
     if session.get("user_role") != "admin":
@@ -390,6 +463,59 @@ def admin_add_hub():
         )
         conn.commit()
         return jsonify({"status": "success", "message": "New recycling hub added successfully."})
+    except Exception as e:
+        if conn: conn.rollback()
+        return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        if cursor: cursor.close()
+        if conn: conn.close()
+
+@app.route("/api/admin/hub/<int:hub_id>", methods=["PUT"])
+def update_admin_hub(hub_id):
+    if session.get("user_role") != "admin":
+        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+
+    data = request.get_json(silent=True) or {}
+    name = data.get("hub_name", "").strip()
+    address = data.get("address", "").strip()
+    city = data.get("city", "").strip()
+    hours = data.get("operating_hours", "").strip()
+    phone = data.get("contact_phone", "").strip()
+
+    if not name or not city:
+        return jsonify({"status": "error", "message": "Hub name and city are required."}), 400
+
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            "UPDATE recycling_hubs SET hub_name = %s, address = %s, city = %s, operating_hours = %s, contact_phone = %s WHERE id = %s;",
+            (name, address, city, hours, phone, hub_id)
+        )
+        conn.commit()
+        return jsonify({"status": "success", "message": "Hub updated successfully."})
+    except Exception as e:
+        if conn: conn.rollback()
+        return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        if cursor: cursor.close()
+        if conn: conn.close()
+
+@app.route("/api/admin/hub/<int:hub_id>", methods=["DELETE"])
+def delete_admin_hub(hub_id):
+    if session.get("user_role") != "admin":
+        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("UPDATE recycling_hubs SET is_active = FALSE WHERE id = %s;", (hub_id,))
+        conn.commit()
+        return jsonify({"status": "success", "message": "Hub deactivated successfully."})
     except Exception as e:
         if conn: conn.rollback()
         return jsonify({"status": "error", "message": str(e)}), 500
@@ -455,7 +581,7 @@ def get_user_contributions():
             LEFT JOIN materials m ON c.material_id = m.id
             LEFT JOIN recycling_hubs h ON c.hub_id = h.id
             WHERE c.user_id = %s
-            ORDER BY c.id DESC;
+            ORDER BY c.id ASC;
         """, (session["user_id"],))
         rows = cursor.fetchall()
 
@@ -491,12 +617,13 @@ def get_recent_contributions():
                 COALESCE(h.hub_name, 'Unknown Hub') AS hub_name,
                 c.weight_kg,
                 c.calculated_payout,
-                EXTRACT(EPOCH FROM (NOW() - c.created_at)) AS seconds_ago
+                EXTRACT(EPOCH FROM (NOW() - c.created_at)) AS seconds_ago,
+                c.id
             FROM contributions c
             LEFT JOIN materials m ON c.material_id = m.id
             LEFT JOIN recycling_hubs h ON c.hub_id = h.id
             WHERE c.status = 'approved'
-            ORDER BY c.created_at DESC
+            ORDER BY c.id ASC
             LIMIT 50;
         """)
         rows = cursor.fetchall()
@@ -506,7 +633,8 @@ def get_recent_contributions():
             "hub_name": r[1],
             "weight": float(r[2]) if r[2] else 0.0,
             "payout": float(r[3]) if r[3] else 0.0,
-            "seconds_ago": float(r[4]) if r[4] is not None else 0
+            "seconds_ago": float(r[4]) if r[4] is not None else 0,
+            "id": r[5]
         } for r in rows]
 
         return jsonify({"status": "success", "data": contributions})
@@ -534,7 +662,7 @@ def get_hubs():
         if city_filter:
             query += " AND city = %s"
             params.append(city_filter)
-        query += " ORDER BY hub_name ASC;"
+        query += " ORDER BY id ASC;"
 
         cursor.execute(query, tuple(params))
         rows = cursor.fetchall()
@@ -598,7 +726,7 @@ def get_materials():
             LEFT JOIN recycling_hubs h ON c.hub_id = h.id
             WHERE {where_str}
             GROUP BY m.id, m.name, m.category, m.price_per_kg, m.preparation_tips, m.eco_impact_desc
-            ORDER BY m.name ASC;
+            ORDER BY m.id ASC;
         """
 
         cursor.execute(query, tuple(params))
@@ -713,10 +841,10 @@ def chat_ai():
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT id, name, category, price_per_kg, unit, preparation_tips, eco_impact_desc, is_active FROM materials;")
+        cursor.execute("SELECT id, name, category, price_per_kg, unit, preparation_tips, eco_impact_desc, is_active FROM materials ORDER BY id ASC;")
         materials_context = cursor.fetchall()
 
-        cursor.execute("SELECT id, hub_name, address, city, operating_hours, contact_phone, is_active FROM recycling_hubs;")
+        cursor.execute("SELECT id, hub_name, address, city, operating_hours, contact_phone, is_active FROM recycling_hubs ORDER BY id ASC;")
         hubs_context = cursor.fetchall()
 
         cursor.execute("""
@@ -726,7 +854,8 @@ def chat_ai():
                 c.weight_kg, c.calculated_payout, c.status, c.notes, c.created_at, c.reviewed_by
             FROM contributions c
             LEFT JOIN materials m ON c.material_id = m.id
-            LEFT JOIN recycling_hubs h ON c.hub_id = h.id;
+            LEFT JOIN recycling_hubs h ON c.hub_id = h.id
+            ORDER BY c.id ASC;
         """)
         contributions_context = cursor.fetchall()
     except Exception:
