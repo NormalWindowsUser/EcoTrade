@@ -88,7 +88,7 @@
     /* Stats Grid */
     .stats-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
         gap: 1.25rem;
         margin-bottom: 2.5rem;
     }
@@ -224,7 +224,7 @@
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         gap: 1.25rem;
-        margin-bottom: 2.5rem;
+        margin-bottom: 1.5rem;
     }
 
     .info-card {
@@ -439,6 +439,18 @@
     </div>
     <div class="stat-card">
         <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+        <div class="stat-content">
+            <h3 id="stat-contributions">--</h3>
+            <p>Total Contributions</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
             <circle cx="12" cy="10" r="3"/>
         </svg>
@@ -508,8 +520,16 @@
     <span>Accepted Materials & Live Rates</span>
     <span class="sub-text" id="rate-summary-tag">Based on community reports</span>
 </div>
+<div class="mb-3">
+    <input type="text" id="search-materials" class="form-control" placeholder="Search material by name or category..." aria-label="Search materials">
+</div>
 <div class="grid-container" id="materials-list">
     <!-- Initial Loader -->
+</div>
+<div class="text-center mb-5" id="load-more-materials-container" style="display: none;">
+    <button id="load-more-materials-btn" class="btn-custom-secondary">
+        Show More Materials
+    </button>
 </div>
 
 <!-- Hubs Display (Scrollable List) -->
@@ -518,6 +538,9 @@
     <span class="sub-text">Verified Drop-offs</span>
 </div>
 <div class="scroll-container">
+    <div class="mb-3">
+        <input type="text" id="search-hubs" class="form-control" placeholder="Search hub by name, city, or address..." aria-label="Search hubs">
+    </div>
     <div class="scroll-box" id="hubs-list">
         <!-- Initial Loader -->
     </div>
@@ -554,12 +577,20 @@
 <script>
     // Global States
     let currentMaterialsData = [];
+    let filteredMaterialsData = [];
+    let materialsDisplayLimit = 6;
+
     let currentHubsData = [];
+    let filteredHubsData = [];
     let hubDisplayLimit = 10;
+
     let allContributions = [];
     let filteredContributions = [];
     let contribDisplayLimit = 10;
+
     let searchTimeout = null;
+    let materialsSearchTimeout = null;
+    let hubsSearchTimeout = null;
 
     // Standard Loading HTML Component
     const getLoadingSpinner = (text = "Loading data...") => `
@@ -588,12 +619,14 @@
             if (data.status === 'success') {
                 const weight = data.total_weight || 0;
                 // Add fade-in animation by toggling class
-                ['stat-weight', 'stat-earnings', 'stat-hubs', 'stat-co2'].forEach(id => {
-                    document.getElementById(id).classList.add('fade-in');
+                ['stat-weight', 'stat-earnings', 'stat-contributions', 'stat-hubs', 'stat-co2'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.classList.add('fade-in');
                 });
                 
                 document.getElementById('stat-weight').innerText = `${weight.toFixed(1)} kg`;
                 document.getElementById('stat-earnings').innerText = `RM ${(data.total_earnings || 0).toFixed(2)}`;
+                document.getElementById('stat-contributions').innerText = (data.total_contributions !== undefined ? data.total_contributions : (data.contributions_count || 0)).toLocaleString();
                 document.getElementById('stat-hubs').innerText = data.active_hubs || 0;
                 document.getElementById('stat-co2').innerText = `${(weight * 1.5).toFixed(1)} kg`;
             }
@@ -619,28 +652,44 @@
             
             if (data.status === 'success' && data.data) {
                 currentMaterialsData = data.data;
+                const query = document.getElementById('search-materials').value.toLowerCase().trim();
+                if (query) {
+                    filteredMaterialsData = currentMaterialsData.filter(m =>
+                        (m.name && m.name.toLowerCase().includes(query)) ||
+                        (m.category && m.category.toLowerCase().includes(query))
+                    );
+                } else {
+                    filteredMaterialsData = [...currentMaterialsData];
+                }
+                materialsDisplayLimit = 6;
                 renderMaterials();
             } else {
+                currentMaterialsData = [];
+                filteredMaterialsData = [];
                 container.innerHTML = '<p class="loading-text text-center w-100 fade-in">No active materials found.</p>';
+                document.getElementById('load-more-materials-container').style.display = 'none';
             }
         } catch (err) {
             console.error("Failed to fetch materials:", err);
             container.innerHTML = '<p class="loading-text text-center w-100 fade-in text-danger">Unable to load materials.</p>';
+            document.getElementById('load-more-materials-container').style.display = 'none';
         }
     }
 
     function renderMaterials() {
         const container = document.getElementById('materials-list');
+        const loadMoreBtnContainer = document.getElementById('load-more-materials-container');
         const weightInput = Math.max(0, parseFloat(document.getElementById('calc-weight').value) || 0);
 
-        if (currentMaterialsData.length > 0) {
-            container.innerHTML = currentMaterialsData.map((m, index) => {
+        const toDisplay = filteredMaterialsData.slice(0, materialsDisplayLimit);
+
+        if (toDisplay.length > 0) {
+            container.innerHTML = toDisplay.map((m, index) => {
                 const estimatedPayout = ((m.avg_reported_rate || 0) * weightInput).toFixed(2);
                 const reportBadge = m.report_count > 0 
                     ? `<span class="badge bg-success ms-1">${m.report_count} user report${m.report_count > 1 ? 's' : ''}</span>`
                     : `<span class="badge bg-secondary ms-1">Base Rate</span>`;
 
-                // Staggered fade in animation using inline animation-delay
                 return `
                     <div class="info-card fade-in" style="animation-delay: ${index * 0.05}s">
                         <div>
@@ -660,8 +709,11 @@
                     </div>
                 `;
             }).join('');
+
+            loadMoreBtnContainer.style.display = filteredMaterialsData.length > materialsDisplayLimit ? 'block' : 'none';
         } else {
-            container.innerHTML = '<p class="loading-text text-center w-100 fade-in">No active materials found.</p>';
+            container.innerHTML = '<p class="loading-text text-center w-100 fade-in">No active materials found matching search.</p>';
+            loadMoreBtnContainer.style.display = 'none';
         }
     }
 
@@ -701,6 +753,17 @@
                 currentHubsData = [];
             }
             
+            const query = document.getElementById('search-hubs').value.toLowerCase().trim();
+            if (query) {
+                filteredHubsData = currentHubsData.filter(h =>
+                    (h.name && h.name.toLowerCase().includes(query)) ||
+                    (h.address && h.address.toLowerCase().includes(query)) ||
+                    (h.city && h.city.toLowerCase().includes(query))
+                );
+            } else {
+                filteredHubsData = [...currentHubsData];
+            }
+
             hubDisplayLimit = 10;
             renderHubs();
         } catch (err) {
@@ -714,10 +777,10 @@
         const container = document.getElementById('hubs-list');
         const loadMoreBtnContainer = document.getElementById('load-more-hubs-container');
         
-        const toDisplay = currentHubsData.slice(0, hubDisplayLimit);
+        const toDisplay = filteredHubsData.slice(0, hubDisplayLimit);
 
         if (toDisplay.length === 0) {
-            container.innerHTML = '<p class="loading-text text-center fade-in">No recycling hubs found for selected filters.</p>';
+            container.innerHTML = '<p class="loading-text text-center fade-in">No recycling hubs found matching your criteria.</p>';
             loadMoreBtnContainer.style.display = 'none';
             return;
         }
@@ -735,7 +798,7 @@
             </div>
         `).join('');
 
-        loadMoreBtnContainer.style.display = currentHubsData.length > hubDisplayLimit ? 'block' : 'none';
+        loadMoreBtnContainer.style.display = filteredHubsData.length > hubDisplayLimit ? 'block' : 'none';
     }
 
     async function fetchRecentContributions() {
@@ -763,7 +826,15 @@
                         ? formatTimeAgo(c.seconds_ago) 
                         : (c.created_at ? formatTimeAgo((new Date() - new Date(c.created_at)) / 1000) : 'Just now')
                 }));
-                filteredContributions = [...allContributions];
+                const query = document.getElementById('search-contributions').value.toLowerCase().trim();
+                if (query) {
+                    filteredContributions = allContributions.filter(c =>
+                        c.material_name.toLowerCase().includes(query) ||
+                        c.hub_name.toLowerCase().includes(query)
+                    );
+                } else {
+                    filteredContributions = [...allContributions];
+                }
                 renderContributions();
             } else {
                 allContributions = [];
@@ -808,6 +879,42 @@
     }
 
     // --- Event Listeners ---
+    document.getElementById('search-materials').addEventListener('input', (e) => {
+        clearTimeout(materialsSearchTimeout);
+        document.getElementById('materials-list').innerHTML = getLoadingSpinner('Searching materials...');
+        
+        materialsSearchTimeout = setTimeout(() => {
+            const query = e.target.value.toLowerCase().trim();
+            filteredMaterialsData = currentMaterialsData.filter(m => 
+                (m.name && m.name.toLowerCase().includes(query)) || 
+                (m.category && m.category.toLowerCase().includes(query))
+            );
+            materialsDisplayLimit = 6;
+            renderMaterials();
+        }, 300);
+    });
+
+    document.getElementById('load-more-materials-btn').addEventListener('click', () => {
+        materialsDisplayLimit += 6;
+        renderMaterials();
+    });
+
+    document.getElementById('search-hubs').addEventListener('input', (e) => {
+        clearTimeout(hubsSearchTimeout);
+        document.getElementById('hubs-list').innerHTML = getLoadingSpinner('Searching hubs...');
+        
+        hubsSearchTimeout = setTimeout(() => {
+            const query = e.target.value.toLowerCase().trim();
+            filteredHubsData = currentHubsData.filter(h => 
+                (h.name && h.name.toLowerCase().includes(query)) || 
+                (h.address && h.address.toLowerCase().includes(query)) ||
+                (h.city && h.city.toLowerCase().includes(query))
+            );
+            hubDisplayLimit = 10;
+            renderHubs();
+        }, 300);
+    });
+
     document.getElementById('load-more-hubs-btn').addEventListener('click', () => {
         hubDisplayLimit += 10;
         renderHubs();
@@ -815,9 +922,7 @@
 
     document.getElementById('search-contributions').addEventListener('input', (e) => {
         clearTimeout(searchTimeout);
-        // Show spinner while "typing" if it takes long, or just let it snap. 
-        // A quick visual reset helps perceived speed:
-        document.getElementById('contributions-list').innerHTML = getLoadingSpinner('Searching...');
+        document.getElementById('contributions-list').innerHTML = getLoadingSpinner('Searching contributions...');
         
         searchTimeout = setTimeout(() => {
             const query = e.target.value.toLowerCase().trim();
@@ -827,7 +932,7 @@
             );
             contribDisplayLimit = 10; 
             renderContributions();
-        }, 400); // Slight delay for debounce
+        }, 300);
     });
 
     document.getElementById('load-more-contributions-btn').addEventListener('click', () => {
