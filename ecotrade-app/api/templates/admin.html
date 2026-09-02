@@ -155,11 +155,12 @@
                                     <th>Category</th>
                                     <th>Base Rate</th>
                                     <th>Tips</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="adminMaterialsTable">
                                 <tr>
-                                    <td colspan="5" class="text-center py-4 text-secondary">Loading materials...</td>
+                                    <td colspan="6" class="text-center py-4 text-secondary">Loading materials...</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -186,11 +187,12 @@
                                     <th>Address</th>
                                     <th>Hours</th>
                                     <th>Phone</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="adminHubsTable">
                                 <tr>
-                                    <td colspan="6" class="text-center py-4 text-secondary">Loading hub network...</td>
+                                    <td colspan="7" class="text-center py-4 text-secondary">Loading hub network...</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -285,6 +287,47 @@
     </div>
 </div>
 
+<!-- MODAL: EDIT MATERIAL -->
+<div class="modal fade" id="editMaterialModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-light border-secondary">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title">Edit Material</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formEditMaterial" onsubmit="submitEditMaterial(event)">
+                <input type="hidden" id="editMatId">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary">Material Name</label>
+                        <input type="text" class="form-control bg-dark text-light border-secondary" id="editMatName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary">Category</label>
+                        <input type="text" class="form-control bg-dark text-light border-secondary" id="editMatCategory" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary">Base Price per kg (RM)</label>
+                        <input type="number" step="0.01" class="form-control bg-dark text-light border-secondary" id="editMatPrice" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary">Preparation Tips</label>
+                        <textarea class="form-control bg-dark text-light border-secondary" id="editMatTips" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary">Eco Impact Description</label>
+                        <textarea class="form-control bg-dark text-light border-secondary" id="editMatImpact" rows="2"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-warning">Update Material</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <!-- MODAL: ADD HUB -->
 <div class="modal fade" id="addHubModal" tabindex="-1">
     <div class="modal-dialog">
@@ -325,8 +368,50 @@
     </div>
 </div>
 
+<!-- MODAL: EDIT HUB -->
+<div class="modal fade" id="editHubModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-light border-secondary">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title">Edit Recycling Hub</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formEditHub" onsubmit="submitEditHub(event)">
+                <input type="hidden" id="editHubId">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary">Hub Name</label>
+                        <input type="text" class="form-control bg-dark text-light border-secondary" id="editHubName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary">City</label>
+                        <input type="text" class="form-control bg-dark text-light border-secondary" id="editHubCity" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary">Address</label>
+                        <input type="text" class="form-control bg-dark text-light border-secondary" id="editHubAddress" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary">Operating Hours</label>
+                        <input type="text" class="form-control bg-dark text-light border-secondary" id="editHubHours">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary">Contact Phone</label>
+                        <input type="text" class="form-control bg-dark text-light border-secondary" id="editHubPhone">
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-warning">Update Hub</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
     let rawMaterials = [];
+    let rawHubs = [];
 
     document.addEventListener("DOMContentLoaded", () => {
         loadAdminData();
@@ -504,15 +589,25 @@
                             <td><span class="badge bg-dark border border-secondary">${mat.category}</span></td>
                             <td class="text-success fw-bold">RM ${price.toFixed(2)} / kg</td>
                             <td class="text-secondary small">${mat.tips || '-'}</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-warning me-1 py-0 px-2" onclick="openEditMaterialModal(${mat.id})">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger py-0 px-2" onclick="deleteMaterial(${mat.id})">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
                         </tr>
                     `;
                     matOptions += `<option value="${mat.id}" data-price="${price}">${mat.name} (RM ${price.toFixed(2)}/kg)</option>`;
                 });
                 tableBody.innerHTML = rowsHtml;
                 if (selectBox) selectBox.innerHTML = matOptions;
+            } else {
+                tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-secondary">No materials found.</td></tr>`;
             }
         } catch (err) {
-            tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-3 text-danger">Failed to load materials.</td></tr>`;
+            tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-3 text-danger">Failed to load materials.</td></tr>`;
         }
     }
 
@@ -545,6 +640,68 @@
         }
     }
 
+    function openEditMaterialModal(id) {
+        const mat = rawMaterials.find(m => m.id === id);
+        if (!mat) return;
+
+        document.getElementById("editMatId").value = mat.id;
+        document.getElementById("editMatName").value = mat.name || '';
+        document.getElementById("editMatCategory").value = mat.category || '';
+        document.getElementById("editMatPrice").value = mat.base_price ?? mat.price_per_kg ?? 0;
+        document.getElementById("editMatTips").value = mat.tips || mat.preparation_tips || '';
+        document.getElementById("editMatImpact").value = mat.eco_impact_desc || '';
+
+        const modalEl = document.getElementById("editMaterialModal");
+        bootstrap.Modal.getOrCreateInstance(modalEl).show();
+    }
+
+    async function submitEditMaterial(e) {
+        e.preventDefault();
+        const id = document.getElementById("editMatId").value;
+        const payload = {
+            name: document.getElementById("editMatName").value,
+            category: document.getElementById("editMatCategory").value,
+            price_per_kg: parseFloat(document.getElementById("editMatPrice").value) || 0,
+            preparation_tips: document.getElementById("editMatTips").value,
+            eco_impact_desc: document.getElementById("editMatImpact").value
+        };
+
+        try {
+            const res = await fetch(`/api/admin/material/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.status === "success") {
+                const modalEl = document.getElementById("editMaterialModal");
+                bootstrap.Modal.getOrCreateInstance(modalEl).hide();
+                fetchMaterials();
+            } else {
+                alert(data.message || "Failed to update material.");
+            }
+        } catch (err) {
+            alert("An error occurred while updating the material.");
+        }
+    }
+
+    async function deleteMaterial(id) {
+        if (!confirm(`Are you sure you want to delete material #${id}?`)) return;
+        try {
+            const res = await fetch(`/api/admin/material/${id}`, {
+                method: "DELETE"
+            });
+            const data = await res.json();
+            if (data.status === "success") {
+                fetchMaterials();
+            } else {
+                alert(data.message || "Failed to delete material.");
+            }
+        } catch (err) {
+            alert("An error occurred while deleting the material.");
+        }
+    }
+
     // HUBS MANAGEMENT
     async function fetchHubs() {
         const tableBody = document.getElementById("adminHubsTable");
@@ -553,6 +710,7 @@
             const res = await fetch("/api/hubs");
             const result = await res.json();
             if (result.status === "success" && result.data) {
+                rawHubs = result.data;
                 let rowsHtml = "";
                 let hubOptions = '<option value="">-- Select Hub --</option>';
 
@@ -565,15 +723,25 @@
                             <td class="text-secondary small">${hub.address}</td>
                             <td class="text-secondary small">${hub.hours || '-'}</td>
                             <td class="text-secondary small">${hub.phone || '-'}</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-warning me-1 py-0 px-2" onclick="openEditHubModal(${hub.id})">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger py-0 px-2" onclick="deleteHub(${hub.id})">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
                         </tr>
                     `;
                     hubOptions += `<option value="${hub.id}">${hub.name} (${hub.city})</option>`;
                 });
                 tableBody.innerHTML = rowsHtml;
                 if (selectBox) selectBox.innerHTML = hubOptions;
+            } else {
+                tableBody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-secondary">No recycling hubs found.</td></tr>`;
             }
         } catch (err) {
-            tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-3 text-danger">Failed to load hubs.</td></tr>`;
+            tableBody.innerHTML = `<tr><td colspan="7" class="text-center py-3 text-danger">Failed to load hubs.</td></tr>`;
         }
     }
 
@@ -603,6 +771,68 @@
             }
         } catch (err) {
             alert("Failed to create hub.");
+        }
+    }
+
+    function openEditHubModal(id) {
+        const hub = rawHubs.find(h => h.id === id);
+        if (!hub) return;
+
+        document.getElementById("editHubId").value = hub.id;
+        document.getElementById("editHubName").value = hub.name || hub.hub_name || '';
+        document.getElementById("editHubCity").value = hub.city || '';
+        document.getElementById("editHubAddress").value = hub.address || '';
+        document.getElementById("editHubHours").value = hub.hours || hub.operating_hours || '';
+        document.getElementById("editHubPhone").value = hub.phone || hub.contact_phone || '';
+
+        const modalEl = document.getElementById("editHubModal");
+        bootstrap.Modal.getOrCreateInstance(modalEl).show();
+    }
+
+    async function submitEditHub(e) {
+        e.preventDefault();
+        const id = document.getElementById("editHubId").value;
+        const payload = {
+            hub_name: document.getElementById("editHubName").value,
+            city: document.getElementById("editHubCity").value,
+            address: document.getElementById("editHubAddress").value,
+            operating_hours: document.getElementById("editHubHours").value,
+            contact_phone: document.getElementById("editHubPhone").value
+        };
+
+        try {
+            const res = await fetch(`/api/admin/hub/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.status === "success") {
+                const modalEl = document.getElementById("editHubModal");
+                bootstrap.Modal.getOrCreateInstance(modalEl).hide();
+                fetchHubs();
+            } else {
+                alert(data.message || "Failed to update hub.");
+            }
+        } catch (err) {
+            alert("An error occurred while updating the hub.");
+        }
+    }
+
+    async function deleteHub(id) {
+        if (!confirm(`Are you sure you want to delete hub #${id}?`)) return;
+        try {
+            const res = await fetch(`/api/admin/hub/${id}`, {
+                method: "DELETE"
+            });
+            const data = await res.json();
+            if (data.status === "success") {
+                fetchHubs();
+            } else {
+                alert(data.message || "Failed to delete hub.");
+            }
+        } catch (err) {
+            alert("An error occurred while deleting the hub.");
         }
     }
 
