@@ -102,7 +102,7 @@ def api_signup():
     full_name = data.get("full_name", "").strip()
     email = data.get("email", "").strip().lower()
     password = data.get("password", "")
-    role = data.get("role", "public")
+    role = "public"  # Hardcoded to prevent privilege escalation via request payload
     school_name = data.get("school_name", "").strip() or None
 
     if not full_name or not email or not password:
@@ -293,11 +293,14 @@ def delete_admin_contribution(cont_id):
         conn.commit()
         return jsonify({"status": "success", "message": "Contribution deleted successfully."})
     except Exception as e:
-        if conn: conn.rollback()
+        if conn: 
+            conn.rollback()
         return jsonify({"status": "error", "message": str(e)}), 500
     finally:
-        if cursor: cursor.close()
-        if conn: conn.close()
+        if cursor: 
+            cursor.close()
+        if conn: 
+            conn.close()
 
 @app.route("/api/admin/users", methods=["GET"])
 def get_admin_users():
@@ -322,8 +325,10 @@ def get_admin_users():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
     finally:
-        if cursor: cursor.close()
-        if conn: conn.close()
+        if cursor: 
+            cursor.close()
+        if conn: 
+            conn.close()
 
 @app.route("/api/admin/user/<int:user_id>/role", methods=["POST"])
 def update_user_role(user_id):
@@ -345,11 +350,14 @@ def update_user_role(user_id):
         conn.commit()
         return jsonify({"status": "success", "message": f"User role updated to '{new_role}'."})
     except Exception as e:
-        if conn: conn.rollback()
+        if conn: 
+            conn.rollback()
         return jsonify({"status": "error", "message": str(e)}), 500
     finally:
-        if cursor: cursor.close()
-        if conn: conn.close()
+        if cursor: 
+            cursor.close()
+        if conn: 
+            conn.close()
 
 @app.route("/api/admin/material", methods=["POST"])
 def admin_add_material():
@@ -359,9 +367,13 @@ def admin_add_material():
     data = request.get_json(silent=True) or {}
     name = data.get("name", "").strip()
     category = data.get("category", "").strip()
-    price = data.get("price_per_kg", 0.0)
     tips = data.get("preparation_tips", "").strip()
     impact = data.get("eco_impact_desc", "").strip()
+
+    try:
+        price = float(data.get("price_per_kg", 0.0))
+    except (ValueError, TypeError):
+        return jsonify({"status": "error", "message": "Invalid price format."}), 400
 
     if not name or not category:
         return jsonify({"status": "error", "message": "Material name and category are required."}), 400
@@ -378,11 +390,14 @@ def admin_add_material():
         conn.commit()
         return jsonify({"status": "success", "message": "New material added successfully."})
     except Exception as e:
-        if conn: conn.rollback()
+        if conn: 
+            conn.rollback()
         return jsonify({"status": "error", "message": str(e)}), 500
     finally:
-        if cursor: cursor.close()
-        if conn: conn.close()
+        if cursor: 
+            cursor.close()
+        if conn: 
+            conn.close()
 
 @app.route("/api/admin/material/<int:mat_id>", methods=["PUT"])
 def update_admin_material(mat_id):
@@ -392,9 +407,13 @@ def update_admin_material(mat_id):
     data = request.get_json(silent=True) or {}
     name = data.get("name", "").strip()
     category = data.get("category", "").strip()
-    price = data.get("price_per_kg", 0.0)
     tips = data.get("preparation_tips", "").strip()
     impact = data.get("eco_impact_desc", "").strip()
+
+    try:
+        price = float(data.get("price_per_kg", 0.0))
+    except (ValueError, TypeError):
+        return jsonify({"status": "error", "message": "Invalid price format."}), 400
 
     if not name or not category:
         return jsonify({"status": "error", "message": "Material name and category are required."}), 400
@@ -411,11 +430,14 @@ def update_admin_material(mat_id):
         conn.commit()
         return jsonify({"status": "success", "message": "Material updated successfully."})
     except Exception as e:
-        if conn: conn.rollback()
+        if conn: 
+            conn.rollback()
         return jsonify({"status": "error", "message": str(e)}), 500
     finally:
-        if cursor: cursor.close()
-        if conn: conn.close()
+        if cursor: 
+            cursor.close()
+        if conn: 
+            conn.close()
 
 @app.route("/api/admin/material/<int:mat_id>", methods=["DELETE"])
 def delete_admin_material(mat_id):
@@ -431,11 +453,14 @@ def delete_admin_material(mat_id):
         conn.commit()
         return jsonify({"status": "success", "message": "Material deactivated successfully."})
     except Exception as e:
-        if conn: conn.rollback()
+        if conn: 
+            conn.rollback()
         return jsonify({"status": "error", "message": str(e)}), 500
     finally:
-        if cursor: cursor.close()
-        if conn: conn.close()
+        if cursor: 
+            cursor.close()
+        if conn: 
+            conn.close()
 
 @app.route("/api/admin/hub", methods=["POST"])
 def admin_add_hub():
@@ -464,11 +489,14 @@ def admin_add_hub():
         conn.commit()
         return jsonify({"status": "success", "message": "New recycling hub added successfully."})
     except Exception as e:
-        if conn: conn.rollback()
+        if conn: 
+            conn.rollback()
         return jsonify({"status": "error", "message": str(e)}), 500
     finally:
-        if cursor: cursor.close()
-        if conn: conn.close()
+        if cursor: 
+            cursor.close()
+        if conn: 
+            conn.close()
 
 @app.route("/api/admin/hub/<int:hub_id>", methods=["PUT"])
 def update_admin_hub(hub_id):
@@ -497,11 +525,14 @@ def update_admin_hub(hub_id):
         conn.commit()
         return jsonify({"status": "success", "message": "Hub updated successfully."})
     except Exception as e:
-        if conn: conn.rollback()
+        if conn: 
+            conn.rollback()
         return jsonify({"status": "error", "message": str(e)}), 500
     finally:
-        if cursor: cursor.close()
-        if conn: conn.close()
+        if cursor: 
+            cursor.close()
+        if conn: 
+            conn.close()
 
 @app.route("/api/admin/hub/<int:hub_id>", methods=["DELETE"])
 def delete_admin_hub(hub_id):
@@ -517,11 +548,14 @@ def delete_admin_hub(hub_id):
         conn.commit()
         return jsonify({"status": "success", "message": "Hub deactivated successfully."})
     except Exception as e:
-        if conn: conn.rollback()
+        if conn: 
+            conn.rollback()
         return jsonify({"status": "error", "message": str(e)}), 500
     finally:
-        if cursor: cursor.close()
-        if conn: conn.close()
+        if cursor: 
+            cursor.close()
+        if conn: 
+            conn.close()
 
 @app.route("/api/admin/contribution", methods=["POST"])
 def admin_add_contribution():
@@ -532,9 +566,13 @@ def admin_add_contribution():
     user_id = data.get("user_id")
     material_id = data.get("material_id")
     hub_id = data.get("hub_id")
-    weight = float(data.get("weight", 0))
-    payout = float(data.get("payout", 0))
     status = data.get("status", "approved")
+
+    try:
+        weight = float(data.get("weight", 0))
+        payout = float(data.get("payout", 0))
+    except (ValueError, TypeError):
+        return jsonify({"status": "error", "message": "Invalid numerical values for weight or payout."}), 400
 
     if not user_id or not material_id or not hub_id or weight <= 0:
         return jsonify({"status": "error", "message": "Please complete all required contribution fields."}), 400
@@ -551,11 +589,14 @@ def admin_add_contribution():
         conn.commit()
         return jsonify({"status": "success", "message": "Contribution recorded successfully."})
     except Exception as e:
-        if conn: conn.rollback()
+        if conn: 
+            conn.rollback()
         return jsonify({"status": "error", "message": str(e)}), 500
     finally:
-        if cursor: cursor.close()
-        if conn: conn.close()
+        if cursor: 
+            cursor.close()
+        if conn: 
+            conn.close()
 
 # --- DATA API ENDPOINTS ---
 
@@ -699,17 +740,17 @@ def get_materials():
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        where_clauses = ["m.is_active = TRUE"]
+        join_conditions = ["c.material_id = m.id", "c.status = 'approved'"]
         params = []
 
         if city:
-            where_clauses.append("h.city = %s")
+            join_conditions.append("h.city = %s")
             params.append(city)
         if hub_id and hub_id.isdigit():
-            where_clauses.append("h.id = %s")
+            join_conditions.append("h.id = %s")
             params.append(int(hub_id))
 
-        where_str = " AND ".join(where_clauses)
+        join_str = " AND ".join(join_conditions)
 
         query = f"""
             SELECT 
@@ -722,9 +763,9 @@ def get_materials():
                 m.preparation_tips,
                 m.eco_impact_desc
             FROM materials m
-            LEFT JOIN contributions c ON m.id = c.material_id AND c.status = 'approved'
+            LEFT JOIN contributions c ON {join_str}
             LEFT JOIN recycling_hubs h ON c.hub_id = h.id
-            WHERE {where_str}
+            WHERE m.is_active = TRUE
             GROUP BY m.id, m.name, m.category, m.price_per_kg, m.preparation_tips, m.eco_impact_desc
             ORDER BY m.id ASC;
         """
@@ -770,6 +811,9 @@ def add_contribution():
     except (ValueError, TypeError):
         return jsonify({"status": "error", "message": "Invalid weight or price format."}), 400
 
+    if weight <= 0 or price < 0:
+        return jsonify({"status": "error", "message": "Weight must be greater than 0."}), 400
+
     material_name = data.get("material_name")
     hub_id = data.get("hub_id")
     payout = weight * price
@@ -781,7 +825,10 @@ def add_contribution():
         cursor = conn.cursor()
         cursor.execute("SELECT id FROM materials WHERE name = %s LIMIT 1;", (material_name,))
         mat_row = cursor.fetchone()
-        material_id = mat_row[0] if mat_row else 1
+        
+        if not mat_row:
+            return jsonify({"status": "error", "message": "Selected material does not exist."}), 400
+        material_id = mat_row[0]
 
         cursor.execute(
             "INSERT INTO contributions (user_id, material_id, hub_id, weight_kg, calculated_payout, status) VALUES (%s, %s, %s, %s, %s, %s) RETURNING id;",
@@ -833,6 +880,9 @@ def chat_ai():
     if not user_prompt:
         return jsonify({"status": "error", "reply": "Please enter a question."}), 400
 
+    if not GEMINI_API_KEY:
+        return jsonify({"status": "error", "reply": "Gemini API key is not configured."}), 500
+
     materials_context = []
     hubs_context = []
     contributions_context = []
@@ -841,7 +891,7 @@ def chat_ai():
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT id, name, category, price_per_kg, unit, preparation_tips, eco_impact_desc, is_active FROM materials ORDER BY id ASC;")
+        cursor.execute("SELECT id, name, category, price_per_kg, preparation_tips, eco_impact_desc, is_active FROM materials ORDER BY id ASC;")
         materials_context = cursor.fetchall()
 
         cursor.execute("SELECT id, hub_name, address, city, operating_hours, contact_phone, is_active FROM recycling_hubs ORDER BY id ASC;")
@@ -851,7 +901,7 @@ def chat_ai():
             SELECT 
                 c.id, c.user_id, c.material_id, COALESCE(m.name, 'Unknown') AS material_name, 
                 c.hub_id, COALESCE(h.hub_name, 'Unknown') AS hub_name, 
-                c.weight_kg, c.calculated_payout, c.status, c.notes, c.created_at, c.reviewed_by
+                c.weight_kg, c.calculated_payout, c.status, c.created_at
             FROM contributions c
             LEFT JOIN materials m ON c.material_id = m.id
             LEFT JOIN recycling_hubs h ON c.hub_id = h.id
@@ -868,8 +918,12 @@ def chat_ai():
 
     try:
         client = genai.Client(api_key=GEMINI_API_KEY)
-        full_prompt = f"""You are an eco-recycling assistant(Your name is Eco AI) for EcoTrade in Malaysia. If the recycling center near to their location not in the database, then find any other recycling center for them.
+        full_prompt = f"""You are an eco-recycling assistant (Your name is Eco AI) for EcoTrade in Malaysia. If a recycling center near their location is not in the database, recommend standard alternatives across Malaysia.
+
 Use the following database context to answer user questions:
+
+All Materials Table:
+{materials_context}
 
 All Recycling Hubs Table:
 {hubs_context}
@@ -880,7 +934,7 @@ All Contributions Table:
 User Question: {user_prompt}"""
 
         response = client.models.generate_content(
-            model="gemini-3.1-flash-lite",
+            model="gemini-2.5-flash",
             contents=full_prompt
         )
         return jsonify({"status": "success", "reply": response.text})
