@@ -12,7 +12,7 @@
     /* Hero Section */
     .hero {
         text-align: center;
-        padding: 2.5rem 1rem 1.5rem;
+        padding: 3rem 1rem 2rem;
         background: transparent;
         border: none;
     }
@@ -25,26 +25,21 @@
         margin-bottom: 0.5rem;
     }
 
-    .hero-emoji {
-        font-size: 2.1rem;
-        line-height: 1;
-        display: inline-block;
-    }
-
     .hero h1 {
-        font-size: 2.2rem;
+        font-size: 2.4rem;
         font-weight: 800;
         color: var(--text-color, #0f172a);
         margin: 0;
-        letter-spacing: -0.03em;
+        letter-spacing: -0.04em;
     }
 
     .hero p {
-        font-size: 0.95rem;
+        font-size: 1rem;
         color: var(--text-muted, #64748b);
         max-width: 600px;
         margin: 0 auto 1.5rem;
         letter-spacing: -0.01em;
+        line-height: 1.6;
     }
 
     .cta-buttons {
@@ -57,25 +52,28 @@
         display: inline-flex;
         align-items: center;
         background: var(--card-bg, #1e293b);
-        padding: 4px 6px 4px 14px;
+        padding: 5px 6px 5px 16px;
         border-radius: 50px;
         border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
-        gap: 8px;
+        gap: 10px;
         text-decoration: none;
-        transition: transform 0.2s ease, background-color 0.2s ease;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.15);
     }
 
     .pill-btn-group:hover {
-        transform: translateY(-1px);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.25);
+        border-color: #10b981;
     }
 
     .pill-btn-text {
         color: var(--text-color, #f8fafc);
-        font-size: 0.85rem;
+        font-size: 0.9rem;
         font-weight: 600;
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 8px;
     }
 
     .pill-btn-badge {
@@ -83,7 +81,7 @@
         color: #ffffff;
         font-size: 0.75rem;
         font-weight: 700;
-        padding: 4px 12px;
+        padding: 6px 14px;
         border-radius: 50px;
     }
 
@@ -97,34 +95,39 @@
 
     .stat-card {
         background: var(--card-bg, #ffffff);
-        padding: 1.25rem 1.5rem;
+        padding: 1.5rem;
         border-radius: 16px;
         border: 1px solid var(--border-color, #e2e8f0);
         display: flex;
         align-items: center;
-        gap: 1rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        gap: 1.25rem;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.06);
     }
 
     .stat-icon {
-        width: 1.5rem;
-        height: 1.5rem;
-        color: var(--text-color, #334155);
+        width: 1.75rem;
+        height: 1.75rem;
+        color: #10b981;
         flex-shrink: 0;
     }
 
     .stat-content h3 {
-        font-size: 1.25rem;
+        font-size: 1.35rem;
         font-weight: 800;
         color: var(--text-color, #0f172a);
-        margin: 0 0 2px 0;
+        margin: 0 0 4px 0;
         line-height: 1.2;
         letter-spacing: -0.02em;
     }
 
     .stat-content p {
         color: var(--text-muted, #64748b);
-        font-size: 0.8rem;
+        font-size: 0.85rem;
         font-weight: 500;
         margin: 0;
     }
@@ -139,13 +142,14 @@
         align-items: center;
         gap: 0.35rem;
         letter-spacing: -0.01em;
+        text-transform: uppercase;
     }
 
     .how-it-works-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
         gap: 1.25rem;
-        margin-bottom: 2rem;
+        margin-bottom: 2.5rem;
     }
 
     .step-card {
@@ -153,20 +157,25 @@
         border: 1px solid var(--border-color, #e2e8f0);
         border-radius: 16px;
         padding: 1.5rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .step-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.06);
     }
 
     .step-label {
         font-size: 0.75rem;
-        font-weight: 700;
-        color: var(--text-muted, #94a3b8);
+        font-weight: 800;
+        color: #10b981;
         letter-spacing: 0.05em;
         text-transform: uppercase;
         margin-bottom: 0.5rem;
     }
 
     .step-card h5 {
-        font-size: 1.1rem;
+        font-size: 1.15rem;
         font-weight: 800;
         color: var(--text-color, #0f172a);
         margin-bottom: 0.5rem;
@@ -174,17 +183,17 @@
     }
 
     .step-card p {
-        font-size: 0.85rem;
+        font-size: 0.9rem;
         color: var(--text-muted, #64748b);
         margin: 0;
-        line-height: 1.4;
+        line-height: 1.5;
     }
 
     /* Dynamic Components Styles */
     .section-title {
-        font-size: 1.1rem;
+        font-size: 1.2rem;
         font-weight: 700;
-        margin-bottom: 0.85rem;
+        margin-bottom: 1rem;
         color: var(--text-color, #f8fafc);
         display: flex;
         justify-content: space-between;
@@ -193,121 +202,130 @@
     }
 
     .section-title span.sub-text {
-        font-size: 0.78rem;
+        font-size: 0.8rem;
         color: var(--text-muted, #94a3b8);
-        font-weight: normal;
+        font-weight: 500;
+        background: var(--card-bg);
+        padding: 4px 10px;
+        border-radius: 20px;
+        border: 1px solid var(--border-color);
     }
 
     .filter-bar {
         background: var(--card-bg, #ffffff);
-        padding: 1rem;
-        border-radius: 12px;
+        padding: 1.25rem;
+        border-radius: 16px;
         border: 1px solid var(--border-color, #e2e8f0);
-        margin-bottom: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.02);
     }
 
     .grid-container {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-        gap: 1rem;
-        margin-bottom: 1.5rem;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.25rem;
+        margin-bottom: 2.5rem;
     }
 
     .info-card {
         background: var(--card-bg, #ffffff);
-        border-radius: 12px;
-        padding: 1.1rem;
+        border-radius: 16px;
+        padding: 1.25rem;
         border: 1px solid var(--border-color, #e2e8f0);
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .info-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.06);
     }
 
     .info-card h4 {
-        font-size: 1rem;
+        font-size: 1.05rem;
         font-weight: 700;
-        color: #10b981;
+        color: var(--text-color);
         margin-bottom: 0.4rem;
     }
 
     .info-card p {
         color: var(--text-muted, #94a3b8);
-        font-size: 0.82rem;
-        margin-bottom: 0.3rem;
+        font-size: 0.85rem;
+        margin-bottom: 0.5rem;
+        line-height: 1.4;
     }
 
     .price-badge {
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
         background: rgba(16, 185, 129, 0.12);
         color: #10b981;
         font-weight: 700;
-        font-size: 0.82rem;
-        padding: 0.25rem 0.6rem;
-        border-radius: 6px;
-        margin-top: 0.4rem;
+        font-size: 0.85rem;
+        padding: 0.4rem 0.75rem;
+        border-radius: 8px;
+        margin-top: 0.5rem;
         border: 1px solid rgba(16, 185, 129, 0.2);
     }
 
     .payout-estimate-box {
-        margin-top: 0.6rem;
-        padding: 0.5rem 0.75rem;
+        margin-top: 0.75rem;
+        padding: 0.75rem;
         background: rgba(16, 185, 129, 0.05);
-        border-radius: 6px;
+        border-radius: 8px;
         border: 1px dashed rgba(16, 185, 129, 0.3);
     }
 
     .scroll-container {
         background: var(--card-bg, #ffffff);
         border: 1px solid var(--border-color, #e2e8f0);
-        border-radius: 12px;
-        padding: 1rem;
-        margin-bottom: 1.5rem;
+        border-radius: 16px;
+        padding: 1.25rem;
+        margin-bottom: 2.5rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.02);
     }
 
     .scroll-box {
-        max-height: 350px;
+        max-height: 380px;
         overflow-y: auto;
         padding-right: 0.5rem;
     }
 
-    .scroll-box::-webkit-scrollbar {
-        width: 6px;
-    }
-    .scroll-box::-webkit-scrollbar-track {
-        background: rgba(0,0,0,0.05);
-        border-radius: 10px;
-    }
-    .scroll-box::-webkit-scrollbar-thumb {
-        background: var(--border-color, #e2e8f0);
-        border-radius: 10px;
-    }
+    .scroll-box::-webkit-scrollbar { width: 6px; }
+    .scroll-box::-webkit-scrollbar-track { background: rgba(0,0,0,0.02); border-radius: 10px; }
+    .scroll-box::-webkit-scrollbar-thumb { background: var(--border-color, #e2e8f0); border-radius: 10px; }
+    .scroll-box::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
 
     .list-row-item {
-        background: rgba(16, 185, 129, 0.05);
-        border: 1px solid rgba(16, 185, 129, 0.15);
-        border-radius: 8px;
-        padding: 0.75rem 1rem;
-        margin-bottom: 0.6rem;
+        background: var(--bg-color);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1rem 1.25rem;
+        margin-bottom: 0.75rem;
         display: flex;
         justify-content: space-between;
         align-items: center;
+        transition: transform 0.2s ease, border-color 0.2s ease;
     }
 
-    .list-row-item:last-child {
-        margin-bottom: 0;
+    .list-row-item:hover {
+        border-color: rgba(16, 185, 129, 0.4);
+        transform: translateX(4px);
     }
 
     .list-details h6 {
-        color: #10b981;
-        margin: 0 0 0.2rem 0;
-        font-weight: 600;
-        font-size: 0.95rem;
+        color: var(--text-color);
+        margin: 0 0 0.3rem 0;
+        font-weight: 700;
+        font-size: 1rem;
     }
 
     .list-details p {
         color: var(--text-muted, #94a3b8);
         margin: 0;
-        font-size: 0.8rem;
+        font-size: 0.85rem;
     }
 
     .list-right-col {
@@ -317,27 +335,60 @@
     }
 
     .btn-custom-secondary {
-        background-color: rgba(16, 185, 129, 0.12);
+        background-color: rgba(16, 185, 129, 0.1);
         color: #10b981;
         font-weight: 600;
-        padding: 0.5rem 1.25rem;
+        padding: 0.6rem 1.5rem;
         border-radius: 50px;
         text-decoration: none;
-        border: 1px solid rgba(16, 185, 129, 0.3);
+        border: 1px solid rgba(16, 185, 129, 0.2);
         transition: all 0.2s ease;
     }
 
     .btn-custom-secondary:hover {
-        background-color: rgba(16, 185, 129, 0.2);
-        color: #10b981;
+        background-color: #10b981;
+        color: #ffffff;
+    }
+
+    /* --- MODERN LOADING SPINNER & ANIMATIONS --- */
+    .spinner-wrapper {
+        grid-column: 1 / -1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem 0;
+    }
+
+    .modern-spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid var(--border-color);
+        border-top-color: #10b981;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        margin-bottom: 1rem;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
     }
 
     .loading-text {
-        grid-column: 1/-1;
-        text-align: center;
         color: var(--text-muted, #94a3b8);
-        font-size: 0.85rem;
-        padding-top: 1rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+        letter-spacing: 0.02em;
+    }
+
+    /* Fade-in effect for loaded data */
+    .fade-in {
+        animation: fadeIn 0.4s ease forwards;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 </style>
 
@@ -367,44 +418,43 @@
 <!-- Stats Grid -->
 <section class="stats-grid" aria-label="Recycling Impact Statistics">
     <div class="stat-card">
-<svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-    <!-- Curved Refresh Arrow -->
-    <path d="M21 2v6h-6M21 8A10 10 0 1 0 21.8 12"/>
-</svg>
+        <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 2v6h-6M21 8A10 10 0 1 0 21.8 12"/>
+        </svg>
         <div class="stat-content">
-            <h3 id="stat-weight">0.0 kg</h3>
+            <h3 id="stat-weight">-- kg</h3>
             <p>Total Recycled</p>
         </div>
     </div>
     <div class="stat-card">
-        <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <rect x="2" y="6" width="20" height="12" rx="2"/>
             <circle cx="12" cy="12" r="2"/>
             <path d="M6 12h.01M18 12h.01"/>
         </svg>
         <div class="stat-content">
-            <h3 id="stat-earnings">RM 0.00</h3>
+            <h3 id="stat-earnings">RM --</h3>
             <p>Payouts Distributed</p>
         </div>
     </div>
     <div class="stat-card">
-        <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
             <circle cx="12" cy="10" r="3"/>
         </svg>
         <div class="stat-content">
-            <h3 id="stat-hubs">0</h3>
+            <h3 id="stat-hubs">--</h3>
             <p>Active Hubs</p>
         </div>
     </div>
     <div class="stat-card">
-        <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
             <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
         </svg>
         <div class="stat-content">
-            <h3 id="stat-co2">0.0 kg</h3>
-            <p>Estimated CO₂ Offset</p>
+            <h3 id="stat-co2">-- kg</h3>
+            <p>Est. CO₂ Offset</p>
         </div>
     </div>
 </section>
@@ -455,11 +505,11 @@
 
 <!-- Materials Display -->
 <div class="section-title">
-    <span>Accepted Materials & User-Reported Live Rates</span>
+    <span>Accepted Materials & Live Rates</span>
     <span class="sub-text" id="rate-summary-tag">Based on community reports</span>
 </div>
 <div class="grid-container" id="materials-list">
-    <p class="loading-text">Loading material rates...</p>
+    <!-- Initial Loader -->
 </div>
 
 <!-- Hubs Display (Scrollable List) -->
@@ -469,10 +519,10 @@
 </div>
 <div class="scroll-container">
     <div class="scroll-box" id="hubs-list">
-        <p class="loading-text">Loading hub locations...</p>
+        <!-- Initial Loader -->
     </div>
     <div class="text-center mt-3" id="load-more-hubs-container" style="display: none;">
-        <button id="load-more-hubs-btn" class="btn-custom-secondary" style="border-radius: 50px; cursor: pointer; padding: 0.3rem 1rem; font-size: 0.85rem;">
+        <button id="load-more-hubs-btn" class="btn-custom-secondary">
             Show More Hubs
         </button>
     </div>
@@ -485,19 +535,19 @@
 </div>
 <div class="scroll-container">
     <div class="mb-3">
-        <input type="text" id="search-contributions" class="form-control form-control-sm" placeholder="Search by material or hub name..." aria-label="Search contributions">
+        <input type="text" id="search-contributions" class="form-control" placeholder="Search by material or hub name..." aria-label="Search contributions">
     </div>
     <div class="scroll-box" id="contributions-list">
-        <p class="loading-text">Loading recent contributions...</p>
+        <!-- Initial Loader -->
     </div>
     <div class="text-center mt-3" id="load-more-contributions-container" style="display: none;">
-        <button id="load-more-contributions-btn" class="btn-custom-secondary" style="border-radius: 50px; cursor: pointer; padding: 0.3rem 1rem; font-size: 0.85rem;">
+        <button id="load-more-contributions-btn" class="btn-custom-secondary">
             Show More Contributions
         </button>
     </div>
 </div>
 
-<footer class="text-center py-3 border-top border-secondary mt-4" style="font-size: 0.82rem; color: var(--text-muted, #94a3b8);">
+<footer class="text-center py-4 border-top border-secondary mt-5" style="font-size: 0.85rem; color: var(--text-muted, #94a3b8);">
     <p class="mb-0">&copy; 2026 EcoTrade Malaysia. Empowering Sustainable Recycling.</p>
 </footer>
 
@@ -510,6 +560,14 @@
     let filteredContributions = [];
     let contribDisplayLimit = 10;
     let searchTimeout = null;
+
+    // Standard Loading HTML Component
+    const getLoadingSpinner = (text = "Loading data...") => `
+        <div class="spinner-wrapper fade-in">
+            <div class="modern-spinner"></div>
+            <p class="loading-text">${text}</p>
+        </div>
+    `;
 
     // --- Helper function for dynamic DB time ---
     function formatTimeAgo(seconds) {
@@ -529,6 +587,11 @@
             const data = await res.json();
             if (data.status === 'success') {
                 const weight = data.total_weight || 0;
+                // Add fade-in animation by toggling class
+                ['stat-weight', 'stat-earnings', 'stat-hubs', 'stat-co2'].forEach(id => {
+                    document.getElementById(id).classList.add('fade-in');
+                });
+                
                 document.getElementById('stat-weight').innerText = `${weight.toFixed(1)} kg`;
                 document.getElementById('stat-earnings').innerText = `RM ${(data.total_earnings || 0).toFixed(2)}`;
                 document.getElementById('stat-hubs').innerText = data.active_hubs || 0;
@@ -540,6 +603,9 @@
     }
 
     async function fetchMaterials() {
+        const container = document.getElementById('materials-list');
+        container.innerHTML = getLoadingSpinner('Fetching current rates...');
+        
         const city = document.getElementById('filter-city').value;
         const hubId = document.getElementById('filter-hub').value;
         
@@ -555,11 +621,11 @@
                 currentMaterialsData = data.data;
                 renderMaterials();
             } else {
-                document.getElementById('materials-list').innerHTML = '<p class="loading-text">No active materials found.</p>';
+                container.innerHTML = '<p class="loading-text text-center w-100 fade-in">No active materials found.</p>';
             }
         } catch (err) {
             console.error("Failed to fetch materials:", err);
-            document.getElementById('materials-list').innerHTML = '<p class="loading-text">Unable to load materials.</p>';
+            container.innerHTML = '<p class="loading-text text-center w-100 fade-in text-danger">Unable to load materials.</p>';
         }
     }
 
@@ -568,14 +634,15 @@
         const weightInput = Math.max(0, parseFloat(document.getElementById('calc-weight').value) || 0);
 
         if (currentMaterialsData.length > 0) {
-            container.innerHTML = currentMaterialsData.map(m => {
+            container.innerHTML = currentMaterialsData.map((m, index) => {
                 const estimatedPayout = ((m.avg_reported_rate || 0) * weightInput).toFixed(2);
                 const reportBadge = m.report_count > 0 
                     ? `<span class="badge bg-success ms-1">${m.report_count} user report${m.report_count > 1 ? 's' : ''}</span>`
                     : `<span class="badge bg-secondary ms-1">Base Rate</span>`;
 
+                // Staggered fade in animation using inline animation-delay
                 return `
-                    <div class="info-card">
+                    <div class="info-card fade-in" style="animation-delay: ${index * 0.05}s">
                         <div>
                             <h4>${m.name || 'Unknown Material'}</h4>
                             <p><strong>Category:</strong> ${m.category || 'General'}</p>
@@ -586,19 +653,22 @@
                                 RM ${(m.avg_reported_rate || 0).toFixed(2)} / kg ${reportBadge}
                             </div>
                             <div class="payout-estimate-box">
-                                <small class="text-muted d-block">Estimated Payout for <strong>${weightInput} kg</strong>:</small>
-                                <span class="fw-bold text-success fs-6">RM ${estimatedPayout}</span>
+                                <small class="text-muted d-block">Est. Payout for <strong>${weightInput} kg</strong>:</small>
+                                <span class="fw-bold text-success fs-5">RM ${estimatedPayout}</span>
                             </div>
                         </div>
                     </div>
                 `;
             }).join('');
         } else {
-            container.innerHTML = '<p class="loading-text">No active materials found.</p>';
+            container.innerHTML = '<p class="loading-text text-center w-100 fade-in">No active materials found.</p>';
         }
     }
 
     async function fetchHubs(city = '') {
+        const container = document.getElementById('hubs-list');
+        container.innerHTML = getLoadingSpinner('Locating hubs near you...');
+        
         try {
             const url = city ? `/api/hubs?city=${encodeURIComponent(city)}` : '/api/hubs';
             const res = await fetch(url);
@@ -635,7 +705,7 @@
             renderHubs();
         } catch (err) {
             console.error("Failed to fetch hubs:", err);
-            document.getElementById('hubs-list').innerHTML = '<p class="loading-text">Unable to load hub locations.</p>';
+            container.innerHTML = '<p class="loading-text text-center fade-in text-danger">Unable to load hub locations.</p>';
             document.getElementById('load-more-hubs-container').style.display = 'none';
         }
     }
@@ -647,13 +717,13 @@
         const toDisplay = currentHubsData.slice(0, hubDisplayLimit);
 
         if (toDisplay.length === 0) {
-            container.innerHTML = '<p class="loading-text">No recycling hubs found for selected filters.</p>';
+            container.innerHTML = '<p class="loading-text text-center fade-in">No recycling hubs found for selected filters.</p>';
             loadMoreBtnContainer.style.display = 'none';
             return;
         }
 
-        container.innerHTML = toDisplay.map(h => `
-            <div class="list-row-item">
+        container.innerHTML = toDisplay.map((h, index) => `
+            <div class="list-row-item fade-in" style="animation-delay: ${index * 0.03}s">
                 <div class="list-details">
                     <h6>${h.name}</h6>
                     <p>📍 ${h.address || 'Address not provided'}, ${h.city}</p>
@@ -671,6 +741,8 @@
     async function fetchRecentContributions() {
         const container = document.getElementById('contributions-list');
         const loadMoreBtnContainer = document.getElementById('load-more-contributions-container');
+        
+        container.innerHTML = getLoadingSpinner('Loading latest community activity...');
 
         try {
             const res = await fetch('/api/recent_contributions');
@@ -696,14 +768,14 @@
             } else {
                 allContributions = [];
                 filteredContributions = [];
-                container.innerHTML = '<p class="loading-text">No recent contributions found in database.</p>';
+                container.innerHTML = '<p class="loading-text text-center fade-in">No recent contributions found in database.</p>';
                 loadMoreBtnContainer.style.display = 'none';
             }
         } catch (err) {
             console.error("Failed to fetch contributions from DB:", err);
             allContributions = [];
             filteredContributions = [];
-            container.innerHTML = '<p class="loading-text">Unable to load database contributions.</p>';
+            container.innerHTML = '<p class="loading-text text-center fade-in text-danger">Unable to load database contributions.</p>';
             loadMoreBtnContainer.style.display = 'none';
         }
     }
@@ -715,19 +787,19 @@
         const toDisplay = filteredContributions.slice(0, contribDisplayLimit);
         
         if (toDisplay.length === 0) {
-            container.innerHTML = '<p class="loading-text">No matching contributions found.</p>';
+            container.innerHTML = '<p class="loading-text text-center fade-in">No matching contributions found.</p>';
             loadMoreBtnContainer.style.display = 'none';
             return;
         }
         
-        container.innerHTML = toDisplay.map(c => `
-            <div class="list-row-item">
+        container.innerHTML = toDisplay.map((c, index) => `
+            <div class="list-row-item fade-in" style="animation-delay: ${index * 0.03}s">
                 <div class="list-details">
                     <h6>${c.material_name} (${c.weight} kg)</h6>
                     <p>Dropped off at <strong>${c.hub_name}</strong> • ${c.time_ago}</p>
                 </div>
                 <div class="list-right-col">
-                    <span class="text-success fw-bold" style="font-size: 0.95rem;">+RM ${c.payout}</span>
+                    <span class="text-success fw-bold" style="font-size: 1.05rem;">+RM ${c.payout}</span>
                 </div>
             </div>
         `).join('');
@@ -743,6 +815,10 @@
 
     document.getElementById('search-contributions').addEventListener('input', (e) => {
         clearTimeout(searchTimeout);
+        // Show spinner while "typing" if it takes long, or just let it snap. 
+        // A quick visual reset helps perceived speed:
+        document.getElementById('contributions-list').innerHTML = getLoadingSpinner('Searching...');
+        
         searchTimeout = setTimeout(() => {
             const query = e.target.value.toLowerCase().trim();
             filteredContributions = allContributions.filter(c => 
@@ -751,7 +827,7 @@
             );
             contribDisplayLimit = 10; 
             renderContributions();
-        }, 300);
+        }, 400); // Slight delay for debounce
     });
 
     document.getElementById('load-more-contributions-btn').addEventListener('click', () => {
@@ -772,11 +848,20 @@
         renderMaterials();
     });
 
+    // Run all fetches concurrently on load for better performance
     document.addEventListener('DOMContentLoaded', () => {
-        fetchStats();
-        fetchHubs();
-        fetchMaterials();
-        fetchRecentContributions();
+        // Set initial HTML for spinners
+        document.getElementById('materials-list').innerHTML = getLoadingSpinner('Fetching current rates...');
+        document.getElementById('hubs-list').innerHTML = getLoadingSpinner('Locating hubs near you...');
+        document.getElementById('contributions-list').innerHTML = getLoadingSpinner('Loading latest community activity...');
+        
+        // Fire API calls asynchronously
+        Promise.all([
+            fetchStats(),
+            fetchHubs(),
+            fetchMaterials(),
+            fetchRecentContributions()
+        ]);
     });
 </script>
 {% endblock %}
