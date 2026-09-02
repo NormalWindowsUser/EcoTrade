@@ -4,14 +4,14 @@
 <div class="row justify-content-center py-3">
     <div class="col-md-12 col-lg-11">
 
-        <!-- Admin Summary Card -->
+        <!-- Admin Summary Header -->
         <div class="card-custom p-4 mb-4">
             <div class="d-flex align-items-center justify-content-between mb-3">
                 <div>
                     <h4 class="fw-bold text-success mb-1">
                         <i class="bi bi-shield-lock me-2"></i>Admin Dashboard
                     </h4>
-                    <p class="text-secondary small mb-0">Manage system contributions, users, and overall metrics.</p>
+                    <p class="text-secondary small mb-0">Manage system contributions, users, materials, and recycling hubs.</p>
                 </div>
                 <span class="badge bg-danger px-3 py-2 fs-6">Administrator</span>
             </div>
@@ -38,48 +38,299 @@
             </div>
         </div>
 
-        <!-- Contributions Management Table -->
-        <div class="card-custom p-4 mb-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="fw-bold text-light mb-0">
-                    <i class="bi bi-list-check text-success me-2"></i>Contribution Management
-                </h5>
-                <button class="btn btn-outline-secondary btn-sm" onclick="loadAdminData()">
-                    <i class="bi bi-arrow-clockwise"></i> Refresh
+        <!-- Navigation Tabs -->
+        <ul class="nav nav-pills mb-3 border-bottom border-secondary pb-2" id="adminTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active me-2" id="contributions-tab" data-bs-toggle="pill" data-bs-target="#tab-contributions" type="button" role="tab">
+                    <i class="bi bi-list-check me-1"></i> Contributions
                 </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link me-2" id="users-tab" data-bs-toggle="pill" data-bs-target="#tab-users" type="button" role="tab">
+                    <i class="bi bi-people me-1"></i> User Controls
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link me-2" id="materials-tab" data-bs-toggle="pill" data-bs-target="#tab-materials" type="button" role="tab">
+                    <i class="bi bi-recycle me-1"></i> Materials
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link me-2" id="hubs-tab" data-bs-toggle="pill" data-bs-target="#tab-hubs" type="button" role="tab">
+                    <i class="bi bi-geo-alt me-1"></i> Recycling Hubs
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="adminTabsContent">
+
+            <!-- TAB 1: CONTRIBUTIONS -->
+            <div class="tab-pane fade show active" id="tab-contributions" role="tabpanel">
+                <div class="card-custom p-4 mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold text-light mb-0">Contribution Records</h5>
+                        <div>
+                            <button class="btn btn-success btn-sm me-2" data-bs-toggle="modal" data-bs-target="#addContributionModal">
+                                <i class="bi bi-plus-lg me-1"></i> Add Contribution
+                            </button>
+                            <button class="btn btn-outline-secondary btn-sm" onclick="loadAdminData()">
+                                <i class="bi bi-arrow-clockwise"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr class="text-secondary small border-secondary">
+                                    <th>ID</th>
+                                    <th>User</th>
+                                    <th>Material</th>
+                                    <th>Hub</th>
+                                    <th>Weight</th>
+                                    <th>Payout</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminContributionsTable">
+                                <tr>
+                                    <td colspan="8" class="text-center py-4 text-secondary">Loading contribution data...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead>
-                        <tr class="text-secondary small border-secondary">
-                            <th>ID</th>
-                            <th>User</th>
-                            <th>Material</th>
-                            <th>Hub</th>
-                            <th>Weight</th>
-                            <th>Payout</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="adminContributionsTable">
-                        <tr>
-                            <td colspan="8" class="text-center py-4 text-secondary">
-                                <div class="spinner-border spinner-border-sm text-success me-2" role="status"></div>
-                                Loading platform data...
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <!-- TAB 2: USER CONTROLS -->
+            <div class="tab-pane fade" id="tab-users" role="tabpanel">
+                <div class="card-custom p-4 mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold text-light mb-0">User Account Management</h5>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="fetchUsers()">
+                            <i class="bi bi-arrow-clockwise"></i> Refresh Users
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr class="text-secondary small border-secondary">
+                                    <th>ID</th>
+                                    <th>Full Name</th>
+                                    <th>Email</th>
+                                    <th>School/Org</th>
+                                    <th>Current Role</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminUsersTable">
+                                <tr>
+                                    <td colspan="6" class="text-center py-4 text-secondary">Loading user directory...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
+
+            <!-- TAB 3: MATERIALS -->
+            <div class="tab-pane fade" id="tab-materials" role="tabpanel">
+                <div class="card-custom p-4 mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold text-light mb-0">Materials Catalog</h5>
+                        <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addMaterialModal">
+                            <i class="bi bi-plus-lg me-1"></i> Add New Material
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr class="text-secondary small border-secondary">
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Category</th>
+                                    <th>Base Rate</th>
+                                    <th>Tips</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminMaterialsTable">
+                                <tr>
+                                    <td colspan="5" class="text-center py-4 text-secondary">Loading materials...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: RECYCLING HUBS -->
+            <div class="tab-pane fade" id="tab-hubs" role="tabpanel">
+                <div class="card-custom p-4 mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold text-light mb-0">Recycling Hub Network</h5>
+                        <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addHubModal">
+                            <i class="bi bi-plus-lg me-1"></i> Add New Hub
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr class="text-secondary small border-secondary">
+                                    <th>ID</th>
+                                    <th>Hub Name</th>
+                                    <th>City</th>
+                                    <th>Address</th>
+                                    <th>Hours</th>
+                                    <th>Phone</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminHubsTable">
+                                <tr>
+                                    <td colspan="6" class="text-center py-4 text-secondary">Loading hub network...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
     </div>
 </div>
 
+<!-- MODAL: ADD CONTRIBUTION -->
+<div class="modal fade" id="addContributionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-light border-secondary">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title">Record New Contribution</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formAddContribution" onsubmit="submitContribution(event)">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary">Target User</label>
+                        <select class="form-select bg-dark text-light border-secondary" id="contUserSelect" required></select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary">Material</label>
+                        <select class="form-select bg-dark text-light border-secondary" id="contMaterialSelect" required onchange="calculatePayout()"></select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary">Recycling Hub</label>
+                        <select class="form-select bg-dark text-light border-secondary" id="contHubSelect" required></select>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label small text-secondary">Weight (kg)</label>
+                            <input type="number" step="0.01" min="0.1" class="form-input bg-dark text-light border-secondary form-control" id="contWeight" required oninput="calculatePayout()">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label small text-secondary">Calculated Payout (RM)</label>
+                            <input type="number" step="0.01" class="form-input bg-dark text-light border-secondary form-control" id="contPayout" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Save Record</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: ADD MATERIAL -->
+<div class="modal fade" id="addMaterialModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-light border-secondary">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title">Add New Material</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formAddMaterial" onsubmit="submitMaterial(event)">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary">Material Name</label>
+                        <input type="text" class="form-control bg-dark text-light border-secondary" id="matName" placeholder="e.g. PET Plastic Bottles" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary">Category</label>
+                        <input type="text" class="form-control bg-dark text-light border-secondary" id="matCategory" placeholder="e.g. Plastic, Metal, Paper" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary">Base Price per kg (RM)</label>
+                        <input type="number" step="0.01" class="form-control bg-dark text-light border-secondary" id="matPrice" placeholder="0.50" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary">Preparation Tips</label>
+                        <textarea class="form-control bg-dark text-light border-secondary" id="matTips" rows="2" placeholder="Rinse and remove caps..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary">Eco Impact Description</label>
+                        <textarea class="form-control bg-dark text-light border-secondary" id="matImpact" rows="2" placeholder="Saves landfill space..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Create Material</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: ADD HUB -->
+<div class="modal fade" id="addHubModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-light border-secondary">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title">Add Recycling Hub</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formAddHub" onsubmit="submitHub(event)">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary">Hub Name</label>
+                        <input type="text" class="form-control bg-dark text-light border-secondary" id="hubName" placeholder="e.g. EcoTrade Petaling Hub" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary">City</label>
+                        <input type="text" class="form-control bg-dark text-light border-secondary" id="hubCity" placeholder="e.g. Petaling Jaya" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary">Address</label>
+                        <input type="text" class="form-control bg-dark text-light border-secondary" id="hubAddress" placeholder="Full address" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary">Operating Hours</label>
+                        <input type="text" class="form-control bg-dark text-light border-secondary" id="hubHours" placeholder="e.g. Mon-Fri: 8:00 AM - 5:00 PM">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary">Contact Phone</label>
+                        <input type="text" class="form-control bg-dark text-light border-secondary" id="hubPhone" placeholder="+60 12-345 6789">
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Add Hub</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
-    document.addEventListener("DOMContentLoaded", loadAdminData);
+    let rawMaterials = [];
+
+    document.addEventListener("DOMContentLoaded", () => {
+        loadAdminData();
+        fetchUsers();
+        fetchMaterials();
+        fetchHubs();
+    });
 
     async function loadAdminData() {
         await Promise.all([fetchDashboardStats(), fetchContributions()]);
@@ -144,7 +395,6 @@
 
     async function updateStatus(id, newStatus) {
         if (!confirm(`Are you sure you want to mark this as ${newStatus}?`)) return;
-        
         try {
             const res = await fetch(`/api/admin/contribution/${id}`, {
                 method: "POST",
@@ -153,12 +403,238 @@
             });
             const data = await res.json();
             if (data.status === "success") {
-                loadAdminData(); // Refresh table and stats
+                loadAdminData();
             } else {
                 alert(data.message);
             }
         } catch (err) {
-            alert("An error occurred while updating the status.");
+            alert("An error occurred while updating status.");
+        }
+    }
+
+    // USER MANAGEMENT
+    async function fetchUsers() {
+        const tableBody = document.getElementById("adminUsersTable");
+        const selectBox = document.getElementById("contUserSelect");
+        try {
+            const res = await fetch("/api/admin/users");
+            const result = await res.json();
+
+            if (result.status === "success" && result.data.length > 0) {
+                let rowsHtml = "";
+                let userOptions = '<option value="">-- Select User --</option>';
+
+                result.data.forEach(user => {
+                    let roleBadge = user.role === "admin"
+                        ? '<span class="badge bg-danger">Admin</span>'
+                        : user.role === "suspended"
+                        ? '<span class="badge bg-secondary">Suspended</span>'
+                        : '<span class="badge bg-success">Public</span>';
+
+                    rowsHtml += `
+                        <tr class="border-secondary">
+                            <td class="text-secondary small">#${user.id}</td>
+                            <td class="fw-bold text-light">${user.full_name}</td>
+                            <td class="text-secondary">${user.email}</td>
+                            <td class="text-secondary small">${user.school_name}</td>
+                            <td>${roleBadge}</td>
+                            <td>
+                                <select class="form-select form-select-sm bg-dark text-light border-secondary d-inline-block w-auto" onchange="updateUserRole(${user.id}, this.value)">
+                                    <option value="public" ${user.role === 'public' ? 'selected' : ''}>Public</option>
+                                    <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
+                                    <option value="suspended" ${user.role === 'suspended' ? 'selected' : ''}>Suspended</option>
+                                </select>
+                            </td>
+                        </tr>
+                    `;
+                    userOptions += `<option value="${user.id}">${user.full_name} (${user.email})</option>`;
+                });
+                tableBody.innerHTML = rowsHtml;
+                if (selectBox) selectBox.innerHTML = userOptions;
+            }
+        } catch (err) {
+            tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-3 text-danger">Failed to load users.</td></tr>`;
+        }
+    }
+
+    async function updateUserRole(userId, newRole) {
+        if (!confirm(`Change user #${userId} role to '${newRole}'?`)) return;
+        try {
+            const res = await fetch(`/api/admin/user/${userId}/role`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ role: newRole })
+            });
+            const data = await res.json();
+            if (data.status === "success") {
+                fetchUsers();
+                fetchDashboardStats();
+            } else {
+                alert(data.message);
+            }
+        } catch (err) {
+            alert("Error updating user role.");
+        }
+    }
+
+    // MATERIALS MANAGEMENT
+    async function fetchMaterials() {
+        const tableBody = document.getElementById("adminMaterialsTable");
+        const selectBox = document.getElementById("contMaterialSelect");
+        try {
+            const res = await fetch("/api/materials");
+            const result = await res.json();
+            if (result.status === "success") {
+                rawMaterials = result.data;
+                let rowsHtml = "";
+                let matOptions = '<option value="">-- Select Material --</option>';
+
+                result.data.forEach(mat => {
+                    rowsHtml += `
+                        <tr class="border-secondary">
+                            <td class="text-secondary small">#${mat.id}</td>
+                            <td class="fw-bold text-light">${mat.name}</td>
+                            <td><span class="badge bg-dark border border-secondary">${mat.category}</span></td>
+                            <td class="text-success fw-bold">RM ${mat.base_price.toFixed(2)} / kg</td>
+                            <td class="text-secondary small">${mat.tips || '-'}</td>
+                        </tr>
+                    `;
+                    matOptions += `<option value="${mat.id}" data-price="${mat.base_price}">${mat.name} (RM ${mat.base_price.toFixed(2)}/kg)</option>`;
+                });
+                tableBody.innerHTML = rowsHtml;
+                if (selectBox) selectBox.innerHTML = matOptions;
+            }
+        } catch (err) {
+            tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-3 text-danger">Failed to load materials.</td></tr>`;
+        }
+    }
+
+    async function submitMaterial(e) {
+        e.preventDefault();
+        const payload = {
+            name: document.getElementById("matName").value,
+            category: document.getElementById("matCategory").value,
+            price_per_kg: parseFloat(document.getElementById("matPrice").value),
+            preparation_tips: document.getElementById("matTips").value,
+            eco_impact_desc: document.getElementById("matImpact").value
+        };
+        try {
+            const res = await fetch("/api/admin/material", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.status === "success") {
+                bootstrap.Modal.getInstance(document.getElementById("addMaterialModal")).hide();
+                document.getElementById("formAddMaterial").reset();
+                fetchMaterials();
+            } else {
+                alert(data.message);
+            }
+        } catch (err) {
+            alert("Failed to create material.");
+        }
+    }
+
+    // HUBS MANAGEMENT
+    async function fetchHubs() {
+        const tableBody = document.getElementById("adminHubsTable");
+        const selectBox = document.getElementById("contHubSelect");
+        try {
+            const res = await fetch("/api/hubs");
+            const result = await res.json();
+            if (result.status === "success") {
+                let rowsHtml = "";
+                let hubOptions = '<option value="">-- Select Hub --</option>';
+
+                result.data.forEach(hub => {
+                    rowsHtml += `
+                        <tr class="border-secondary">
+                            <td class="text-secondary small">#${hub.id}</td>
+                            <td class="fw-bold text-light">${hub.name}</td>
+                            <td><span class="badge bg-secondary">${hub.city}</span></td>
+                            <td class="text-secondary small">${hub.address}</td>
+                            <td class="text-secondary small">${hub.hours || '-'}</td>
+                            <td class="text-secondary small">${hub.phone || '-'}</td>
+                        </tr>
+                    `;
+                    hubOptions += `<option value="${hub.id}">${hub.name} (${hub.city})</option>`;
+                });
+                tableBody.innerHTML = rowsHtml;
+                if (selectBox) selectBox.innerHTML = hubOptions;
+            }
+        } catch (err) {
+            tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-3 text-danger">Failed to load hubs.</td></tr>`;
+        }
+    }
+
+    async function submitHub(e) {
+        e.preventDefault();
+        const payload = {
+            hub_name: document.getElementById("hubName").value,
+            city: document.getElementById("hubCity").value,
+            address: document.getElementById("hubAddress").value,
+            operating_hours: document.getElementById("hubHours").value,
+            contact_phone: document.getElementById("hubPhone").value
+        };
+        try {
+            const res = await fetch("/api/admin/hub", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.status === "success") {
+                bootstrap.Modal.getInstance(document.getElementById("addHubModal")).hide();
+                document.getElementById("formAddHub").reset();
+                fetchHubs();
+            } else {
+                alert(data.message);
+            }
+        } catch (err) {
+            alert("Failed to create hub.");
+        }
+    }
+
+    // MANUAL CONTRIBUTION CREATION
+    function calculatePayout() {
+        const matSelect = document.getElementById("contMaterialSelect");
+        const selectedOpt = matSelect.options[matSelect.selectedIndex];
+        const weight = parseFloat(document.getElementById("contWeight").value) || 0;
+        
+        if (selectedOpt && selectedOpt.dataset.price) {
+            const price = parseFloat(selectedOpt.dataset.price);
+            document.getElementById("contPayout").value = (weight * price).toFixed(2);
+        }
+    }
+
+    async function submitContribution(e) {
+        e.preventDefault();
+        const payload = {
+            user_id: parseInt(document.getElementById("contUserSelect").value),
+            material_id: parseInt(document.getElementById("contMaterialSelect").value),
+            hub_id: parseInt(document.getElementById("contHubSelect").value),
+            weight: parseFloat(document.getElementById("contWeight").value),
+            payout: parseFloat(document.getElementById("contPayout").value),
+            status: "approved"
+        };
+        try {
+            const res = await fetch("/api/admin/contribution", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.status === "success") {
+                bootstrap.Modal.getInstance(document.getElementById("addContributionModal")).hide();
+                document.getElementById("formAddContribution").reset();
+                loadAdminData();
+            } else {
+                alert(data.message);
+            }
+        } catch (err) {
+            alert("Failed to record contribution.");
         }
     }
 </script>
