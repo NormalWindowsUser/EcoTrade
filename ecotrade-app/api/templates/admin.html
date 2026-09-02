@@ -439,6 +439,7 @@
         }
     }
 
+    // CONTRIBUTIONS MANAGEMENT
     async function fetchContributions() {
         const tableBody = document.getElementById("adminContributionsTable");
         try {
@@ -454,10 +455,12 @@
                         ? '<span class="badge bg-danger">Rejected</span>'
                         : '<span class="badge bg-warning text-dark">Pending</span>';
 
-                    let actions = item.status === "pending" 
-                        ? `<button class="btn btn-sm btn-success me-1 py-0 px-2" onclick="updateStatus(${item.id}, 'approved')"><i class="bi bi-check2"></i></button>
-                           <button class="btn btn-sm btn-danger py-0 px-2" onclick="updateStatus(${item.id}, 'rejected')"><i class="bi bi-x-lg"></i></button>`
-                        : `<span class="text-muted small">Reviewed</span>`;
+                    let approveRejectBtns = item.status === "pending" 
+                        ? `<button class="btn btn-sm btn-success me-1 py-0 px-2" title="Approve" onclick="updateStatus(${item.id}, 'approved')"><i class="bi bi-check2"></i></button>
+                           <button class="btn btn-sm btn-warning me-1 py-0 px-2" title="Reject" onclick="updateStatus(${item.id}, 'rejected')"><i class="bi bi-x-lg"></i></button>`
+                        : `<span class="text-muted small me-2">Reviewed</span>`;
+
+                    let deleteBtn = `<button class="btn btn-sm btn-outline-danger py-0 px-2" title="Delete Contribution" onclick="deleteContribution(${item.id})"><i class="bi bi-trash"></i></button>`;
 
                     const weightVal = (parseFloat(item.weight) || 0).toFixed(2);
                     const payoutVal = (parseFloat(item.payout) || 0).toFixed(2);
@@ -471,7 +474,7 @@
                             <td class="fw-semibold text-light">${weightVal} kg</td>
                             <td class="fw-bold text-success">RM ${payoutVal}</td>
                             <td>${statusBadge}</td>
-                            <td>${actions}</td>
+                            <td>${approveRejectBtns}${deleteBtn}</td>
                         </tr>
                     `;
                 });
@@ -485,7 +488,7 @@
     }
 
     async function updateStatus(id, newStatus) {
-        if (!confirm(`Are you sure you want to mark this as ${newStatus}?`)) return;
+        if (!confirm(`Are you sure you want to mark this contribution as ${newStatus}?`)) return;
         try {
             const res = await fetch(`/api/admin/contribution/${id}`, {
                 method: "POST",
@@ -496,10 +499,27 @@
             if (data.status === "success") {
                 loadAdminData();
             } else {
-                alert(data.message);
+                alert(data.message || "Failed to update status.");
             }
         } catch (err) {
             alert("An error occurred while updating status.");
+        }
+    }
+
+    async function deleteContribution(id) {
+        if (!confirm(`Are you sure you want to delete contribution #${id}? This action cannot be undone.`)) return;
+        try {
+            const res = await fetch(`/api/admin/contribution/${id}`, {
+                method: "DELETE"
+            });
+            const data = await res.json();
+            if (data.status === "success") {
+                loadAdminData();
+            } else {
+                alert(data.message || "Failed to delete contribution.");
+            }
+        } catch (err) {
+            alert("An error occurred while deleting the contribution.");
         }
     }
 
