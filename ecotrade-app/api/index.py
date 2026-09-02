@@ -43,6 +43,31 @@ def verify_turnstile(token, ip):
     except Exception:
         return False
 
+# --- MIDDLEWARE FOR LIVE SESSION SYNC ---
+
+@app.before_request
+def sync_user_role():
+    """Sync session role with live database role on every request."""
+    if "user_id" in session:
+        conn = None
+        cursor = None
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("SELECT role FROM users WHERE id = %s;", (session["user_id"],))
+            row = cursor.fetchone()
+            if row:
+                session["user_role"] = row[0]
+            else:
+                session.clear()
+        except Exception:
+            pass
+        finally:
+            if cursor:
+                cursor.close()
+            if conn:
+                conn.close()
+
 # --- PAGE ROUTES ---
 
 @app.route("/")
@@ -438,6 +463,9 @@ def get_user_contributions():
     if "user_id" not in session:
         return jsonify({"status": "error", "message": "Unauthorized access."}), 401
 
+    if session.get("user_role") == "suspended":
+        return jsonify({"status": "error", "message": "Account suspended."}), 403
+
     conn = None
     cursor = None
     try:
@@ -628,6 +656,9 @@ def get_materials():
 def add_contribution():
     if "user_id" not in session:
         return jsonify({"status": "error", "message": "You must be logged in to submit a contribution."}), 401
+
+    if session.get("user_role") == "suspended":
+        return jsonify({"status": "error", "message": "Suspended accounts cannot submit contributions."}), 403
 
     data = request.get_json(silent=True) or {}
     token = data.get("cf_turnstile_response")
