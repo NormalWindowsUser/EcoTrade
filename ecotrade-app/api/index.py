@@ -173,6 +173,109 @@ def api_login():
         if conn:
             conn.close()
 
+# --- ADMIN API ENDPOINTS ---
+
+@app.route("/api/admin/dashboard", methods=["GET"])
+def get_admin_dashboard():
+    if session.get("user_role") != "admin":
+        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute("SELECT COUNT(*) FROM users;")
+        total_users = cursor.fetchone()[0]
+
+        cursor.execute("SELECT COUNT(*) FROM contributions WHERE status = 'pending';")
+        pending_count = cursor.fetchone()[0]
+
+        cursor.execute("SELECT COALESCE(SUM(weight_kg), 0), COALESCE(SUM(calculated_payout), 0) FROM contributions WHERE status = 'approved';")
+        stats_row = cursor.fetchone()
+
+        return jsonify({
+            "status": "success",
+            "total_users": total_users,
+            "pending_count": pending_count,
+            "total_weight": float(stats_row[0]),
+            "total_payout": float(stats_row[1])
+        })
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+@app.route("/api/admin/contributions", methods=["GET"])
+def get_admin_contributions():
+    if session.get("user_role") != "admin":
+        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT 
+                c.id, u.full_name, COALESCE(m.name, 'Unknown'), COALESCE(h.hub_name, 'Unknown'), 
+                c.weight_kg, c.calculated_payout, c.status
+            FROM contributions c
+            JOIN users u ON c.user_id = u.id
+            LEFT JOIN materials m ON c.material_id = m.id
+            LEFT JOIN recycling_hubs h ON c.hub_id = h.id
+            ORDER BY CASE WHEN c.status = 'pending' THEN 1 ELSE 2 END, c.created_at DESC
+            LIMIT 100;
+        """)
+        rows = cursor.fetchall()
+        data = [{
+            "id": r[0], "user_name": r[1], "material": r[2], "hub": r[3], 
+            "weight": float(r[4]), "payout": float(r[5]), "status": r[6]
+        } for r in rows]
+        
+        return jsonify({"status": "success", "data": data})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+@app.route("/api/admin/contribution/<int:cont_id>", methods=["POST"])
+def update_contribution_status(cont_id):
+    if session.get("user_role") != "admin":
+        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+
+    data = request.get_json(silent=True) or {}
+    new_status = data.get("status")
+
+    if new_status not in ["approved", "rejected"]:
+        return jsonify({"status": "error", "message": "Invalid status"}), 400
+
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("UPDATE contributions SET status = %s, reviewed_by = %s WHERE id = %s;", 
+                       (new_status, session["user_id"], cont_id))
+        conn.commit()
+        return jsonify({"status": "success", "message": f"Contribution {new_status}."})
+    except Exception as e:
+        if conn:
+            conn.rollback()
+        return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
 # --- DATA API ENDPOINTS ---
 
 @app.route("/api/user/contributions", methods=["GET"])
@@ -237,6 +340,7 @@ def get_recent_contributions():
             FROM contributions c
             LEFT JOIN materials m ON c.material_id = m.id
             LEFT JOIN recycling_hubs h ON c.hub_id = h.id
+            WHERE c.status = 'approved'
             ORDER BY c.created_at DESC
             LIMIT 50;
         """)
@@ -335,7 +439,7 @@ def get_materials():
                 m.preparation_tips,
                 m.eco_impact_desc
             FROM materials m
-            LEFT JOIN contributions c ON m.id = c.material_id
+            LEFT JOIN contributions c ON m.id = c.material_id AND c.status = 'approved'
             LEFT JOIN recycling_hubs h ON c.hub_id = h.id
             WHERE {where_str}
             GROUP BY m.id, m.name, m.category, m.price_per_kg, m.preparation_tips, m.eco_impact_desc
@@ -396,9 +500,10 @@ def add_contribution():
         mat_row = cursor.fetchone()
         material_id = mat_row[0] if mat_row else 1
 
+        # CHANGED: 'pending' changed to 'approved' so it auto-approves.
         cursor.execute(
             "INSERT INTO contributions (user_id, material_id, hub_id, weight_kg, calculated_payout, status) VALUES (%s, %s, %s, %s, %s, %s) RETURNING id;",
-            (session["user_id"], material_id, hub_id, weight, payout, 'approved')
+            (session["user_id"], material_id, hub_id, weight, payout, 'approved') 
         )
         conn.commit()
         return jsonify({"status": "success", "payout": payout})
@@ -419,7 +524,7 @@ def get_stats():
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT COALESCE(SUM(weight_kg), 0), COALESCE(SUM(calculated_payout), 0) FROM contributions;")
+        cursor.execute("SELECT COALESCE(SUM(weight_kg), 0), COALESCE(SUM(calculated_payout), 0) FROM contributions WHERE status = 'approved';")
         row = cursor.fetchone()
         cursor.execute("SELECT COUNT(*) FROM recycling_hubs WHERE is_active = TRUE;")
         hubs_count = cursor.fetchone()[0]
@@ -483,10 +588,10 @@ def chat_ai():
         full_prompt = f"""You are an eco-recycling assistant(Your name is Eco AI) for EcoTrade in Malaysia. If the recycling center near to their location not in the database, then find any other recycling center for them.
 Use the following database context to answer user questions:
 
-All Recycling Hubs Table (id, hub_name, address, city, operating_hours, contact_phone, is_active):
+All Recycling Hubs Table:
 {hubs_context}
 
-All Contributions Table (id, user_id, material_id, material_name, hub_id, hub_name, weight_kg, calculated_payout, status, notes, created_at, reviewed_by):
+All Contributions Table:
 {contributions_context}
 
 User Question: {user_prompt}"""
