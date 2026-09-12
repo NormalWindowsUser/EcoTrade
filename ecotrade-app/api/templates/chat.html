@@ -7,8 +7,8 @@
 <!-- Mobile Sidebar Backdrop Overlay -->
 <div id="sidebarBackdrop" class="sidebar-backdrop d-md-none"></div>
 
-<!-- Full Viewport Width Wrapper with Bottom Clearance for Floating Navigation -->
-<div class="full-width-wrapper pb-5">
+<!-- Outer Wrapper (Prevent horizontal overflow across all devices) -->
+<div class="full-width-wrapper pb-4">
     <div class="ai-dashboard-container d-flex w-100 overflow-hidden rounded-4 border border-secondary border-opacity-25 shadow-sm bg-body position-relative">
 
         <!-- LEFT SIDEBAR: History (Drawer on mobile, fixed on desktop) -->
@@ -68,7 +68,7 @@
                     <h6 id="activeChatTitle" class="fw-bold mb-0 text-body text-truncate">New Conversation</h6>
                 </div>
                 <div class="d-flex align-items-center gap-2 flex-shrink-0">
-                    <button class="btn btn-sm btn-outline-success rounded-pill px-2.5 px-sm-3 py-1.5 d-flex align-items-center gap-1.5 fw-medium" data-bs-toggle="modal" data-bs-target="#quizModal" onclick="startQuiz()">
+                    <button id="openQuizBtn" class="btn btn-sm btn-outline-success rounded-pill px-2.5 px-sm-3 py-1.5 d-flex align-items-center gap-1.5 fw-medium">
                         <i class="bi bi-journal-check"></i>
                         <span class="d-none d-sm-inline">Take Sustainability Quiz</span>
                         <span class="d-inline d-sm-none">Quiz</span>
@@ -101,7 +101,7 @@
                 </div>
             </div>
 
-            <!-- COMPACT INPUT FOOTER WITH EXTRA PADDING FOR BASE NAV CLEARANCE -->
+            <!-- COMPACT INPUT FOOTER -->
             <footer class="p-2 px-3 bg-body border-top border-secondary border-opacity-25 pb-3">
                 <div class="position-relative bg-body-tertiary rounded-4 border border-secondary border-opacity-50 px-3 py-1.5 shadow-sm focus-within-ring d-flex align-items-center gap-2">
                     <textarea id="chatInput" class="form-control border-0 bg-transparent shadow-none text-body p-1" rows="1" placeholder="Recycle your thoughts here..." style="resize: none; max-height: 100px; line-height: 1.4;"></textarea>
@@ -141,6 +141,7 @@
                     <h5 class="modal-title fw-bold text-body m-0 fs-6 fs-md-5" id="quizModalLabel">General Sustainability Quiz</h5>
                     <span id="quizCounter" class="badge bg-success bg-opacity-10 text-success fw-bold px-3 py-2 rounded-pill fs-7">1/5</span>
                 </div>
+                <button type="button" class="btn-close" onclick="closeQuizModal()" aria-label="Close"></button>
             </div>
 
             <!-- Quiz Progress Bar -->
@@ -168,14 +169,14 @@
                     <p id="quizScoreText" class="text-secondary mb-4 fs-5">You scored 0 out of 5</p>
                     <div class="d-flex justify-content-center gap-2">
                         <button class="btn btn-outline-success rounded-pill px-4 py-2 fw-medium" onclick="startQuiz()">Try Again</button>
-                        <button class="btn btn-success rounded-pill px-4 py-2 fw-medium" data-bs-dismiss="modal">Return to Chat</button>
+                        <button class="btn btn-success rounded-pill px-4 py-2 fw-medium" onclick="closeQuizModal()">Return to Chat</button>
                     </div>
                 </div>
             </div>
 
             <!-- Quiz Footer -->
             <div class="modal-footer border-top border-secondary border-opacity-25 px-4 py-3 bg-body-tertiary justify-content-between" id="quizFooter">
-                <button type="button" class="btn btn-outline-secondary rounded-3 px-3 py-1.5 btn-sm fw-medium" data-bs-dismiss="modal">Quit Quiz</button>
+                <button type="button" class="btn btn-outline-secondary rounded-3 px-3 py-1.5 btn-sm fw-medium" onclick="closeQuizModal()">Quit Quiz</button>
                 <button id="nextQuestionBtn" class="btn btn-success rounded-3 px-4 py-1.5 btn-sm fw-medium d-none" onclick="nextQuestion()">Next Question <i class="bi bi-arrow-right ms-1"></i></button>
             </div>
         </div>
@@ -261,6 +262,39 @@
         cycleEcoTips();
         autoResizeTextarea();
     });
+
+    // Quiz Modal Trigger
+    function openQuizModal() {
+        startQuiz();
+        const modalElem = document.getElementById('quizModal');
+        if (window.bootstrap && window.bootstrap.Modal) {
+            const modal = bootstrap.Modal.getOrCreateInstance(modalElem);
+            modal.show();
+        } else {
+            modalElem.classList.add('show');
+            modalElem.style.display = 'block';
+            document.body.classList.add('modal-open');
+            if (!document.getElementById('modalBackdropFallback')) {
+                const backdrop = document.createElement('div');
+                backdrop.id = 'modalBackdropFallback';
+                backdrop.className = 'modal-backdrop fade show';
+                backdrop.onclick = closeQuizModal;
+                document.body.appendChild(backdrop);
+            }
+        }
+    }
+
+    function closeQuizModal() {
+        const modalElem = document.getElementById('quizModal');
+        if (window.bootstrap && window.bootstrap.Modal) {
+            const modal = bootstrap.Modal.getInstance(modalElem);
+            if (modal) modal.hide();
+        }
+        modalElem.classList.remove('show');
+        modalElem.style.display = 'none';
+        document.body.classList.remove('modal-open');
+        document.getElementById('modalBackdropFallback')?.remove();
+    }
 
     // Mobile Sidebar Drawer Controller
     function setupMobileDrawer() {
@@ -438,7 +472,6 @@
         renderSidebarHistory();
         if (switchTab) renderActiveSessionMessages();
 
-        // Close mobile drawer on selection
         document.getElementById('sidebarBackdrop').click();
     }
 
@@ -461,7 +494,6 @@
         renderSidebarHistory();
         renderActiveSessionMessages();
 
-        // Close mobile drawer on item pick
         document.getElementById('sidebarBackdrop').click();
     }
 
@@ -649,6 +681,7 @@
     }
 
     function setupEventListeners() {
+        document.getElementById('openQuizBtn').addEventListener('click', openQuizModal);
         document.getElementById('sendBtn').addEventListener('click', sendMessage);
         document.getElementById('chatInput').addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
@@ -717,22 +750,26 @@
 </script>
 
 <style>
-    /* Responsive full width container */
-    .full-width-wrapper {
-        width: 100vw;
-        position: relative;
-        left: 50%;
-        right: 50%;
-        margin-left: -50vw;
-        margin-right: -50vw;
-        padding: 0 1rem;
-        box-sizing: border-box;
+    /* Prevent global horizontal scrolling caused by viewport calculations */
+    html, body {
+        max-width: 100%;
+        overflow-x: hidden !important;
     }
 
-    /* Fixed Height Container for viewports & dynamic scaling */
+    /* Container wrapper adjusted to fit cleanly inside page bounds without horizontal overflow */
+    .full-width-wrapper {
+        width: 100%;
+        max-width: 100%;
+        margin: 0 auto;
+        padding: 0;
+        box-sizing: border-box;
+        overflow-x: hidden;
+    }
+
+    /* Height fit so outer scrollbars are minimized */
     .ai-dashboard-container {
-        height: calc(100vh - 150px);
-        min-height: 540px;
+        height: calc(100vh - 160px);
+        min-height: 520px;
         width: 100% !important;
         max-width: 100% !important;
     }
@@ -747,11 +784,11 @@
     /* MOBILE DRAWER STYLING (<768px) */
     @media (max-width: 767.98px) {
         .full-width-wrapper {
-            padding: 0 0.5rem 4rem 0.5rem; /* Additional bottom spacing prevents base navigation bar cutoff */
+            padding: 0 0 5rem 0;
         }
 
         .ai-dashboard-container {
-            height: calc(100vh - 120px);
+            height: calc(100vh - 140px);
             border-radius: 0.75rem !important;
         }
 
