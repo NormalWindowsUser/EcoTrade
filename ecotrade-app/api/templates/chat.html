@@ -4,38 +4,38 @@
 <!-- Include Marked.js to render AI Markdown responses into HTML -->
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-<!-- ChatGPT-Style Full-Width Wrapper -->
-<div class="ai-page-wrapper d-flex flex-column mx-auto px-2 px-md-3" style="max-width: 800px; min-height: 100vh;">
+<!-- Full Page AI Layout Container -->
+<div class="ai-page-wrapper d-flex flex-column pb-3">
     
-    <!-- Centered Header -->
-    <div id="aiHeader" class="ai-header flex-column align-items-center justify-content-center text-center pt-2 pb-3 border-bottom border-secondary-subtle mb-3 position-relative d-none">
-        <div class="d-flex flex-column align-items-center justify-content-center">
-            <div class="d-inline-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success rounded-circle mb-2" style="width: 42px; height: 42px;">
-                <i class="bi bi-robot fs-4"></i>
+    <!-- Active Top Header (Compact & Centered Design) -->
+    <div id="aiHeader" class="ai-header align-items-center justify-content-between pb-2 border-bottom border-secondary mb-3 position-relative d-none">
+        <div class="d-flex align-items-center justify-content-center w-100 gap-2">
+            <i class="bi bi-robot text-success fs-5"></i>
+            <div class="text-center">
+                <h6 class="fw-bold text-success mb-0 lh-1">Eco Assistant</h6>
+                <span class="text-secondary" style="font-size: 0.725rem;">AI-powered recycling guide</span>
             </div>
-            <h5 class="fw-bold text-success mb-0 lh-1 fs-5">Eco Assistant</h5>
-            <small class="text-secondary mt-1" style="font-size: 0.78rem;">AI-powered recycling guide</small>
         </div>
         
-        <button class="btn btn-outline-danger btn-sm rounded-pill px-3 py-1 icon-hover-btn position-absolute top-50 end-0 translate-middle-y d-flex align-items-center gap-1.5" id="clearBtn" title="Clear chat history">
+        <button class="btn btn-outline-danger btn-sm rounded-pill px-3 py-1 icon-hover-btn position-absolute top-50 end-0 translate-middle-y d-flex align-items-center gap-1" id="clearBtn" title="Clear chat history">
             <i class="bi bi-trash"></i>
             <span class="d-none d-sm-inline">Clear History</span>
         </button>
     </div>
     
-    <!-- Empty State View (Landing View) -->
-    <div id="landingView" class="d-flex flex-column justify-content-center align-items-center flex-grow-1 w-100 my-auto py-5">
+    <!-- Empty State View (Centered Landing View) -->
+    <div id="landingView" class="d-flex flex-column justify-content-center align-items-center flex-grow-1 w-100 my-auto py-4">
         <div class="text-center mb-4">
-            <div class="d-inline-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success rounded-circle mb-3" style="width: 68px; height: 68px;">
+            <div class="d-inline-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success rounded-circle mb-3" style="width: 64px; height: 64px;">
                 <i class="bi bi-robot fs-1"></i>
             </div>
-            <h2 class="fw-bold text-body mb-2 fs-3">Welcome to Eco Assistant</h2>
-            <p class="text-secondary mb-0" style="font-size: 0.95rem;">Your AI-powered recycling & sustainability guide</p>
+            <h2 class="fw-bold text-body mb-1">Welcome to Eco Assistant</h2>
+            <p class="text-secondary mb-0">Your AI-powered recycling & sustainability guide</p>
         </div>
 
-        <!-- Input Box (Landing View) -->
-        <div class="w-100 px-2" style="max-width: 720px;">
-            <div class="bg-body-tertiary border border-secondary-subtle rounded-4 p-3 shadow-sm position-relative custom-input-box mb-3">
+        <!-- Input Box inside Landing View -->
+        <div class="w-100" style="max-width: 680px;">
+            <div class="bg-body-tertiary border border-secondary rounded-4 p-3 shadow-sm position-relative custom-input-box mb-3">
                 <textarea id="landingChatInput" class="form-control border-0 shadow-none p-0 text-body custom-textarea-bg" rows="2" placeholder="Ask AI anything about recycling..."></textarea>
                 
                 <div class="d-flex justify-content-between align-items-center mt-2">
@@ -43,7 +43,7 @@
                         <i class="bi bi-x-lg fs-6 lh-1"></i>
                     </button>
                     
-                    <button class="btn btn-success rounded-circle p-0 shadow-sm d-inline-flex align-items-center justify-content-center landing-send-btn" type="button" title="Send message" style="width: 38px; height: 38px;">
+                    <button class="btn btn-success rounded-circle p-0 shadow-sm d-inline-flex align-items-center justify-content-center landing-send-btn" type="button" title="Send message" style="width: 40px; height: 40px;">
                         <i class="bi bi-arrow-up-short fs-3 text-white lh-1"></i>
                     </button>
                 </div>
@@ -71,13 +71,13 @@
         </div>
     </div>
 
-    <!-- Active Chat Stream Container (Normal Scroll Flow) -->
-    <div id="chatBox" class="ai-chat-stream flex-grow-1 w-100 pb-5 d-none">
+    <!-- Active Chat Stream Container -->
+    <div id="chatBox" class="ai-chat-stream flex-grow-1 custom-scrollbar px-1 px-md-3 overflow-y-auto d-none">
     </div>
     
-    <!-- Floating Bottom Input Console (Sticky above Bottom Nav) -->
-    <div id="activeInputWrapper" class="ai-input-wrapper sticky-bottom bg-body pt-2 pb-3 mt-auto d-none" style="z-index: 1020;">
-        <div class="bg-body-tertiary border border-secondary-subtle rounded-4 p-3 shadow-sm position-relative custom-input-box">
+    <!-- Floating Bottom Input Console (Active Chat Mode) -->
+    <div id="activeInputWrapper" class="ai-input-wrapper pt-2 mt-auto mb-2 d-none">
+        <div class="bg-body-tertiary border border-secondary rounded-4 p-3 shadow-sm position-relative custom-input-box">
             <textarea id="activeChatInput" class="form-control border-0 shadow-none p-0 text-body custom-textarea-bg" rows="2" placeholder="Ask AI anything about recycling..."></textarea>
             
             <div class="d-flex justify-content-between align-items-center mt-2">
@@ -85,7 +85,7 @@
                     <i class="bi bi-x-lg fs-6 lh-1"></i>
                 </button>
                 
-                <button class="btn btn-success rounded-circle p-0 shadow-sm d-inline-flex align-items-center justify-content-center active-send-btn" type="button" title="Send message" style="width: 38px; height: 38px;">
+                <button class="btn btn-success rounded-circle p-0 shadow-sm d-inline-flex align-items-center justify-content-center active-send-btn" type="button" title="Send message" style="width: 40px; height: 40px;">
                     <i class="bi bi-arrow-up-short fs-3 text-white lh-1"></i>
                 </button>
             </div>
@@ -171,14 +171,15 @@
     }
 
     function scrollToBottom() {
-        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        const box = document.getElementById('chatBox');
+        box.scrollTop = box.scrollHeight;
     }
 
     function renderUserBubble(text) {
         const box = document.getElementById('chatBox');
         box.innerHTML += `
-            <div class="d-flex justify-content-end mb-4 animate-fade-in">
-                <div class="user-bubble px-3.5 py-2.5 shadow-sm" style="max-width: 82%; font-size: 0.95rem; background-color: #10b981; color: #ffffff; border-radius: 18px 18px 4px 18px; word-break: break-word; line-height: 1.5;">
+            <div class="d-flex justify-content-end mb-3 animate-fade-in pe-1">
+                <div class="user-bubble shadow-sm px-3 py-2" style="max-width: 80%; font-size: 0.95rem; background-color: #10b981; color: #ffffff; border-radius: 18px 18px 4px 18px; word-break: break-word;">
                     ${escapeHtml(text)}
                 </div>
             </div>
@@ -191,19 +192,17 @@
         const copyBtnId = 'copy-btn-' + Date.now();
         
         const wrapper = document.createElement('div');
-        wrapper.className = 'd-flex justify-content-start mb-4 animate-fade-in';
+        wrapper.className = 'd-flex justify-content-start mb-3 animate-fade-in ps-1';
         wrapper.innerHTML = `
-            <div class="d-flex gap-3 w-100" style="max-width: 100%;">
-                <div class="avatar-icon flex-shrink-0 d-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success rounded-circle" style="width: 32px; height: 32px;">
-                    <i class="bi bi-robot fs-6"></i>
+            <div class="d-flex flex-column align-items-start" style="max-width: 88%; word-break: break-word;">
+                <div class="bg-body-tertiary border border-secondary border-opacity-50 rounded-4 px-3 py-2.5 shadow-sm w-100">
+                    <div id="${bubbleId}" class="ai-reply-content text-body" style="font-size: 0.95rem; line-height: 1.6;"></div>
                 </div>
-                <div class="d-flex flex-column align-items-start flex-grow-1" style="word-break: break-word; min-width: 0;">
-                    <div id="${bubbleId}" class="ai-reply-content text-body w-100" style="font-size: 0.95rem; line-height: 1.65;"></div>
-                    <div class="mt-2">
-                        <button class="btn btn-link text-secondary p-0 border-0 me-2" id="${copyBtnId}" title="Copy message" style="font-size: 0.85rem;">
-                            <i class="bi bi-copy"></i>
-                        </button>
-                    </div>
+                <div class="d-flex align-items-center gap-2 mt-1 px-1">
+                    <button class="btn btn-link text-secondary p-0 border-0 icon-hover-btn" id="${copyBtnId}" title="Copy message" style="font-size: 0.825rem;">
+                        <i class="bi bi-copy"></i>
+                    </button>
+                    <small class="text-secondary opacity-75" style="font-size: 0.7rem;">Eco Assistant</small>
                 </div>
             </div>
         `;
@@ -270,18 +269,13 @@
         const box = document.getElementById('chatBox');
         const loadingId = 'loading-' + Date.now();
         box.innerHTML += `
-            <div id="${loadingId}" class="d-flex justify-content-start mb-4 animate-fade-in">
-                <div class="d-flex gap-3 align-items-center">
-                    <div class="avatar-icon flex-shrink-0 d-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success rounded-circle" style="width: 32px; height: 32px;">
-                        <i class="bi bi-robot fs-6"></i>
-                    </div>
-                    <div class="text-secondary thinking-bubble py-1" style="font-size: 0.9rem;">
-                        <span class="spinner-grow spinner-grow-sm text-success me-2" role="status"></span>
-                        <span class="me-1">Eco AI is thinking</span>
-                        <span class="typing-dots">
-                            <span>.</span><span>.</span><span>.</span>
-                        </span>
-                    </div>
+            <div id="${loadingId}" class="d-flex justify-content-start mb-3 animate-fade-in ps-1">
+                <div class="bg-body-tertiary border border-secondary border-opacity-50 rounded-4 px-3 py-2 shadow-sm text-secondary thinking-bubble" style="font-size: 0.9rem;">
+                    <span class="spinner-grow spinner-grow-sm text-success me-2" role="status"></span>
+                    <span class="me-1">Eco AI is thinking</span>
+                    <span class="typing-dots">
+                        <span>.</span><span>.</span><span>.</span>
+                    </span>
                 </div>
             </div>
         `;
@@ -303,7 +297,7 @@
             } else {
                 box.innerHTML += `
                     <div class="d-flex justify-content-center mb-3">
-                        <div class="alert alert-danger py-2 small mb-0 rounded-pill shadow-sm">${data.reply || 'AI service error.'}</div>
+                        <div class="alert alert-danger py-2 px-3 small mb-0 rounded-pill shadow-sm">${data.reply || 'AI service error.'}</div>
                     </div>
                 `;
                 setInputState(false);
@@ -312,7 +306,7 @@
             document.getElementById(loadingId)?.remove();
             box.innerHTML += `
                 <div class="d-flex justify-content-center mb-3">
-                    <div class="alert alert-danger py-2 small mb-0 rounded-pill shadow-sm"><i class="bi bi-exclamation-triangle"></i> Connection error. Please try again.</div>
+                    <div class="alert alert-danger py-2 px-3 small mb-0 rounded-pill shadow-sm"><i class="bi bi-exclamation-triangle"></i> Connection error. Please try again.</div>
                 </div>
             `;
             setInputState(false);
@@ -369,6 +363,11 @@
 </script>
 
 <style>
+    .ai-page-wrapper {
+        height: calc(100vh - 140px);
+        width: 100%;
+    }
+
     .custom-textarea-bg {
         background-color: transparent !important;
     }
@@ -378,7 +377,7 @@
     }
     .custom-input-box:focus-within {
         border-color: #10b981 !important;
-        box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.12) !important;
+        box-shadow: 0 0 0 0.2rem rgba(16, 185, 129, 0.15) !important;
     }
 
     .prompt-chip {
@@ -387,6 +386,9 @@
         border-color: var(--bs-border-color);
         background-color: var(--bs-body-bg);
         color: var(--bs-body-color);
+    }
+    .prompt-chip i {
+        margin-right: 0.15rem;
     }
     .prompt-chip:hover {
         border-color: #10b981;
@@ -402,6 +404,20 @@
         color: var(--bs-secondary-color);
     }
 
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 5px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background-color: var(--bs-border-color);
+        border-radius: 10px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background-color: var(--bs-secondary-color);
+    }
+
     .animate-fade-in {
         animation: fadeIn 0.25s ease-out forwards;
     }
@@ -412,7 +428,7 @@
     }
 
     .ai-reply-content {
-        line-height: 1.65;
+        line-height: 1.6;
         word-wrap: break-word;
         overflow-wrap: break-word;
     }
@@ -427,7 +443,7 @@
         font-size: 1.05rem;
         font-weight: 700;
         color: #10b981;
-        margin-top: 0.75rem;
+        margin-top: 0.5rem;
         margin-bottom: 0.5rem;
     }
     .ai-reply-content h1:first-child, .ai-reply-content h2:first-child, .ai-reply-content h3:first-child {
@@ -446,7 +462,7 @@
     .ai-reply-content pre {
         background-color: #1e1e1e;
         color: #d4d4d4;
-        padding: 1rem;
+        padding: 0.85rem;
         border-radius: 0.5rem;
         overflow-x: auto;
         margin-top: 0.5rem;
