@@ -833,7 +833,7 @@
     </div>
 </div>
 
-<!-- Authentic Database Activity Notification Toast -->
+<!-- Database Activity Notification Toast -->
 <div id="liveActivityToast" class="live-activity-toast">
     <div class="toast-icon-box">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -885,7 +885,7 @@
     // Operating Hours Checking Helper (Parses "08:00 AM - 04:00 PM", "24 Hours", etc.)
     function isHubOpen(hoursStr) {
         if (!hoursStr || hoursStr === 'N/A') return false;
-        const lower = hoursStr.toLowerCase();
+        const lower = hoursStr.toLowerCase().trim();
         if (lower.includes('24 hours') || lower.includes('24/7')) return true;
 
         const parts = hoursStr.split('-').map(s => s.trim());
@@ -1129,20 +1129,31 @@
             const data = await res.json();
             
             if (data.status === 'success' && Array.isArray(data.data) && data.data.length > 0) {
+                // Fix 1: Sort items DESCENDING by timestamp / seconds_ago so the most recent log appears at the top
+                data.data.sort((a, b) => {
+                    if (a.seconds_ago !== undefined && b.seconds_ago !== undefined) {
+                        return a.seconds_ago - b.seconds_ago; // Smaller seconds_ago = more recent
+                    }
+                    return new Date(b.created_at || 0) - new Date(a.created_at || 0); // Newest date first
+                });
+
                 const newItems = data.data.map(c => ({
                     id: c.id || `${c.material_name}-${c.created_at}`,
                     material_name: c.material_name || 'Unknown Material',
                     hub_name: c.hub_name || 'Unknown Hub',
                     weight: parseFloat(c.weight || 0).toFixed(1),
                     payout: parseFloat(c.payout || 0).toFixed(2),
+                    seconds_ago: c.seconds_ago,
                     time_ago: c.seconds_ago !== undefined 
                         ? formatTimeAgo(c.seconds_ago) 
                         : (c.created_at ? formatTimeAgo((new Date() - new Date(c.created_at)) / 1000) : 'Just now')
                 }));
 
-                // Check for actual new entry from DB to show real notification toast
+                // Fix 2: Only trigger toast for genuinely recent events (< 2 minutes old)
                 if (latestKnownContributionId && newItems[0].id !== latestKnownContributionId) {
-                    showNewContributionToast(newItems[0]);
+                    if (newItems[0].seconds_ago === undefined || newItems[0].seconds_ago < 120) {
+                        showNewContributionToast(newItems[0]);
+                    }
                 }
                 latestKnownContributionId = newItems[0].id;
 
@@ -1195,7 +1206,6 @@
         loadMoreBtnContainer.style.display = filteredContributions.length > contribDisplayLimit ? 'block' : 'none';
     }
 
-    // Authentic Toast triggered ONLY when real database entries arrive
     function showNewContributionToast(item) {
         const toast = document.getElementById('liveActivityToast');
         const msg = document.getElementById('toastMessage');
