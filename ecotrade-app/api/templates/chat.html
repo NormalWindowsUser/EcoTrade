@@ -5,7 +5,7 @@
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
 <!-- Full Page AI Layout Container -->
-<div class="ai-page-wrapper d-flex flex-column">
+<div class="ai-page-wrapper d-flex flex-column pb-3">
     
     <!-- Header Controls -->
     <div class="ai-header d-flex align-items-center justify-content-between pb-3 border-bottom border-secondary mb-2">
@@ -33,8 +33,8 @@
         </div>
     </div>
     
-    <!-- Bottom Floating Input Console -->
-    <div class="ai-input-wrapper pt-3 mt-auto">
+    <!-- Bottom Floating Input Console (Elevated above Bottom Nav) -->
+    <div class="ai-input-wrapper pt-2 mt-auto mb-2">
         <div class="bg-body-tertiary border border-secondary rounded-4 p-3 shadow-sm position-relative custom-input-box">
             <textarea id="chatInput" class="form-control border-0 shadow-none p-0 text-body custom-textarea-bg" rows="2" placeholder="Ask AI anything about recycling..."></textarea>
             
@@ -277,7 +277,8 @@
 
 <style>
     .ai-page-wrapper {
-        height: calc(100vh - 120px);
+        /* Height adjusted to account for top navbar and bottom navbar clearance */
+        height: calc(100vh - 140px);
         width: 100%;
     }
 
@@ -345,7 +346,6 @@
         margin-top: 0;
     }
 
-    /* Inline single-word code highlights */
     .ai-reply-content code {
         background-color: rgba(16, 185, 129, 0.1);
         color: #10b981;
@@ -355,7 +355,6 @@
         font-size: 0.875em;
     }
 
-    /* Multi-line code block box */
     .ai-reply-content pre {
         background-color: #1e1e1e;
         color: #d4d4d4;
