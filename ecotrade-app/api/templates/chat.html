@@ -4,235 +4,461 @@
 <!-- Include Marked.js to render AI Markdown responses into HTML -->
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-<!-- Full Page AI Layout Container -->
-<div class="ai-page-wrapper d-flex flex-column pb-3">
-    
-    <!-- Top Header Controls (Centered Title with Beside Icon & Icon-Only Clear Action) -->
-    <div id="aiHeader" class="ai-header flex-column align-items-center justify-content-center text-center pb-2 border-bottom border-secondary mb-2 position-relative d-none">
-        <!-- Title Row: Logo + Eco Assistant -->
-        <div class="d-flex align-items-center justify-content-center gap-2 mb-1">
-            <div class="d-inline-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success rounded-circle" style="width: 28px; height: 28px;">
-                <i class="bi bi-robot fs-6"></i>
-            </div>
-            <h6 class="fw-bold text-success mb-0 lh-1 fs-6">Eco Assistant</h6>
-        </div>
+<div class="ai-dashboard-container d-flex w-100 overflow-hidden rounded-4 border border-secondary border-opacity-25 shadow-lg">
+
+    <!-- LEFT SIDEBAR: Controls & History -->
+    <aside class="ai-sidebar d-flex flex-column p-3 bg-dark text-light border-end border-secondary border-opacity-25" style="width: 280px; min-width: 280px;">
         
-        <!-- Subtitle Row: Positioned below both logo and title -->
-        <small class="text-secondary d-block" style="font-size: 0.725rem;">AI-powered recycling guide</small>
-        
-        <!-- Icon-Only Clear History Action (Slightly larger icon & vertically aligned with the title row) -->
-        <button class="btn btn-link text-danger p-0 position-absolute end-0 top-50 translate-middle-y border-0 icon-hover-btn me-1" id="clearBtn" title="Clear chat history">
-            <i class="bi bi-trash fs-5"></i>
-        </button>
-    </div>
-    
-    <!-- Empty State View (Centered Landing View) -->
-    <div id="landingView" class="d-flex flex-column justify-content-center align-items-center flex-grow-1 w-100 my-auto py-4">
-        <div class="text-center mb-4">
-            <div class="d-inline-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success rounded-circle mb-2" style="width: 48px; height: 48px;">
-                <i class="bi bi-robot fs-3"></i>
+        <!-- App Identity -->
+        <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom border-secondary border-opacity-50">
+            <div class="d-flex align-items-center gap-2">
+                <div class="bg-success bg-opacity-25 text-success rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                    <i class="bi bi-tree-fill fs-5"></i>
+                </div>
+                <div>
+                    <h6 class="fw-bold mb-0 text-white">EcoTrade AI</h6>
+                    <small class="text-secondary" style="font-size: 0.7rem;">v2.4 Smart Assistant</small>
+                </div>
             </div>
-            <h4 class="fw-bold text-body mb-1">Welcome to Eco Assistant</h4>
-            <small class="text-secondary d-block mb-0" style="font-size: 0.85rem;">Your AI-powered recycling & sustainability guide</small>
         </div>
 
-        <!-- Input Box inside Landing View -->
-        <div class="w-100" style="max-width: 680px;">
-            <div class="bg-body-tertiary border border-secondary rounded-4 p-3 shadow-sm position-relative custom-input-box mb-3">
-                <textarea id="landingChatInput" class="form-control border-0 shadow-none p-0 text-body custom-textarea-bg" rows="2" placeholder="Ask AI anything about recycling..."></textarea>
-                
-                <div class="d-flex justify-content-between align-items-center mt-2">
-                    <button class="btn btn-body-tertiary rounded-circle p-0 text-secondary border-0 icon-hover-btn d-inline-flex align-items-center justify-content-center reset-input-btn" type="button" title="Clear input text" style="width: 36px; height: 36px;">
-                        <i class="bi bi-x-lg fs-6 lh-1"></i>
+        <!-- New Chat Action -->
+        <button id="newChatBtn" class="btn btn-success w-100 fw-medium d-flex align-items-center justify-content-center gap-2 py-2 mb-3 shadow-sm rounded-3">
+            <i class="bi bi-plus-lg fs-6"></i>
+            <span>New Chat</span>
+        </button>
+
+        <!-- Advisor Selector -->
+        <div class="mb-3">
+            <label class="text-secondary uppercase fs-7 fw-bold mb-2 d-block text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Choose Advisor</label>
+            <div class="row g-2">
+                <div class="col-6">
+                    <button class="advisor-card btn btn-outline-secondary w-100 active p-2 text-center rounded-3 border-opacity-25" data-persona="GreenBot">
+                        <i class="bi bi-leaf d-block fs-5 mb-1 text-success"></i>
+                        <span class="d-block text-truncate small">GreenBot</span>
                     </button>
-                    
-                    <button class="btn btn-success rounded-circle p-0 shadow-sm d-inline-flex align-items-center justify-content-center landing-send-btn" type="button" title="Send message" style="width: 40px; height: 40px;">
-                        <i class="bi bi-arrow-up-short fs-3 text-white lh-1"></i>
+                </div>
+                <div class="col-6">
+                    <button class="advisor-card btn btn-outline-secondary w-100 p-2 text-center rounded-3 border-opacity-25" data-persona="Waste Wizard">
+                        <i class="bi bi-recycle d-block fs-5 mb-1 text-info"></i>
+                        <span class="d-block text-truncate small">Waste Wizard</span>
+                    </button>
+                </div>
+                <div class="col-6">
+                    <button class="advisor-card btn btn-outline-secondary w-100 p-2 text-center rounded-3 border-opacity-25" data-persona="EcoLife Guide">
+                        <i class="bi bi-house-heart d-block fs-5 mb-1 text-warning"></i>
+                        <span class="d-block text-truncate small">EcoLife Guide</span>
+                    </button>
+                </div>
+                <div class="col-6">
+                    <button class="advisor-card btn btn-outline-secondary w-100 p-2 text-center rounded-3 border-opacity-25" data-persona="Climate Sage">
+                        <i class="bi bi-globe-americas d-block fs-5 mb-1 text-primary"></i>
+                        <span class="d-block text-truncate small">Climate Sage</span>
                     </button>
                 </div>
             </div>
+        </div>
 
-            <!-- Custom Prompt Suggestion Chips -->
-            <div class="d-flex flex-wrap justify-content-center gap-2">
-                <button class="btn btn-outline-secondary rounded-pill btn-sm prompt-chip px-3 py-1.5 d-inline-flex align-items-center gap-2" data-template="Scrap metal and plastic market prices for ">
-                    <i class="bi bi-currency-dollar text-success fs-6"></i>
-                    <span>Material Prices</span>
-                </button>
-                <button class="btn btn-outline-secondary rounded-pill btn-sm prompt-chip px-3 py-1.5 d-inline-flex align-items-center gap-2" data-template="Preparation steps before recycling ">
-                    <i class="bi bi-box-seam text-info fs-6"></i>
-                    <span>Preparation Tips</span>
-                </button>
-                <button class="btn btn-outline-secondary rounded-pill btn-sm prompt-chip px-3 py-1.5 d-inline-flex align-items-center gap-2" data-template="Environmental carbon impact of recycling ">
-                    <i class="bi bi-tree text-success fs-6"></i>
-                    <span>Eco Impact</span>
-                </button>
-                <button class="btn btn-outline-secondary rounded-pill btn-sm prompt-chip px-3 py-1.5 d-inline-flex align-items-center gap-2" data-template="Recycling centers near ">
-                    <i class="bi bi-geo-alt text-warning fs-6"></i>
-                    <span>Disposal Centers</span>
-                </button>
+        <!-- Chat History List -->
+        <div class="flex-grow-1 overflow-y-auto custom-scrollbar mb-3">
+            <label class="text-secondary uppercase fs-7 fw-bold mb-2 d-block text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Chat History</label>
+            <div id="historyList" class="d-flex flex-column gap-1">
+                <!-- Dynamic Session Items -->
             </div>
         </div>
-    </div>
 
-    <!-- Active Chat Stream Container -->
-    <div id="chatBox" class="ai-chat-stream flex-grow-1 custom-scrollbar px-2 overflow-y-auto d-none">
-    </div>
-    
-    <!-- Floating Bottom Input Console (Active Chat Mode) -->
-    <div id="activeInputWrapper" class="ai-input-wrapper pt-2 mt-auto mb-2 d-none">
-        <div class="bg-body-tertiary border border-secondary rounded-4 p-3 shadow-sm position-relative custom-input-box">
-            <textarea id="activeChatInput" class="form-control border-0 shadow-none p-0 text-body custom-textarea-bg" rows="2" placeholder="Ask AI anything about recycling..."></textarea>
-            
-            <div class="d-flex justify-content-between align-items-center mt-2">
-                <button class="btn btn-body-tertiary rounded-circle p-0 text-secondary border-0 icon-hover-btn d-inline-flex align-items-center justify-content-center reset-input-btn" type="button" title="Clear input text" style="width: 36px; height: 36px;">
-                    <i class="bi bi-x-lg fs-6 lh-1"></i>
+        <!-- Sidebar Footer -->
+        <div class="pt-2 border-top border-secondary border-opacity-50 fs-7 text-secondary">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+                <span class="small"><i class="bi bi-shield-check me-1"></i> Verified Knowledge</span>
+            </div>
+            <p class="mb-0 text-muted text-center" style="font-size: 0.68rem;">Reducing carbon footprint one chat at a time.</p>
+        </div>
+    </aside>
+
+    <!-- RIGHT MAIN CANVAS -->
+    <main class="ai-main-content d-flex flex-column flex-grow-1 bg-body-tertiary">
+
+        <!-- Top Navigation Header -->
+        <header class="d-flex align-items-center justify-content-between px-4 py-3 bg-body border-bottom border-secondary border-opacity-25">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-chat-left-text text-success fs-5"></i>
+                <h6 id="activeChatTitle" class="fw-bold mb-0 text-body">New Conversation</h6>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <button class="btn btn-sm btn-outline-success rounded-pill px-3 d-flex align-items-center gap-1" onclick="alert('Quiz feature coming soon!')">
+                    <i class="bi bi-journal-check"></i>
+                    <span>Take Sustainability Quiz</span>
                 </button>
+            </div>
+        </header>
+
+        <!-- Dynamic Chat Stream -->
+        <div id="chatBox" class="flex-grow-1 overflow-y-auto p-4 custom-scrollbar">
+            <!-- Landing Suggestions (Visible when active chat has no messages) -->
+            <div id="landingView" class="h-100 d-flex flex-column align-items-center justify-content-center text-center my-auto">
+                <div class="bg-success bg-opacity-10 text-success rounded-circle p-3 mb-3">
+                    <i class="bi bi-robot fs-1"></i>
+                </div>
+                <h4 class="fw-bold mb-1">How can I assist your eco-goals today?</h4>
+                <p class="text-secondary small mb-4" style="max-width: 450px;">Ask anything about material recyclability, local scrap market trends, or proper waste separation.</p>
                 
-                <button class="btn btn-success rounded-circle p-0 shadow-sm d-inline-flex align-items-center justify-content-center active-send-btn" type="button" title="Send message" style="width: 40px; height: 40px;">
-                    <i class="bi bi-arrow-up-short fs-3 text-white lh-1"></i>
-                </button>
+                <!-- Quick Suggestion Chips -->
+                <div class="d-flex flex-wrap justify-content-center gap-2" style="max-width: 600px;">
+                    <button class="btn btn-outline-secondary rounded-pill btn-sm prompt-chip px-3 py-2" data-template="What is the current market price for scrap aluminum and PET bottles?">
+                        <i class="bi bi-currency-dollar text-success me-1"></i> Market Prices
+                    </button>
+                    <button class="btn btn-outline-secondary rounded-pill btn-sm prompt-chip px-3 py-2" data-template="How should I prepare electronic waste before dropping it off?">
+                        <i class="bi bi-box-seam text-info me-1"></i> Prep Instructions
+                    </button>
+                    <button class="btn btn-outline-secondary rounded-pill btn-sm prompt-chip px-3 py-2" data-template="What is the environmental carbon reduction of recycling 10kg of paper?">
+                        <i class="bi bi-tree text-success me-1"></i> Carbon Impact
+                    </button>
+                    <button class="btn btn-outline-secondary rounded-pill btn-sm prompt-chip px-3 py-2" data-template="Where can I safely dispose of used cooking oil and household batteries?">
+                        <i class="bi bi-geo-alt text-warning me-1"></i> Drop-off Locations
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
 
+        <!-- Bottom Input & Console Footer -->
+        <footer class="p-3 bg-body border-top border-secondary border-opacity-25">
+            <div class="position-relative bg-body-tertiary rounded-4 border border-secondary border-opacity-50 p-2 shadow-sm focus-within-ring">
+                <textarea id="chatInput" class="form-control border-0 bg-transparent shadow-none text-body p-2" rows="2" placeholder="Recycle your thoughts here..." style="resize: none;"></textarea>
+                
+                <div class="d-flex justify-content-between align-items-center px-2 pt-1">
+                    <button id="clearInputBtn" class="btn btn-link text-secondary p-0 border-0" title="Clear text">
+                        <i class="bi bi-x-circle fs-5"></i>
+                    </button>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-leaf text-success opacity-75 fs-5"></i>
+                        <button id="sendBtn" class="btn btn-success rounded-circle p-0 d-flex align-items-center justify-content-center shadow-sm" style="width: 38px; height: 38px;">
+                            <i class="bi bi-send-fill fs-6 text-white"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dynamic Eco Ticker Footer -->
+            <div class="text-center mt-2">
+                <small class="text-secondary" style="font-size: 0.75rem;">
+                    <i class="bi bi-heart-fill text-success me-1"></i>
+                    <span id="ecoTipTicker">Electric vehicles emit 54% fewer carbon emissions on average than gasoline-powered cars.</span>
+                </small>
+            </div>
+        </footer>
+
+    </main>
 </div>
 
 <script>
-    const STORAGE_KEY = 'eco_ai_chat_history';
+    const SESSIONS_KEY = 'eco_ai_chat_sessions_v2';
+    const ACTIVE_SESSION_KEY = 'eco_ai_active_session_id';
+
+    let sessions = [];
+    let currentSessionId = null;
+    let currentPersona = 'GreenBot';
     let isGenerating = false;
 
+    const ecoTips = [
+        "Recycling one aluminum can saves enough energy to run a TV for 3 hours.",
+        "Electric vehicles emit 54% fewer carbon emissions on average than gasoline-powered cars.",
+        "Rinsing food containers before recycling prevents whole batches from land-filling.",
+        "Glass is 100% recyclable and can be recycled endlessly without loss in quality."
+    ];
+
     document.addEventListener('DOMContentLoaded', () => {
-        loadSavedHistory();
+        loadStorage();
         setupEventListeners();
+        cycleEcoTips();
     });
 
-    function saveMessageToHistory(role, content) {
-        const history = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-        history.push({ role, content, timestamp: new Date().toISOString() });
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
-    }
+    function loadStorage() {
+        const storedSessions = localStorage.getItem(SESSIONS_KEY);
+        sessions = storedSessions ? JSON.parse(storedSessions) : [];
+        currentSessionId = localStorage.getItem(ACTIVE_SESSION_KEY);
 
-    function showChatView() {
-        document.getElementById('landingView').classList.add('d-none');
-        document.getElementById('landingView').classList.remove('d-flex');
-        
-        document.getElementById('aiHeader').classList.remove('d-none');
-        document.getElementById('aiHeader').classList.add('d-flex');
-        
-        document.getElementById('chatBox').classList.remove('d-none');
-        document.getElementById('activeInputWrapper').classList.remove('d-none');
-    }
-
-    function showLandingView() {
-        document.getElementById('landingView').classList.remove('d-none');
-        document.getElementById('landingView').classList.add('d-flex');
-        
-        document.getElementById('aiHeader').classList.add('d-none');
-        document.getElementById('aiHeader').classList.remove('d-flex');
-        
-        document.getElementById('chatBox').classList.add('d-none');
-        document.getElementById('activeInputWrapper').classList.add('d-none');
-        document.getElementById('chatBox').innerHTML = '';
-        document.getElementById('landingChatInput').value = '';
-    }
-
-    function loadSavedHistory() {
-        const history = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-        if (history.length > 0) {
-            showChatView();
-            history.forEach(item => {
-                if (item.role === 'user') {
-                    renderUserBubble(item.content);
-                } else if (item.role === 'ai') {
-                    renderAiBubble(item.content, false);
-                }
-            });
-            scrollToBottom();
+        if (sessions.length === 0) {
+            createNewChat(false);
         } else {
-            showLandingView();
+            if (!currentSessionId || !sessions.find(s => s.id === currentSessionId)) {
+                currentSessionId = sessions[0].id;
+            }
+            renderSidebarHistory();
+            renderActiveSessionMessages();
         }
     }
 
-    function setInputState(disabled) {
-        isGenerating = disabled;
-        const inputs = [document.getElementById('landingChatInput'), document.getElementById('activeChatInput')];
-        const buttons = document.querySelectorAll('.landing-send-btn, .active-send-btn, .reset-input-btn, .prompt-chip');
+    function saveStorage() {
+        localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions));
+        localStorage.setItem(ACTIVE_SESSION_KEY, currentSessionId);
+    }
 
-        inputs.forEach(input => { if (input) input.disabled = disabled; });
-        buttons.forEach(btn => {
-            btn.disabled = disabled;
-            if (disabled) btn.classList.add('opacity-50');
-            else btn.classList.remove('opacity-50');
+    function createNewChat(switchTab = true) {
+        const newSession = {
+            id: 'session_' + Date.now(),
+            title: 'New Conversation',
+            persona: currentPersona,
+            messages: []
+        };
+        sessions.unshift(newSession);
+        currentSessionId = newSession.id;
+        saveStorage();
+        renderSidebarHistory();
+        if (switchTab) renderActiveSessionMessages();
+    }
+
+    function deleteChat(sessionId, event) {
+        event.stopPropagation();
+        sessions = sessions.filter(s => s.id !== sessionId);
+        if (sessions.length === 0) {
+            createNewChat(false);
+        } else if (currentSessionId === sessionId) {
+            currentSessionId = sessions[0].id;
+        }
+        saveStorage();
+        renderSidebarHistory();
+        renderActiveSessionMessages();
+    }
+
+    function switchSession(sessionId) {
+        currentSessionId = sessionId;
+        saveStorage();
+        renderSidebarHistory();
+        renderActiveSessionMessages();
+    }
+
+    function renderSidebarHistory() {
+        const historyContainer = document.getElementById('historyList');
+        historyContainer.innerHTML = '';
+
+        sessions.forEach(session => {
+            const isActive = session.id === currentSessionId;
+            const item = document.createElement('div');
+            item.className = `history-item d-flex align-items-center justify-content-between p-2 rounded-3 cursor-pointer ${isActive ? 'bg-secondary bg-opacity-25 text-white fw-medium' : 'text-secondary hover-bg-dark'}`;
+            item.onclick = () => switchSession(session.id);
+
+            item.innerHTML = `
+                <div class="d-flex align-items-center gap-2 text-truncate pe-2">
+                    <i class="bi bi-chat-left-text fs-6"></i>
+                    <span class="text-truncate small">${escapeHtml(session.title)}</span>
+                </div>
+                <button class="btn btn-link text-danger p-0 border-0 opacity-75 hover-opacity-100 delete-session-btn" title="Delete chat">
+                    <i class="bi bi-trash fs-6"></i>
+                </button>
+            `;
+
+            item.querySelector('.delete-session-btn').addEventListener('click', (e) => deleteChat(session.id, e));
+            historyContainer.appendChild(item);
+        });
+    }
+
+    function renderActiveSessionMessages() {
+        const activeSession = sessions.find(s => s.id === currentSessionId);
+        const chatBox = document.getElementById('chatBox');
+        const activeTitle = document.getElementById('activeChatTitle');
+
+        if (!activeSession) return;
+        activeTitle.textContent = activeSession.title;
+
+        chatBox.innerHTML = '';
+
+        if (activeSession.messages.length === 0) {
+            const landingView = document.getElementById('landingView');
+            if (landingView) {
+                chatBox.appendChild(landingView.cloneNode(true));
+                bindPromptChips();
+            }
+            return;
+        }
+
+        activeSession.messages.forEach(msg => {
+            if (msg.role === 'user') {
+                renderUserBubble(msg.content, false);
+            } else {
+                renderAiBubble(msg.content, false);
+            }
         });
 
-        if (!disabled) {
-            const activeInput = document.getElementById('chatBox').classList.contains('d-none') 
-                ? document.getElementById('landingChatInput') 
-                : document.getElementById('activeChatInput');
-            activeInput?.focus();
-        }
+        scrollToBottom();
     }
 
-    function scrollToBottom() {
-        const box = document.getElementById('chatBox');
-        box.scrollTop = box.scrollHeight;
-    }
-
-    function renderUserBubble(text) {
-        const box = document.getElementById('chatBox');
-        box.innerHTML += `
+    function renderUserBubble(text, shouldScroll = true) {
+        const chatBox = document.getElementById('chatBox');
+        const userHtml = `
             <div class="d-flex justify-content-end mb-4 animate-fade-in pe-2">
-                <div class="user-bubble px-4 py-2" style="max-width: 80%; font-size: 0.95rem; background-color: #10b981; color: #ffffff; border-radius: 20px; word-break: break-word;">
+                <div class="user-bubble px-3 py-2 text-white bg-success rounded-4" style="max-width: 75%; font-size: 0.95rem; word-break: break-word;">
                     ${escapeHtml(text)}
                 </div>
             </div>
         `;
+        chatBox.insertAdjacentHTML('beforeend', userHtml);
+        if (shouldScroll) scrollToBottom();
     }
 
     function renderAiBubble(markdownContent, animate = true) {
-        const box = document.getElementById('chatBox');
+        const chatBox = document.getElementById('chatBox');
         const bubbleId = 'ai-msg-' + Date.now();
         const copyBtnId = 'copy-btn-' + Date.now();
-        
-        const wrapper = document.createElement('div');
-        wrapper.className = 'd-flex justify-content-start mb-4 animate-fade-in ps-2';
-        wrapper.innerHTML = `
-            <div class="d-flex flex-column align-items-start" style="max-width: 90%; word-break: break-word;">
+        const activeSession = sessions.find(s => s.id === currentSessionId);
+
+        const aiCard = document.createElement('div');
+        aiCard.className = 'd-flex justify-content-start mb-4 animate-fade-in ps-2';
+        aiCard.innerHTML = `
+            <div class="ai-card p-3 rounded-4 bg-body border border-secondary border-opacity-25 shadow-sm" style="max-width: 85%; width: 100%;">
+                <div class="d-flex align-items-center gap-2 mb-2 pb-2 border-bottom border-secondary border-opacity-10">
+                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-2 py-1 fs-7">
+                        <i class="bi bi-robot me-1"></i>${activeSession ? activeSession.persona : currentPersona}
+                    </span>
+                    <small class="text-secondary ms-auto" style="font-size: 0.7rem;">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</small>
+                </div>
                 <div id="${bubbleId}" class="ai-reply-content text-body" style="font-size: 0.95rem; line-height: 1.6;"></div>
-                <div class="mt-1">
-                    <button class="btn btn-link text-secondary p-0 border-0 me-2" id="${copyBtnId}" title="Copy message" style="font-size: 0.9rem;">
+                <div class="d-flex align-items-center gap-2 mt-3 pt-2 border-top border-secondary border-opacity-10">
+                    <button class="btn btn-sm btn-link text-secondary p-0 border-0" id="${copyBtnId}" title="Copy response">
                         <i class="bi bi-copy"></i>
+                    </button>
+                    <button class="btn btn-sm btn-link text-secondary p-0 border-0" onclick="this.classList.toggle('text-success')" title="Helpful">
+                        <i class="bi bi-hand-thumbs-up"></i>
+                    </button>
+                    <button class="btn btn-sm btn-link text-secondary p-0 border-0" onclick="this.classList.toggle('text-danger')" title="Unhelpful">
+                        <i class="bi bi-hand-thumbs-down"></i>
                     </button>
                 </div>
             </div>
         `;
 
+        chatBox.appendChild(aiCard);
+        const targetElem = document.getElementById(bubbleId);
+
         if (!animate) {
-            box.appendChild(wrapper);
-            document.getElementById(bubbleId).innerHTML = marked.parse(markdownContent);
+            targetElem.innerHTML = marked.parse(markdownContent);
             attachCopyHandler(copyBtnId, markdownContent);
             return;
         }
 
-        box.appendChild(wrapper);
-        const targetElem = document.getElementById(bubbleId);
         let index = 0;
-        const typingSpeed = 12;
-
+        const typingSpeed = 10;
         function typeChar() {
             if (index < markdownContent.length) {
-                index++;
+                index += 2;
                 const currentText = markdownContent.substring(0, index);
                 targetElem.innerHTML = marked.parse(currentText);
                 scrollToBottom();
                 setTimeout(typeChar, typingSpeed);
             } else {
+                targetElem.innerHTML = marked.parse(markdownContent);
                 attachCopyHandler(copyBtnId, markdownContent);
                 setInputState(false);
             }
         }
-
         typeChar();
+    }
+
+    async function sendMessage() {
+        if (isGenerating) return;
+        const input = document.getElementById('chatInput');
+        const userMsg = input.value.trim();
+
+        if (!userMsg) return;
+
+        const activeSession = sessions.find(s => s.id === currentSessionId);
+        if (!activeSession) return;
+
+        if (activeSession.messages.length === 0) {
+            document.getElementById('chatBox').innerHTML = '';
+            activeSession.title = userMsg.length > 25 ? userMsg.substring(0, 25) + '...' : userMsg;
+            renderSidebarHistory();
+        }
+
+        activeSession.messages.push({ role: 'user', content: userMsg });
+        renderUserBubble(userMsg);
+        input.value = '';
+        setInputState(true);
+
+        // Render Loading Bubble
+        const loadingId = 'loading-' + Date.now();
+        const chatBox = document.getElementById('chatBox');
+        chatBox.insertAdjacentHTML('beforeend', `
+            <div id="${loadingId}" class="d-flex justify-content-start mb-4 ps-2">
+                <div class="bg-body border border-secondary border-opacity-25 rounded-4 p-3 text-secondary" style="font-size: 0.9rem;">
+                    <span class="spinner-grow spinner-grow-sm text-success me-2" role="status"></span>
+                    <span>${activeSession.persona} is thinking...</span>
+                </div>
+            </div>
+        `);
+        scrollToBottom();
+
+        try {
+            const res = await fetch('/api/chat', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ prompt: userMsg, persona: activeSession.persona })
+            });
+            const data = await res.json();
+            document.getElementById(loadingId)?.remove();
+
+            if (data.status === 'success') {
+                activeSession.messages.push({ role: 'ai', content: data.reply });
+                saveStorage();
+                renderAiBubble(data.reply, true);
+            } else {
+                renderAiBubble(data.reply || "Unable to reach Eco AI services right now.", false);
+                setInputState(false);
+            }
+        } catch (err) {
+            document.getElementById(loadingId)?.remove();
+            renderAiBubble("Connection error. Please try again.", false);
+            setInputState(false);
+        }
+    }
+
+    function setupEventListeners() {
+        document.getElementById('sendBtn').addEventListener('click', sendMessage);
+        document.getElementById('chatInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        document.getElementById('newChatBtn').addEventListener('click', () => createNewChat(true));
+
+        document.getElementById('clearInputBtn').addEventListener('click', () => {
+            document.getElementById('chatInput').value = '';
+        });
+
+        document.querySelectorAll('.advisor-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.advisor-card').forEach(c => c.classList.remove('active'));
+                card.classList.add('active');
+                currentPersona = card.getAttribute('data-persona');
+                const activeSession = sessions.find(s => s.id === currentSessionId);
+                if (activeSession) {
+                    activeSession.persona = currentPersona;
+                    saveStorage();
+                    renderActiveSessionMessages();
+                }
+            });
+        });
+
+        bindPromptChips();
+    }
+
+    function bindPromptChips() {
+        document.querySelectorAll('.prompt-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                const template = chip.getAttribute('data-template');
+                const input = document.getElementById('chatInput');
+                input.value = template;
+                input.focus();
+            });
+        });
+    }
+
+    function setInputState(disabled) {
+        isGenerating = disabled;
+        document.getElementById('chatInput').disabled = disabled;
+        document.getElementById('sendBtn').disabled = disabled;
     }
 
     function attachCopyHandler(btnId, text) {
@@ -247,114 +473,18 @@
         });
     }
 
-    async function sendMessage() {
-        if (isGenerating) return;
-
-        const landingInput = document.getElementById('landingChatInput');
-        const activeInput = document.getElementById('activeChatInput');
-        const userMsg = document.getElementById('chatBox').classList.contains('d-none') ? landingInput.value.trim() : activeInput.value.trim();
-
-        if (!userMsg) return;
-
-        showChatView();
-        setInputState(true);
-
-        renderUserBubble(userMsg);
-        saveMessageToHistory('user', userMsg);
-
-        landingInput.value = '';
-        activeInput.value = '';
-        scrollToBottom();
-
-        const box = document.getElementById('chatBox');
-        const loadingId = 'loading-' + Date.now();
-        box.innerHTML += `
-            <div id="${loadingId}" class="d-flex justify-content-start mb-4 animate-fade-in ps-2">
-                <div class="text-secondary thinking-bubble py-1" style="font-size: 0.9rem;">
-                    <span class="spinner-grow spinner-grow-sm text-success me-2" role="status"></span>
-                    <span class="me-1">Eco AI is thinking</span>
-                    <span class="typing-dots">
-                        <span>.</span><span>.</span><span>.</span>
-                    </span>
-                </div>
-            </div>
-        `;
-        scrollToBottom();
-
-        try {
-            const res = await fetch('/api/chat', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ prompt: userMsg })
-            });
-            const data = await res.json();
-            
-            document.getElementById(loadingId)?.remove();
-
-            if (data.status === 'success') {
-                renderAiBubble(data.reply, true);
-                saveMessageToHistory('ai', data.reply);
-            } else {
-                box.innerHTML += `
-                    <div class="d-flex justify-content-center mb-3">
-                        <div class="alert alert-danger py-2 small mb-0 rounded-pill shadow-sm">${data.reply || 'AI service error.'}</div>
-                    </div>
-                `;
-                setInputState(false);
-            }
-        } catch (err) {
-            document.getElementById(loadingId)?.remove();
-            box.innerHTML += `
-                <div class="d-flex justify-content-center mb-3">
-                    <div class="alert alert-danger py-2 small mb-0 rounded-pill shadow-sm"><i class="bi bi-exclamation-triangle"></i> Connection error. Please try again.</div>
-                </div>
-            `;
-            setInputState(false);
-        }
-        scrollToBottom();
+    function cycleEcoTips() {
+        let index = 0;
+        setInterval(() => {
+            index = (index + 1) % ecoTips.length;
+            const ticker = document.getElementById('ecoTipTicker');
+            if (ticker) ticker.textContent = ecoTips[index];
+        }, 7000);
     }
 
-    function setupEventListeners() {
-        document.querySelectorAll('.landing-send-btn, .active-send-btn').forEach(btn => {
-            btn.addEventListener('click', () => sendMessage());
-        });
-
-        document.querySelectorAll('.prompt-chip').forEach(chip => {
-            chip.addEventListener('click', () => {
-                const template = chip.getAttribute('data-template');
-                const targetInput = document.getElementById('chatBox').classList.contains('d-none')
-                    ? document.getElementById('landingChatInput')
-                    : document.getElementById('activeChatInput');
-                
-                targetInput.value = template;
-                targetInput.focus();
-                targetInput.setSelectionRange(targetInput.value.length, targetInput.value.length);
-            });
-        });
-
-        document.querySelectorAll('.reset-input-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                if (isGenerating) return;
-                document.getElementById('landingChatInput').value = '';
-                document.getElementById('activeChatInput').value = '';
-            });
-        });
-
-        const handleEnterKey = (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-            }
-        };
-
-        document.getElementById('landingChatInput').addEventListener('keydown', handleEnterKey);
-        document.getElementById('activeChatInput').addEventListener('keydown', handleEnterKey);
-
-        document.getElementById('clearBtn').addEventListener('click', () => {
-            if (isGenerating) return;
-            localStorage.removeItem(STORAGE_KEY);
-            showLandingView();
-        });
+    function scrollToBottom() {
+        const box = document.getElementById('chatBox');
+        box.scrollTop = box.scrollHeight;
     }
 
     function escapeHtml(str) {
@@ -363,131 +493,46 @@
 </script>
 
 <style>
-    .ai-page-wrapper {
-        height: calc(100vh - 140px);
-        width: 100%;
+    .ai-dashboard-container {
+        height: calc(100vh - 110px);
+        min-height: 550px;
     }
 
-    .custom-textarea-bg {
-        background-color: transparent !important;
+    .cursor-pointer { cursor: pointer; }
+
+    .hover-bg-dark:hover {
+        background-color: rgba(255, 255, 255, 0.08);
+        color: #fff !important;
     }
 
-    .custom-input-box {
-        transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-    .custom-input-box:focus-within {
+    .advisor-card.active {
         border-color: #10b981 !important;
-        box-shadow: 0 0 0 0.2rem rgba(16, 185, 129, 0.15) !important;
+        background-color: rgba(16, 185, 129, 0.15) !important;
+        color: #fff !important;
     }
 
-    .prompt-chip {
-        font-size: 0.825rem;
-        transition: all 0.2s ease;
-        border-color: var(--bs-border-color);
-        background-color: var(--bs-body-bg);
-        color: var(--bs-body-color);
-    }
-    .prompt-chip i {
-        margin-right: 0.15rem;
-    }
-    .prompt-chip:hover {
-        border-color: #10b981;
-        background-color: rgba(16, 185, 129, 0.08);
-        color: var(--bs-body-color);
-        transform: translateY(-1px);
+    .focus-within-ring:focus-within {
+        border-color: #10b981 !important;
+        box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.15) !important;
     }
 
-    #landingChatInput, #activeChatInput {
-        resize: none;
-    }
-    #landingChatInput::placeholder, #activeChatInput::placeholder {
-        color: var(--bs-secondary-color);
-    }
-
-    .custom-scrollbar::-webkit-scrollbar {
-        width: 6px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-track {
-        background: transparent;
-    }
+    .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
     .custom-scrollbar::-webkit-scrollbar-thumb {
-        background-color: var(--bs-border-color);
+        background-color: rgba(108, 117, 125, 0.3);
         border-radius: 10px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-        background-color: var(--bs-secondary-color);
     }
 
     .animate-fade-in {
-        animation: fadeIn 0.3s ease-out forwards;
+        animation: fadeIn 0.25s ease-out forwards;
     }
 
     @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
+        from { opacity: 0; transform: translateY(8px); }
         to { opacity: 1; transform: translateY(0); }
     }
 
-    .ai-reply-content {
-        line-height: 1.6;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-    }
-    .ai-reply-content p:last-child {
-        margin-bottom: 0;
-    }
-    .ai-reply-content ul, .ai-reply-content ol {
-        padding-left: 1.25rem;
-        margin-bottom: 0.5rem;
-    }
-    .ai-reply-content h1, .ai-reply-content h2, .ai-reply-content h3, .ai-reply-content h4 {
-        font-size: 1rem;
-        font-weight: 700;
-        color: #10b981;
-        margin-top: 0.5rem;
-        margin-bottom: 0.5rem;
-    }
-    .ai-reply-content h1:first-child, .ai-reply-content h2:first-child, .ai-reply-content h3:first-child {
-        margin-top: 0;
-    }
-
-    .ai-reply-content code {
-        background-color: rgba(16, 185, 129, 0.1);
-        color: #10b981;
-        padding: 0.15rem 0.4rem;
-        border-radius: 0.3rem;
-        font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-        font-size: 0.875em;
-    }
-
-    .ai-reply-content pre {
-        background-color: #1e1e1e;
-        color: #d4d4d4;
-        padding: 1rem;
-        border-radius: 0.5rem;
-        overflow-x: auto;
-        margin-top: 0.5rem;
-        margin-bottom: 0.75rem;
-    }
-    .ai-reply-content pre code {
-        background-color: transparent !important;
-        color: inherit !important;
-        padding: 0 !important;
-        border-radius: 0 !important;
-    }
-
-    .typing-dots span {
-        display: inline-block;
-        font-weight: bold;
-        color: #10b981;
-        animation: waveDots 1.4s infinite ease-in-out;
-    }
-
-    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
-
-    @keyframes waveDots {
-        0%, 100% { transform: translateY(0); opacity: 0.4; }
-        50% { transform: translateY(-3px); opacity: 1; }
-    }
+    .ai-reply-content ul, .ai-reply-content ol { padding-left: 1.25rem; margin-bottom: 0.5rem; }
+    .ai-reply-content p:last-child { margin-bottom: 0; }
 </style>
 {% endblock %}
