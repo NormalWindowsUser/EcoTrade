@@ -274,7 +274,7 @@
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         gap: 1.25rem;
-        margin-bottom: 2.5rem;
+        margin-bottom: 1.5rem;
     }
 
     .info-card {
@@ -638,6 +638,11 @@
 <div class="grid-container" id="materials-list">
     <!-- Initial Loader -->
 </div>
+<div class="text-center mb-4" id="load-more-materials-container" style="display: none;">
+    <button id="load-more-materials-btn" class="btn-custom-secondary">
+        Show More Materials
+    </button>
+</div>
 
 <!-- Hubs Display (Scrollable List) -->
 <div class="section-title">
@@ -681,6 +686,7 @@
 <script>
     // Global States
     let currentMaterialsData = [];
+    let materialDisplayLimit = 6;
     let currentHubsData = [];
     let hubDisplayLimit = 10;
     let allContributions = [];
@@ -714,7 +720,6 @@
             const data = await res.json();
             if (data.status === 'success') {
                 const weight = data.total_weight || 0;
-                // Add fade-in animation by toggling class
                 ['stat-weight', 'stat-earnings', 'stat-hubs', 'stat-co2'].forEach(id => {
                     document.getElementById(id).classList.add('fade-in');
                 });
@@ -731,7 +736,9 @@
 
     async function fetchMaterials() {
         const container = document.getElementById('materials-list');
+        const loadMoreBtnContainer = document.getElementById('load-more-materials-container');
         container.innerHTML = getLoadingSpinner('Fetching current rates...');
+        loadMoreBtnContainer.style.display = 'none';
         
         const city = document.getElementById('filter-city').value;
         const hubId = document.getElementById('filter-hub').value;
@@ -746,30 +753,36 @@
             
             if (data.status === 'success' && data.data) {
                 currentMaterialsData = data.data;
+                materialDisplayLimit = 6; // Reset display count on new query
                 renderMaterials();
             } else {
+                currentMaterialsData = [];
                 container.innerHTML = '<p class="loading-text text-center w-100 fade-in">No active materials found.</p>';
+                loadMoreBtnContainer.style.display = 'none';
             }
         } catch (err) {
             console.error("Failed to fetch materials:", err);
             container.innerHTML = '<p class="loading-text text-center w-100 fade-in text-danger">Unable to load materials.</p>';
+            loadMoreBtnContainer.style.display = 'none';
         }
     }
 
     function renderMaterials() {
         const container = document.getElementById('materials-list');
+        const loadMoreBtnContainer = document.getElementById('load-more-materials-container');
         const weightInput = Math.max(0, parseFloat(document.getElementById('calc-weight').value) || 0);
 
-        if (currentMaterialsData.length > 0) {
-            container.innerHTML = currentMaterialsData.map((m, index) => {
+        const toDisplay = currentMaterialsData.slice(0, materialDisplayLimit);
+
+        if (toDisplay.length > 0) {
+            container.innerHTML = toDisplay.map((m, index) => {
                 const estimatedPayout = ((m.avg_reported_rate || 0) * weightInput).toFixed(2);
                 const reportBadge = m.report_count > 0 
                     ? `<span class="badge bg-success ms-1">${m.report_count} user report${m.report_count > 1 ? 's' : ''}</span>`
                     : `<span class="badge bg-secondary ms-1">Base Rate</span>`;
 
-                // Staggered fade in animation using inline animation-delay
                 return `
-                    <div class="info-card fade-in" style="animation-delay: ${index * 0.05}s">
+                    <div class="info-card fade-in" style="animation-delay: ${index * 0.04}s">
                         <div>
                             <h4>${m.name || 'Unknown Material'}</h4>
                             <p><strong>Category:</strong> ${m.category || 'General'}</p>
@@ -787,8 +800,11 @@
                     </div>
                 `;
             }).join('');
+
+            loadMoreBtnContainer.style.display = currentMaterialsData.length > materialDisplayLimit ? 'block' : 'none';
         } else {
             container.innerHTML = '<p class="loading-text text-center w-100 fade-in">No active materials found.</p>';
+            loadMoreBtnContainer.style.display = 'none';
         }
     }
 
@@ -935,6 +951,11 @@
     }
 
     // --- Event Listeners ---
+    document.getElementById('load-more-materials-btn').addEventListener('click', () => {
+        materialDisplayLimit += 6;
+        renderMaterials();
+    });
+
     document.getElementById('load-more-hubs-btn').addEventListener('click', () => {
         hubDisplayLimit += 10;
         renderHubs();
