@@ -7,23 +7,23 @@
 <!-- Full Page AI Layout Container -->
 <div class="ai-page-wrapper d-flex flex-column pb-3">
     
-    <!-- Top Header Controls (Hidden during empty state, visible during chat) -->
-    <div id="aiHeader" class="ai-header align-items-center justify-content-between pb-3 border-bottom border-secondary mb-2 d-none">
-        <div class="d-flex align-items-center gap-2">
-            <i class="bi bi-robot text-success fs-4"></i>
-            <div>
-                <h5 class="fw-bold text-success mb-0 lh-1">Eco Assistant</h5>
-                <small class="text-secondary" style="font-size: 0.75rem;">AI-powered recycling guide</small>
+    <!-- Top Header Controls (Centered layout as requested) -->
+    <div id="aiHeader" class="ai-header flex-column align-items-center justify-content-center text-center pb-3 border-bottom border-secondary mb-3 position-relative d-none">
+        <div class="d-flex flex-column align-items-center justify-content-center">
+            <div class="d-inline-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success rounded-circle mb-2" style="width: 48px; height: 48px;">
+                <i class="bi bi-robot fs-3"></i>
             </div>
+            <h5 class="fw-bold text-success mb-1 lh-1 fs-4">Eco Assistant</h5>
+            <small class="text-secondary" style="font-size: 0.8rem;">AI-powered recycling guide</small>
         </div>
         
-        <button class="btn btn-outline-danger btn-sm rounded-pill px-3 py-1 icon-hover-btn d-flex align-items-center gap-1" id="clearBtn" title="Clear chat history">
+        <button class="btn btn-outline-danger btn-sm rounded-pill px-3 py-1 icon-hover-btn position-absolute top-0 end-0 d-flex align-items-center gap-1" id="clearBtn" title="Clear chat history">
             <i class="bi bi-trash"></i>
-            <span>Clear History</span>
+            <span class="d-none d-sm-inline">Clear History</span>
         </button>
     </div>
     
-    <!-- Empty State View (Centered Layout) -->
+    <!-- Empty State View (Centered Landing View) -->
     <div id="landingView" class="d-flex flex-column justify-content-center align-items-center flex-grow-1 w-100 my-auto py-4">
         <div class="text-center mb-4">
             <div class="d-inline-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success rounded-circle mb-3" style="width: 64px; height: 64px;">
@@ -49,30 +49,30 @@
                 </div>
             </div>
 
-            <!-- Recycling Prompt Suggestion Chips -->
+            <!-- Custom Prompt Suggestion Chips (Pre-fills text into input with clean icon gaps) -->
             <div class="d-flex flex-wrap justify-content-center gap-2">
-                <button class="btn btn-outline-secondary rounded-pill btn-sm prompt-chip px-3 py-1.5 d-flex align-items-center gap-1.5" data-prompt="What are the current scrap market prices for metals and plastics?">
-                    <i class="bi bi-currency-dollar text-success"></i>
+                <button class="btn btn-outline-secondary rounded-pill btn-sm prompt-chip px-3 py-2 d-inline-flex align-items-center gap-2" data-template="Scrap metal and plastic market prices for ">
+                    <i class="bi bi-currency-dollar text-success fs-6"></i>
                     <span>Material Prices</span>
                 </button>
-                <button class="btn btn-outline-secondary rounded-pill btn-sm prompt-chip px-3 py-1.5 d-flex align-items-center gap-1.5" data-prompt="How should I clean and prepare plastic and glass containers before recycling?">
-                    <i class="bi bi-box-seam text-info"></i>
+                <button class="btn btn-outline-secondary rounded-pill btn-sm prompt-chip px-3 py-2 d-inline-flex align-items-center gap-2" data-template="Preparation steps before recycling ">
+                    <i class="bi bi-box-seam text-info fs-6"></i>
                     <span>Preparation Tips</span>
                 </button>
-                <button class="btn btn-outline-secondary rounded-pill btn-sm prompt-chip px-3 py-1.5 d-flex align-items-center gap-1.5" data-prompt="How much carbon emissions are saved by recycling 1kg of aluminum?">
-                    <i class="bi bi-tree text-success"></i>
+                <button class="btn btn-outline-secondary rounded-pill btn-sm prompt-chip px-3 py-2 d-inline-flex align-items-center gap-2" data-template="Environmental carbon impact of recycling ">
+                    <i class="bi bi-tree text-success fs-6"></i>
                     <span>Eco Impact</span>
                 </button>
-                <button class="btn btn-outline-secondary rounded-pill btn-sm prompt-chip px-3 py-1.5 d-flex align-items-center gap-1.5" data-prompt="Where can I safely dispose of e-waste and lithium batteries?">
-                    <i class="bi bi-geo-alt text-warning"></i>
+                <button class="btn btn-outline-secondary rounded-pill btn-sm prompt-chip px-3 py-2 d-inline-flex align-items-center gap-2" data-template="Recycling centers near ">
+                    <i class="bi bi-geo-alt text-warning fs-6"></i>
                     <span>Disposal Centers</span>
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Active Chat Stream Container (Hidden initially when empty) -->
-    <div id="chatBox" class="ai-chat-stream flex-grow-1 custom-scrollbar pe-2 overflow-y-auto d-none">
+    <!-- Active Chat Stream Container -->
+    <div id="chatBox" class="ai-chat-stream flex-grow-1 custom-scrollbar px-2 overflow-y-auto d-none">
     </div>
     
     <!-- Floating Bottom Input Console (Active Chat Mode) -->
@@ -244,12 +244,12 @@
         });
     }
 
-    async function sendMessage(customPrompt = null) {
+    async function sendMessage() {
         if (isGenerating) return;
 
         const landingInput = document.getElementById('landingChatInput');
         const activeInput = document.getElementById('activeChatInput');
-        const userMsg = customPrompt || (document.getElementById('chatBox').classList.contains('d-none') ? landingInput.value.trim() : activeInput.value.trim());
+        const userMsg = document.getElementById('chatBox').classList.contains('d-none') ? landingInput.value.trim() : activeInput.value.trim();
 
         if (!userMsg) return;
 
@@ -316,10 +316,18 @@
             btn.addEventListener('click', () => sendMessage());
         });
 
+        /* Option Chip Event: Inserts pre-filled text template into input instead of immediate sending */
         document.querySelectorAll('.prompt-chip').forEach(chip => {
             chip.addEventListener('click', () => {
-                const prompt = chip.getAttribute('data-prompt');
-                sendMessage(prompt);
+                const template = chip.getAttribute('data-template');
+                const targetInput = document.getElementById('chatBox').classList.contains('d-none')
+                    ? document.getElementById('landingChatInput')
+                    : document.getElementById('activeChatInput');
+                
+                targetInput.value = template;
+                targetInput.focus();
+                // Set cursor position to end of input box
+                targetInput.setSelectionRange(targetInput.value.length, targetInput.value.length);
             });
         });
 
@@ -377,6 +385,9 @@
         border-color: var(--bs-border-color);
         background-color: var(--bs-body-bg);
         color: var(--bs-body-color);
+    }
+    .prompt-chip i {
+        margin-right: 0.15rem;
     }
     .prompt-chip:hover {
         border-color: #10b981;
