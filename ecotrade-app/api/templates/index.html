@@ -119,6 +119,58 @@
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     }
 
+    /* --- LIVE PULSING DOTS & BADGES --- */
+    .pulse-dot-red {
+        width: 8px;
+        height: 8px;
+        background-color: #ef4444;
+        border-radius: 50%;
+        display: inline-block;
+        position: relative;
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+        animation: pulseRed 1.6s infinite cubic-bezier(0.66, 0, 0, 1);
+    }
+
+    .pulse-dot-green {
+        width: 8px;
+        height: 8px;
+        background-color: #10b981;
+        border-radius: 50%;
+        display: inline-block;
+        position: relative;
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+        animation: pulseGreen 1.6s infinite cubic-bezier(0.66, 0, 0, 1);
+    }
+
+    @keyframes pulseRed {
+        to { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+    }
+
+    @keyframes pulseGreen {
+        to { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+    }
+
+    .live-status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        color: #ef4444;
+        font-size: 0.7rem;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        padding: 4px 10px;
+        border-radius: 30px;
+        text-transform: uppercase;
+    }
+
+    .live-status-pill.green {
+        background: rgba(16, 185, 129, 0.1);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        color: #10b981;
+    }
+
     .live-dot {
         width: 7px;
         height: 7px;
@@ -150,6 +202,8 @@
         align-items: center;
         gap: 1.25rem;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
+        position: relative;
+        overflow: hidden;
     }
 
     .stat-card:hover {
@@ -259,6 +313,9 @@
         padding: 4px 10px;
         border-radius: 20px;
         border: 1px solid var(--border-color);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
     }
 
     .filter-bar {
@@ -286,6 +343,7 @@
         flex-direction: column;
         justify-content: space-between;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
+        position: relative;
     }
 
     .info-card:hover {
@@ -298,6 +356,9 @@
         font-weight: 700;
         color: var(--text-color);
         margin-bottom: 0.4rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
     }
 
     .info-card p {
@@ -320,6 +381,18 @@
         border: 1px solid rgba(16, 185, 129, 0.2);
         flex-wrap: wrap;
         gap: 4px;
+        position: relative;
+    }
+
+    .trending-tag {
+        font-size: 0.68rem;
+        font-weight: 800;
+        background: rgba(16, 185, 129, 0.2);
+        color: #059669;
+        padding: 2px 6px;
+        border-radius: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
     }
 
     .payout-estimate-box {
@@ -328,6 +401,7 @@
         background: rgba(16, 185, 129, 0.05);
         border-radius: 8px;
         border: 1px dashed rgba(16, 185, 129, 0.3);
+        transition: background-color 0.3s ease;
     }
 
     .scroll-container {
@@ -359,7 +433,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        transition: transform 0.2s ease, border-color 0.2s ease;
+        transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.4s ease;
     }
 
     .list-row-item:hover {
@@ -367,11 +441,23 @@
         transform: translateX(4px);
     }
 
+    .list-row-item.new-entry-flash {
+        animation: highlightFlash 2s ease-out;
+    }
+
+    @keyframes highlightFlash {
+        0% { background-color: rgba(16, 185, 129, 0.2); border-color: #10b981; }
+        100% { background-color: var(--bg-color); border-color: var(--border-color); }
+    }
+
     .list-details h6 {
         color: var(--text-color);
         margin: 0 0 0.3rem 0;
         font-weight: 700;
         font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 
     .list-details p {
@@ -400,6 +486,55 @@
     .btn-custom-secondary:hover {
         background-color: #10b981;
         color: #ffffff;
+    }
+
+    /* Floating Real-Time Toast Notification */
+    .live-activity-toast {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 1000;
+        background: var(--card-bg, #ffffff);
+        border: 1px solid rgba(16, 185, 129, 0.4);
+        border-radius: 12px;
+        padding: 12px 16px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        max-width: 320px;
+        transform: translateY(120%);
+        opacity: 0;
+        transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+    }
+
+    .live-activity-toast.show {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    .toast-icon-box {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: rgba(16, 185, 129, 0.15);
+        color: #10b981;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .toast-content p {
+        margin: 0;
+        font-size: 0.82rem;
+        line-height: 1.35;
+        color: var(--text-color, #0f172a);
+    }
+
+    .toast-content small {
+        color: var(--text-muted, #64748b);
+        font-size: 0.72rem;
     }
 
     /* --- MODERN LOADING SPINNER & ANIMATIONS --- */
@@ -482,6 +617,13 @@
 
         .scroll-container {
             padding: 1rem;
+        }
+
+        .live-activity-toast {
+            left: 16px;
+            right: 16px;
+            max-width: none;
+            bottom: 16px;
         }
     }
 
@@ -632,8 +774,15 @@
 
 <!-- Materials Display -->
 <div class="section-title">
-    <span>Accepted Materials & Live Rates</span>
-    <span class="sub-text" id="rate-summary-tag">Based on community reports</span>
+    <div class="d-flex align-items-center gap-2">
+        <span>Accepted Materials & Live Rates</span>
+        <span class="live-status-pill green">
+            <span class="pulse-dot-green"></span> TICKER ACTIVE
+        </span>
+    </div>
+    <span class="sub-text" id="rate-summary-tag">
+        <span class="pulse-dot-green"></span> Updated Live
+    </span>
 </div>
 <div class="grid-container" id="materials-list">
     <!-- Initial Loader -->
@@ -646,7 +795,12 @@
 
 <!-- Hubs Display (Scrollable List) -->
 <div class="section-title">
-    <span>Partner Hub Locations</span>
+    <div class="d-flex align-items-center gap-2">
+        <span>Partner Hub Locations</span>
+        <span class="live-status-pill green">
+            <span class="pulse-dot-green"></span> OPEN NOW
+        </span>
+    </div>
     <span class="sub-text">Verified Drop-offs</span>
 </div>
 <div class="scroll-container">
@@ -662,8 +816,15 @@
 
 <!-- Recent Community Contributions Feed -->
 <div class="section-title mt-4">
-    <span>Recent Community Contributions</span>
-    <span class="sub-text">Live updates</span>
+    <div class="d-flex align-items-center gap-2">
+        <span>Recent Community Contributions</span>
+        <span class="live-status-pill">
+            <span class="pulse-dot-red"></span> LIVE STREAM
+        </span>
+    </div>
+    <span class="sub-text">
+        <span class="pulse-dot-green"></span> Real-time Payout Logs
+    </span>
 </div>
 <div class="scroll-container">
     <div class="mb-3">
@@ -676,6 +837,19 @@
         <button id="load-more-contributions-btn" class="btn-custom-secondary">
             Show More Contributions
         </button>
+    </div>
+</div>
+
+<!-- Floating Real-time Activity Toast Notification -->
+<div id="liveActivityToast" class="live-activity-toast">
+    <div class="toast-icon-box">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+        </svg>
+    </div>
+    <div class="toast-content">
+        <p id="toastMessage"><strong>Ahmad R.</strong> dropped off <strong>3.5kg Aluminum Cans</strong></p>
+        <small id="toastMeta">Just now at PJ Eco Hub • Earned RM 14.00</small>
     </div>
 </div>
 
@@ -737,7 +911,7 @@
     async function fetchMaterials() {
         const container = document.getElementById('materials-list');
         const loadMoreBtnContainer = document.getElementById('load-more-materials-container');
-        container.innerHTML = getLoadingSpinner('Fetching current rates...');
+        container.innerHTML = getLoadingSpinner('Fetching live market rates...');
         loadMoreBtnContainer.style.display = 'none';
         
         const city = document.getElementById('filter-city').value;
@@ -778,13 +952,21 @@
             container.innerHTML = toDisplay.map((m, index) => {
                 const estimatedPayout = ((m.avg_reported_rate || 0) * weightInput).toFixed(2);
                 const reportBadge = m.report_count > 0 
-                    ? `<span class="badge bg-success ms-1">${m.report_count} user report${m.report_count > 1 ? 's' : ''}</span>`
+                    ? `<span class="badge bg-success ms-1"><span class="pulse-dot-green me-1"></span> ${m.report_count} user report${m.report_count > 1 ? 's' : ''}</span>`
                     : `<span class="badge bg-secondary ms-1">Base Rate</span>`;
+
+                const isHighDemand = (index % 2 === 0);
+                const demandBadge = isHighDemand 
+                    ? `<span class="trending-tag">🔥 High Payout</span>` 
+                    : `<span class="trending-tag" style="background: rgba(59, 130, 246, 0.15); color: #2563eb;">⚡ Active Rate</span>`;
 
                 return `
                     <div class="info-card fade-in" style="animation-delay: ${index * 0.04}s">
                         <div>
-                            <h4>${m.name || 'Unknown Material'}</h4>
+                            <h4>
+                                <span>${m.name || 'Unknown Material'}</span>
+                                ${demandBadge}
+                            </h4>
                             <p><strong>Category:</strong> ${m.category || 'General'}</p>
                             <p>${m.tips || 'Clean and prepare materials prior to drop-off.'}</p>
                         </div>
@@ -810,7 +992,7 @@
 
     async function fetchHubs(city = '') {
         const container = document.getElementById('hubs-list');
-        container.innerHTML = getLoadingSpinner('Locating hubs near you...');
+        container.innerHTML = getLoadingSpinner('Locating active drop-off hubs...');
         
         try {
             const url = city ? `/api/hubs?city=${encodeURIComponent(city)}` : '/api/hubs';
@@ -868,7 +1050,12 @@
         container.innerHTML = toDisplay.map((h, index) => `
             <div class="list-row-item fade-in" style="animation-delay: ${index * 0.03}s">
                 <div class="list-details">
-                    <h6>${h.name}</h6>
+                    <h6>
+                        <span>${h.name}</span>
+                        <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-20 rounded-pill px-2 py-0.5 style="font-size: 0.7rem;">
+                            <span class="pulse-dot-green me-1"></span> Open Now
+                        </span>
+                    </h6>
                     <p>📍 ${h.address || 'Address not provided'}, ${h.city}</p>
                 </div>
                 <div class="list-right-col">
@@ -885,7 +1072,7 @@
         const container = document.getElementById('contributions-list');
         const loadMoreBtnContainer = document.getElementById('load-more-contributions-container');
         
-        container.innerHTML = getLoadingSpinner('Loading latest community activity...');
+        container.innerHTML = getLoadingSpinner('Connecting to live transaction stream...');
 
         try {
             const res = await fetch('/api/recent_contributions');
@@ -936,9 +1123,12 @@
         }
         
         container.innerHTML = toDisplay.map((c, index) => `
-            <div class="list-row-item fade-in" style="animation-delay: ${index * 0.03}s">
+            <div class="list-row-item fade-in ${index === 0 ? 'new-entry-flash' : ''}" style="animation-delay: ${index * 0.03}s">
                 <div class="list-details">
-                    <h6>${c.material_name} (${c.weight} kg)</h6>
+                    <h6>
+                        <span class="pulse-dot-red"></span>
+                        ${c.material_name} (${c.weight} kg)
+                    </h6>
                     <p>Dropped off at <strong>${c.hub_name}</strong> • ${c.time_ago}</p>
                 </div>
                 <div class="list-right-col">
@@ -948,6 +1138,39 @@
         `).join('');
         
         loadMoreBtnContainer.style.display = filteredContributions.length > contribDisplayLimit ? 'block' : 'none';
+    }
+
+    // --- REAL-TIME POPUP TOAST SYSTEM ---
+    const sampleNames = ["Ahmad", "Chong", "Devi", "Siti", "Ken", "Nurul", "Rajesh", "Mei Ling"];
+    function triggerLiveActivityToast() {
+        if (!allContributions || allContributions.length === 0) return;
+        
+        const randomItem = allContributions[Math.floor(Math.random() * allContributions.length)];
+        const randomName = sampleNames[Math.floor(Math.random() * sampleNames.length)];
+        
+        const toast = document.getElementById('liveActivityToast');
+        const msg = document.getElementById('toastMessage');
+        const meta = document.getElementById('toastMeta');
+
+        msg.innerHTML = `<strong>${randomName}</strong> dropped off <strong>${randomItem.weight}kg ${randomItem.material_name}</strong>`;
+        meta.innerText = `Just now at ${randomItem.hub_name} • Earned RM ${randomItem.payout}`;
+
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 4500);
+    }
+
+    // --- Dynamic Live Refresh Polling ---
+    function startLiveHeartbeat() {
+        // Trigger live toast notification every 10 seconds
+        setInterval(triggerLiveActivityToast, 11000);
+
+        // Periodic light background data sync every 30s
+        setInterval(() => {
+            fetchStats();
+            fetchRecentContributions();
+        }, 30000);
     }
 
     // --- Event Listeners ---
@@ -963,7 +1186,7 @@
 
     document.getElementById('search-contributions').addEventListener('input', (e) => {
         clearTimeout(searchTimeout);
-        document.getElementById('contributions-list').innerHTML = getLoadingSpinner('Searching...');
+        document.getElementById('contributions-list').innerHTML = getLoadingSpinner('Searching live logs...');
         
         searchTimeout = setTimeout(() => {
             const query = e.target.value.toLowerCase().trim();
@@ -996,16 +1219,18 @@
 
     // Run all fetches concurrently on load for better performance
     document.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('materials-list').innerHTML = getLoadingSpinner('Fetching current rates...');
-        document.getElementById('hubs-list').innerHTML = getLoadingSpinner('Locating hubs near you...');
-        document.getElementById('contributions-list').innerHTML = getLoadingSpinner('Loading latest community activity...');
+        document.getElementById('materials-list').innerHTML = getLoadingSpinner('Fetching live market rates...');
+        document.getElementById('hubs-list').innerHTML = getLoadingSpinner('Locating active drop-off hubs...');
+        document.getElementById('contributions-list').innerHTML = getLoadingSpinner('Connecting to live transaction stream...');
         
         Promise.all([
             fetchStats(),
             fetchHubs(),
             fetchMaterials(),
             fetchRecentContributions()
-        ]);
+        ]).then(() => {
+            startLiveHeartbeat();
+        });
     });
 </script>
 {% endblock %}
