@@ -4,151 +4,154 @@
 <!-- Include Marked.js to render AI Markdown responses into HTML -->
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-<div class="ai-dashboard-container d-flex w-100 overflow-hidden rounded-4 border border-secondary border-opacity-25 shadow-lg">
+<!-- Full-width layout wrapper to clear restrictive container limits -->
+<div class="container-fluid px-2 px-md-3 py-2 h-100">
+    <div class="ai-dashboard-container d-flex w-100 overflow-hidden rounded-4 border border-secondary border-opacity-25 shadow-sm bg-body">
 
-    <!-- LEFT SIDEBAR: Controls & History -->
-    <aside class="ai-sidebar d-flex flex-column p-3 bg-dark text-light border-end border-secondary border-opacity-25" style="width: 280px; min-width: 280px;">
-        
-        <!-- App Identity -->
-        <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom border-secondary border-opacity-50">
-            <div class="d-flex align-items-center gap-2">
-                <div class="bg-success bg-opacity-25 text-success rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                    <i class="bi bi-tree-fill fs-5"></i>
-                </div>
-                <div>
-                    <h6 class="fw-bold mb-0 text-white">EcoTrade AI</h6>
-                    <small class="text-secondary" style="font-size: 0.7rem;">v2.4 Smart Assistant</small>
-                </div>
-            </div>
-        </div>
-
-        <!-- New Chat Action -->
-        <button id="newChatBtn" class="btn btn-success w-100 fw-medium d-flex align-items-center justify-content-center gap-2 py-2 mb-3 shadow-sm rounded-3">
-            <i class="bi bi-plus-lg fs-6"></i>
-            <span>New Chat</span>
-        </button>
-
-        <!-- Advisor Selector -->
-        <div class="mb-3">
-            <label class="text-secondary uppercase fs-7 fw-bold mb-2 d-block text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Choose Advisor</label>
-            <div class="row g-2">
-                <div class="col-6">
-                    <button class="advisor-card btn btn-outline-secondary w-100 active p-2 text-center rounded-3 border-opacity-25" data-persona="GreenBot">
-                        <i class="bi bi-leaf d-block fs-5 mb-1 text-success"></i>
-                        <span class="d-block text-truncate small">GreenBot</span>
-                    </button>
-                </div>
-                <div class="col-6">
-                    <button class="advisor-card btn btn-outline-secondary w-100 p-2 text-center rounded-3 border-opacity-25" data-persona="Waste Wizard">
-                        <i class="bi bi-recycle d-block fs-5 mb-1 text-info"></i>
-                        <span class="d-block text-truncate small">Waste Wizard</span>
-                    </button>
-                </div>
-                <div class="col-6">
-                    <button class="advisor-card btn btn-outline-secondary w-100 p-2 text-center rounded-3 border-opacity-25" data-persona="EcoLife Guide">
-                        <i class="bi bi-house-heart d-block fs-5 mb-1 text-warning"></i>
-                        <span class="d-block text-truncate small">EcoLife Guide</span>
-                    </button>
-                </div>
-                <div class="col-6">
-                    <button class="advisor-card btn btn-outline-secondary w-100 p-2 text-center rounded-3 border-opacity-25" data-persona="Climate Sage">
-                        <i class="bi bi-globe-americas d-block fs-5 mb-1 text-primary"></i>
-                        <span class="d-block text-truncate small">Climate Sage</span>
-                    </button>
+        <!-- LEFT SIDEBAR: Controls & History -->
+        <aside class="ai-sidebar d-flex flex-column p-3 bg-body-tertiary border-end border-secondary border-opacity-25" style="width: 300px; min-width: 280px;">
+            
+            <!-- App Identity -->
+            <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom border-secondary border-opacity-25">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="bg-success bg-opacity-10 text-success rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                        <i class="bi bi-tree-fill fs-5"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-0 text-body">EcoTrade AI</h6>
+                        <small class="text-secondary" style="font-size: 0.725rem;">v2.4 Smart Assistant</small>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Chat History List -->
-        <div class="flex-grow-1 overflow-y-auto custom-scrollbar mb-3">
-            <label class="text-secondary uppercase fs-7 fw-bold mb-2 d-block text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Chat History</label>
-            <div id="historyList" class="d-flex flex-column gap-1">
-                <!-- Dynamic Session Items -->
-            </div>
-        </div>
+            <!-- New Chat Action -->
+            <button id="newChatBtn" class="btn btn-success w-100 fw-semibold d-flex align-items-center justify-content-center gap-2 py-2 mb-3 shadow-sm rounded-3">
+                <i class="bi bi-plus-lg fs-6"></i>
+                <span>New Chat</span>
+            </button>
 
-        <!-- Sidebar Footer -->
-        <div class="pt-2 border-top border-secondary border-opacity-50 fs-7 text-secondary">
-            <div class="d-flex justify-content-between align-items-center mb-1">
-                <span class="small"><i class="bi bi-shield-check me-1"></i> Verified Knowledge</span>
-            </div>
-            <p class="mb-0 text-muted text-center" style="font-size: 0.68rem;">Reducing carbon footprint one chat at a time.</p>
-        </div>
-    </aside>
-
-    <!-- RIGHT MAIN CANVAS -->
-    <main class="ai-main-content d-flex flex-column flex-grow-1 bg-body-tertiary">
-
-        <!-- Top Navigation Header -->
-        <header class="d-flex align-items-center justify-content-between px-4 py-3 bg-body border-bottom border-secondary border-opacity-25">
-            <div class="d-flex align-items-center gap-2">
-                <i class="bi bi-chat-left-text text-success fs-5"></i>
-                <h6 id="activeChatTitle" class="fw-bold mb-0 text-body">New Conversation</h6>
-            </div>
-            <div class="d-flex align-items-center gap-2">
-                <button class="btn btn-sm btn-outline-success rounded-pill px-3 d-flex align-items-center gap-1" onclick="alert('Quiz feature coming soon!')">
-                    <i class="bi bi-journal-check"></i>
-                    <span>Take Sustainability Quiz</span>
-                </button>
-            </div>
-        </header>
-
-        <!-- Dynamic Chat Stream -->
-        <div id="chatBox" class="flex-grow-1 overflow-y-auto p-4 custom-scrollbar">
-            <!-- Landing Suggestions (Visible when active chat has no messages) -->
-            <div id="landingView" class="h-100 d-flex flex-column align-items-center justify-content-center text-center my-auto">
-                <div class="bg-success bg-opacity-10 text-success rounded-circle p-3 mb-3">
-                    <i class="bi bi-robot fs-1"></i>
-                </div>
-                <h4 class="fw-bold mb-1">How can I assist your eco-goals today?</h4>
-                <p class="text-secondary small mb-4" style="max-width: 450px;">Ask anything about material recyclability, local scrap market trends, or proper waste separation.</p>
-                
-                <!-- Quick Suggestion Chips -->
-                <div class="d-flex flex-wrap justify-content-center gap-2" style="max-width: 600px;">
-                    <button class="btn btn-outline-secondary rounded-pill btn-sm prompt-chip px-3 py-2" data-template="What is the current market price for scrap aluminum and PET bottles?">
-                        <i class="bi bi-currency-dollar text-success me-1"></i> Market Prices
-                    </button>
-                    <button class="btn btn-outline-secondary rounded-pill btn-sm prompt-chip px-3 py-2" data-template="How should I prepare electronic waste before dropping it off?">
-                        <i class="bi bi-box-seam text-info me-1"></i> Prep Instructions
-                    </button>
-                    <button class="btn btn-outline-secondary rounded-pill btn-sm prompt-chip px-3 py-2" data-template="What is the environmental carbon reduction of recycling 10kg of paper?">
-                        <i class="bi bi-tree text-success me-1"></i> Carbon Impact
-                    </button>
-                    <button class="btn btn-outline-secondary rounded-pill btn-sm prompt-chip px-3 py-2" data-template="Where can I safely dispose of used cooking oil and household batteries?">
-                        <i class="bi bi-geo-alt text-warning me-1"></i> Drop-off Locations
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Bottom Input & Console Footer -->
-        <footer class="p-3 bg-body border-top border-secondary border-opacity-25">
-            <div class="position-relative bg-body-tertiary rounded-4 border border-secondary border-opacity-50 p-2 shadow-sm focus-within-ring">
-                <textarea id="chatInput" class="form-control border-0 bg-transparent shadow-none text-body p-2" rows="2" placeholder="Recycle your thoughts here..." style="resize: none;"></textarea>
-                
-                <div class="d-flex justify-content-between align-items-center px-2 pt-1">
-                    <button id="clearInputBtn" class="btn btn-link text-secondary p-0 border-0" title="Clear text">
-                        <i class="bi bi-x-circle fs-5"></i>
-                    </button>
-                    <div class="d-flex align-items-center gap-2">
-                        <i class="bi bi-leaf text-success opacity-75 fs-5"></i>
-                        <button id="sendBtn" class="btn btn-success rounded-circle p-0 d-flex align-items-center justify-content-center shadow-sm" style="width: 38px; height: 38px;">
-                            <i class="bi bi-send-fill fs-6 text-white"></i>
+            <!-- Advisor Selector -->
+            <div class="mb-3">
+                <label class="text-secondary fs-7 fw-bold mb-2 d-block text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Choose Advisor</label>
+                <div class="row g-2">
+                    <div class="col-6">
+                        <button class="advisor-card btn btn-outline-secondary w-100 active p-2 text-center rounded-3 border-opacity-25" data-persona="GreenBot">
+                            <i class="bi bi-leaf d-block fs-5 mb-1 text-success"></i>
+                            <span class="d-block text-truncate small fw-medium">GreenBot</span>
+                        </button>
+                    </div>
+                    <div class="col-6">
+                        <button class="advisor-card btn btn-outline-secondary w-100 p-2 text-center rounded-3 border-opacity-25" data-persona="Waste Wizard">
+                            <i class="bi bi-recycle d-block fs-5 mb-1 text-info"></i>
+                            <span class="d-block text-truncate small fw-medium">Waste Wizard</span>
+                        </button>
+                    </div>
+                    <div class="col-6">
+                        <button class="advisor-card btn btn-outline-secondary w-100 p-2 text-center rounded-3 border-opacity-25" data-persona="EcoLife Guide">
+                            <i class="bi bi-house-heart d-block fs-5 mb-1 text-warning"></i>
+                            <span class="d-block text-truncate small fw-medium">EcoLife Guide</span>
+                        </button>
+                    </div>
+                    <div class="col-6">
+                        <button class="advisor-card btn btn-outline-secondary w-100 p-2 text-center rounded-3 border-opacity-25" data-persona="Climate Sage">
+                            <i class="bi bi-globe-americas d-block fs-5 mb-1 text-primary"></i>
+                            <span class="d-block text-truncate small fw-medium">Climate Sage</span>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Dynamic Eco Ticker Footer -->
-            <div class="text-center mt-2">
-                <small class="text-secondary" style="font-size: 0.75rem;">
-                    <i class="bi bi-heart-fill text-success me-1"></i>
-                    <span id="ecoTipTicker">Electric vehicles emit 54% fewer carbon emissions on average than gasoline-powered cars.</span>
-                </small>
+            <!-- Chat History List -->
+            <div class="flex-grow-1 overflow-y-auto custom-scrollbar mb-3">
+                <label class="text-secondary fs-7 fw-bold mb-2 d-block text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Chat History</label>
+                <div id="historyList" class="d-flex flex-column gap-1 pe-1">
+                    <!-- Dynamic Session Items -->
+                </div>
             </div>
-        </footer>
 
-    </main>
+            <!-- Sidebar Footer -->
+            <div class="pt-2 border-top border-secondary border-opacity-25 fs-7 text-secondary">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="small"><i class="bi bi-shield-check me-1 text-success"></i> Verified Knowledge</span>
+                </div>
+                <p class="mb-0 text-muted" style="font-size: 0.7rem;">Reducing carbon footprint one chat at a time.</p>
+            </div>
+        </aside>
+
+        <!-- RIGHT MAIN CANVAS -->
+        <main class="ai-main-content d-flex flex-column flex-grow-1 bg-body">
+
+            <!-- Top Navigation Header -->
+            <header class="d-flex align-items-center justify-content-between px-4 py-3 border-bottom border-secondary border-opacity-25 bg-body">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-chat-left-text text-success fs-5"></i>
+                    <h6 id="activeChatTitle" class="fw-bold mb-0 text-body">New Conversation</h6>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <button class="btn btn-sm btn-outline-success rounded-pill px-3 d-flex align-items-center gap-1 fw-medium" onclick="alert('Quiz feature coming soon!')">
+                        <i class="bi bi-journal-check"></i>
+                        <span>Take Sustainability Quiz</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Dynamic Chat Stream -->
+            <div id="chatBox" class="flex-grow-1 overflow-y-auto p-4 custom-scrollbar">
+                <!-- Landing Suggestions -->
+                <div id="landingView" class="h-100 d-flex flex-column align-items-center justify-content-center text-center my-auto">
+                    <div class="bg-success bg-opacity-10 text-success rounded-circle p-3 mb-3">
+                        <i class="bi bi-robot fs-1"></i>
+                    </div>
+                    <h4 class="fw-bold mb-2">How can I assist your eco-goals today?</h4>
+                    <p class="text-secondary small mb-4" style="max-width: 520px;">Ask anything about material recyclability, local scrap market trends, or proper waste separation.</p>
+                    
+                    <!-- Quick Suggestion Chips -->
+                    <div class="d-flex flex-wrap justify-content-center gap-2" style="max-width: 720px;">
+                        <button class="btn btn-outline-secondary rounded-pill btn-sm prompt-chip px-3 py-2" data-template="What is the current market price for scrap aluminum and PET bottles?">
+                            <i class="bi bi-currency-dollar text-success me-1"></i> Market Prices
+                        </button>
+                        <button class="btn btn-outline-secondary rounded-pill btn-sm prompt-chip px-3 py-2" data-template="How should I prepare electronic waste before dropping it off?">
+                            <i class="bi bi-box-seam text-info me-1"></i> Prep Instructions
+                        </button>
+                        <button class="btn btn-outline-secondary rounded-pill btn-sm prompt-chip px-3 py-2" data-template="What is the environmental carbon reduction of recycling 10kg of paper?">
+                            <i class="bi bi-tree text-success me-1"></i> Carbon Impact
+                        </button>
+                        <button class="btn btn-outline-secondary rounded-pill btn-sm prompt-chip px-3 py-2" data-template="Where can I safely dispose of used cooking oil and household batteries?">
+                            <i class="bi bi-geo-alt text-warning me-1"></i> Drop-off Locations
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Input & Console Footer -->
+            <footer class="p-3 bg-body border-top border-secondary border-opacity-25 pb-5">
+                <div class="position-relative bg-body-tertiary rounded-4 border border-secondary border-opacity-50 p-2 shadow-sm focus-within-ring">
+                    <textarea id="chatInput" class="form-control border-0 bg-transparent shadow-none text-body p-2" rows="2" placeholder="Recycle your thoughts here..." style="resize: none;"></textarea>
+                    
+                    <div class="d-flex justify-content-between align-items-center px-2 pt-1">
+                        <button id="clearInputBtn" class="btn btn-link text-secondary p-0 border-0" title="Clear text">
+                            <i class="bi bi-x-circle fs-5"></i>
+                        </button>
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-leaf text-success opacity-75 fs-5"></i>
+                            <button id="sendBtn" class="btn btn-success rounded-circle p-0 d-flex align-items-center justify-content-center shadow-sm" style="width: 38px; height: 38px;">
+                                <i class="bi bi-send-fill fs-6 text-white"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dynamic Eco Ticker Footer -->
+                <div class="text-center mt-2">
+                    <small class="text-secondary" style="font-size: 0.75rem;">
+                        <i class="bi bi-heart-fill text-success me-1"></i>
+                        <span id="ecoTipTicker">Electric vehicles emit 54% fewer carbon emissions on average than gasoline-powered cars.</span>
+                    </small>
+                </div>
+            </footer>
+
+        </main>
+    </div>
 </div>
 
 <script>
@@ -235,7 +238,7 @@
         sessions.forEach(session => {
             const isActive = session.id === currentSessionId;
             const item = document.createElement('div');
-            item.className = `history-item d-flex align-items-center justify-content-between p-2 rounded-3 cursor-pointer ${isActive ? 'bg-secondary bg-opacity-25 text-white fw-medium' : 'text-secondary hover-bg-dark'}`;
+            item.className = `history-item d-flex align-items-center justify-content-between p-2 rounded-3 cursor-pointer ${isActive ? 'bg-success bg-opacity-10 border border-success border-opacity-25 text-success fw-bold' : 'text-body hover-bg-tertiary'}`;
             item.onclick = () => switchSession(session.id);
 
             item.innerHTML = `
@@ -243,7 +246,7 @@
                     <i class="bi bi-chat-left-text fs-6"></i>
                     <span class="text-truncate small">${escapeHtml(session.title)}</span>
                 </div>
-                <button class="btn btn-link text-danger p-0 border-0 opacity-75 hover-opacity-100 delete-session-btn" title="Delete chat">
+                <button class="btn btn-link text-secondary hover-danger p-0 border-0 delete-session-btn" title="Delete chat">
                     <i class="bi bi-trash fs-6"></i>
                 </button>
             `;
@@ -287,7 +290,7 @@
         const chatBox = document.getElementById('chatBox');
         const userHtml = `
             <div class="d-flex justify-content-end mb-4 animate-fade-in pe-2">
-                <div class="user-bubble px-3 py-2 text-white bg-success rounded-4" style="max-width: 75%; font-size: 0.95rem; word-break: break-word;">
+                <div class="user-bubble px-3 py-2 text-white bg-success rounded-4 shadow-sm" style="max-width: 75%; font-size: 0.95rem; word-break: break-word;">
                     ${escapeHtml(text)}
                 </div>
             </div>
@@ -305,7 +308,7 @@
         const aiCard = document.createElement('div');
         aiCard.className = 'd-flex justify-content-start mb-4 animate-fade-in ps-2';
         aiCard.innerHTML = `
-            <div class="ai-card p-3 rounded-4 bg-body border border-secondary border-opacity-25 shadow-sm" style="max-width: 85%; width: 100%;">
+            <div class="ai-card p-3 rounded-4 bg-body-tertiary border border-secondary border-opacity-25 shadow-sm" style="max-width: 85%; width: 100%;">
                 <div class="d-flex align-items-center gap-2 mb-2 pb-2 border-bottom border-secondary border-opacity-10">
                     <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-2 py-1 fs-7">
                         <i class="bi bi-robot me-1"></i>${activeSession ? activeSession.persona : currentPersona}
@@ -375,12 +378,11 @@
         input.value = '';
         setInputState(true);
 
-        // Render Loading Bubble
         const loadingId = 'loading-' + Date.now();
         const chatBox = document.getElementById('chatBox');
         chatBox.insertAdjacentHTML('beforeend', `
             <div id="${loadingId}" class="d-flex justify-content-start mb-4 ps-2">
-                <div class="bg-body border border-secondary border-opacity-25 rounded-4 p-3 text-secondary" style="font-size: 0.9rem;">
+                <div class="bg-body-tertiary border border-secondary border-opacity-25 rounded-4 p-3 text-secondary" style="font-size: 0.9rem;">
                     <span class="spinner-grow spinner-grow-sm text-success me-2" role="status"></span>
                     <span>${activeSession.persona} is thinking...</span>
                 </div>
@@ -493,22 +495,26 @@
 </script>
 
 <style>
+    /* Dynamic Screen Filling Height */
     .ai-dashboard-container {
-        height: calc(100vh - 110px);
-        min-height: 550px;
+        height: calc(100vh - 170px);
+        min-height: 580px;
     }
 
     .cursor-pointer { cursor: pointer; }
 
-    .hover-bg-dark:hover {
-        background-color: rgba(255, 255, 255, 0.08);
-        color: #fff !important;
+    .hover-bg-tertiary:hover {
+        background-color: var(--bs-secondary-bg);
+    }
+
+    .hover-danger:hover {
+        color: var(--bs-danger) !important;
     }
 
     .advisor-card.active {
         border-color: #10b981 !important;
-        background-color: rgba(16, 185, 129, 0.15) !important;
-        color: #fff !important;
+        background-color: rgba(16, 185, 129, 0.12) !important;
+        color: #10b981 !important;
     }
 
     .focus-within-ring:focus-within {
@@ -519,7 +525,7 @@
     .custom-scrollbar::-webkit-scrollbar { width: 5px; }
     .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
     .custom-scrollbar::-webkit-scrollbar-thumb {
-        background-color: rgba(108, 117, 125, 0.3);
+        background-color: rgba(108, 117, 125, 0.25);
         border-radius: 10px;
     }
 
