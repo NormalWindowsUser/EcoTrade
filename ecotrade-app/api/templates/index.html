@@ -49,7 +49,7 @@
         align-items: center;
     }
 
-    /* --- ATTENTION-GRABBING AI BUTTON --- */
+    /* Attention-Grabbing AI Button */
     .pill-btn-group {
         display: inline-flex;
         align-items: center;
@@ -119,14 +119,13 @@
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     }
 
-    /* --- LIVE PULSING DOTS & BADGES --- */
+    /* Live Pulsing Dots & Status Pills */
     .pulse-dot-red {
         width: 8px;
         height: 8px;
         background-color: #ef4444;
         border-radius: 50%;
         display: inline-block;
-        position: relative;
         box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
         animation: pulseRed 1.6s infinite cubic-bezier(0.66, 0, 0, 1);
     }
@@ -137,9 +136,16 @@
         background-color: #10b981;
         border-radius: 50%;
         display: inline-block;
-        position: relative;
         box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
         animation: pulseGreen 1.6s infinite cubic-bezier(0.66, 0, 0, 1);
+    }
+
+    .pulse-dot-gray {
+        width: 8px;
+        height: 8px;
+        background-color: #94a3b8;
+        border-radius: 50%;
+        display: inline-block;
     }
 
     @keyframes pulseRed {
@@ -169,6 +175,12 @@
         background: rgba(16, 185, 129, 0.1);
         border: 1px solid rgba(16, 185, 129, 0.3);
         color: #10b981;
+    }
+
+    .live-status-pill.gray {
+        background: rgba(148, 163, 184, 0.12);
+        border: 1px solid rgba(148, 163, 184, 0.3);
+        color: #64748b;
     }
 
     .live-dot {
@@ -202,8 +214,6 @@
         align-items: center;
         gap: 1.25rem;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
-        position: relative;
-        overflow: hidden;
     }
 
     .stat-card:hover {
@@ -343,7 +353,6 @@
         flex-direction: column;
         justify-content: space-between;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
-        position: relative;
     }
 
     .info-card:hover {
@@ -356,9 +365,6 @@
         font-weight: 700;
         color: var(--text-color);
         margin-bottom: 0.4rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
     }
 
     .info-card p {
@@ -381,18 +387,6 @@
         border: 1px solid rgba(16, 185, 129, 0.2);
         flex-wrap: wrap;
         gap: 4px;
-        position: relative;
-    }
-
-    .trending-tag {
-        font-size: 0.68rem;
-        font-weight: 800;
-        background: rgba(16, 185, 129, 0.2);
-        color: #059669;
-        padding: 2px 6px;
-        border-radius: 4px;
-        text-transform: uppercase;
-        letter-spacing: 0.03em;
     }
 
     .payout-estimate-box {
@@ -401,7 +395,6 @@
         background: rgba(16, 185, 129, 0.05);
         border-radius: 8px;
         border: 1px dashed rgba(16, 185, 129, 0.3);
-        transition: background-color 0.3s ease;
     }
 
     .scroll-container {
@@ -442,11 +435,11 @@
     }
 
     .list-row-item.new-entry-flash {
-        animation: highlightFlash 2s ease-out;
+        animation: highlightFlash 2.5s ease-out;
     }
 
     @keyframes highlightFlash {
-        0% { background-color: rgba(16, 185, 129, 0.2); border-color: #10b981; }
+        0% { background-color: rgba(16, 185, 129, 0.25); border-color: #10b981; }
         100% { background-color: var(--bg-color); border-color: var(--border-color); }
     }
 
@@ -488,7 +481,7 @@
         color: #ffffff;
     }
 
-    /* Floating Real-Time Toast Notification */
+    /* Authentic Real-Time Database Activity Toast Notification */
     .live-activity-toast {
         position: fixed;
         bottom: 24px;
@@ -502,7 +495,7 @@
         display: flex;
         align-items: center;
         gap: 12px;
-        max-width: 320px;
+        max-width: 340px;
         transform: translateY(120%);
         opacity: 0;
         transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
@@ -537,7 +530,7 @@
         font-size: 0.72rem;
     }
 
-    /* --- MODERN LOADING SPINNER & ANIMATIONS --- */
+    /* Modern Loading Spinner */
     .spinner-wrapper {
         grid-column: 1 / -1;
         display: flex;
@@ -568,7 +561,7 @@
         letter-spacing: 0.02em;
     }
 
-    /* Fade-in effect for loaded data */
+    /* Fade-in effect */
     .fade-in {
         animation: fadeIn 0.4s ease forwards;
     }
@@ -578,7 +571,7 @@
         to { opacity: 1; transform: translateY(0); }
     }
 
-    /* --- RESPONSIVE BREAKPOINTS & MOBILE FIXES --- */
+    /* Responsive Breakpoints */
     @media (max-width: 768px) {
         .hero {
             padding: 2.25rem 0.75rem 1.5rem;
@@ -777,11 +770,11 @@
     <div class="d-flex align-items-center gap-2">
         <span>Accepted Materials & Live Rates</span>
         <span class="live-status-pill green">
-            <span class="pulse-dot-green"></span> TICKER ACTIVE
+            <span class="pulse-dot-green"></span> ACTIVE RATES
         </span>
     </div>
     <span class="sub-text" id="rate-summary-tag">
-        <span class="pulse-dot-green"></span> Updated Live
+        Based on community reports
     </span>
 </div>
 <div class="grid-container" id="materials-list">
@@ -797,8 +790,8 @@
 <div class="section-title">
     <div class="d-flex align-items-center gap-2">
         <span>Partner Hub Locations</span>
-        <span class="live-status-pill green">
-            <span class="pulse-dot-green"></span> OPEN NOW
+        <span id="hubs-summary-pill" class="live-status-pill gray">
+            <span class="pulse-dot-gray"></span> CHECKING STATUS
         </span>
     </div>
     <span class="sub-text">Verified Drop-offs</span>
@@ -818,12 +811,12 @@
 <div class="section-title mt-4">
     <div class="d-flex align-items-center gap-2">
         <span>Recent Community Contributions</span>
-        <span class="live-status-pill">
-            <span class="pulse-dot-red"></span> LIVE STREAM
+        <span class="live-status-pill green">
+            <span class="pulse-dot-green"></span> COMMUNITY FEED
         </span>
     </div>
     <span class="sub-text">
-        <span class="pulse-dot-green"></span> Real-time Payout Logs
+        Real-time Payout Logs
     </span>
 </div>
 <div class="scroll-container">
@@ -840,7 +833,7 @@
     </div>
 </div>
 
-<!-- Floating Real-time Activity Toast Notification -->
+<!-- Authentic Database Activity Notification Toast -->
 <div id="liveActivityToast" class="live-activity-toast">
     <div class="toast-icon-box">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -848,8 +841,8 @@
         </svg>
     </div>
     <div class="toast-content">
-        <p id="toastMessage"><strong>Ahmad R.</strong> dropped off <strong>3.5kg Aluminum Cans</strong></p>
-        <small id="toastMeta">Just now at PJ Eco Hub • Earned RM 14.00</small>
+        <p id="toastMessage">New contribution logged!</p>
+        <small id="toastMeta">Just now</small>
     </div>
 </div>
 
@@ -867,8 +860,9 @@
     let filteredContributions = [];
     let contribDisplayLimit = 10;
     let searchTimeout = null;
+    let latestKnownContributionId = null;
 
-    // Standard Loading HTML Component
+    // Loading Spinner Component
     const getLoadingSpinner = (text = "Loading data...") => `
         <div class="spinner-wrapper fade-in">
             <div class="modern-spinner"></div>
@@ -876,7 +870,7 @@
         </div>
     `;
 
-    // --- Helper function for dynamic DB time ---
+    // Time Ago Helper
     function formatTimeAgo(seconds) {
         if (!seconds && seconds !== 0) return "Just now";
         if (seconds < 60) return `${Math.floor(seconds)} secs ago`;
@@ -886,6 +880,42 @@
         if (hours < 24) return `${hours} hours ago`;
         const days = Math.floor(hours / 24);
         return `${days} days ago`;
+    }
+
+    // Operating Hours Checking Helper (Parses "08:00 AM - 04:00 PM", "24 Hours", etc.)
+    function isHubOpen(hoursStr) {
+        if (!hoursStr || hoursStr === 'N/A') return false;
+        const lower = hoursStr.toLowerCase();
+        if (lower.includes('24 hours') || lower.includes('24/7')) return true;
+
+        const parts = hoursStr.split('-').map(s => s.trim());
+        if (parts.length !== 2) return false;
+
+        const parseTime = (timeStr) => {
+            const match = timeStr.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+            if (!match) return null;
+            let [_, hours, minutes, modifier] = match;
+            hours = parseInt(hours, 10);
+            minutes = parseInt(minutes, 10);
+            if (modifier.toUpperCase() === 'PM' && hours < 12) hours += 12;
+            if (modifier.toUpperCase() === 'AM' && hours === 12) hours = 0;
+            return hours * 60 + minutes;
+        };
+
+        const startTime = parseTime(parts[0]);
+        const endTime = parseTime(parts[1]);
+
+        if (startTime === null || endTime === null) return false;
+
+        const now = new Date();
+        const currentMins = now.getHours() * 60 + now.getMinutes();
+
+        if (endTime >= startTime) {
+            return currentMins >= startTime && currentMins <= endTime;
+        } else {
+            // Hours wrap past midnight
+            return currentMins >= startTime || currentMins <= endTime;
+        }
     }
 
     async function fetchStats() {
@@ -911,7 +941,7 @@
     async function fetchMaterials() {
         const container = document.getElementById('materials-list');
         const loadMoreBtnContainer = document.getElementById('load-more-materials-container');
-        container.innerHTML = getLoadingSpinner('Fetching live market rates...');
+        container.innerHTML = getLoadingSpinner('Fetching current rates...');
         loadMoreBtnContainer.style.display = 'none';
         
         const city = document.getElementById('filter-city').value;
@@ -927,7 +957,7 @@
             
             if (data.status === 'success' && data.data) {
                 currentMaterialsData = data.data;
-                materialDisplayLimit = 6; // Reset display count on new query
+                materialDisplayLimit = 6;
                 renderMaterials();
             } else {
                 currentMaterialsData = [];
@@ -952,21 +982,13 @@
             container.innerHTML = toDisplay.map((m, index) => {
                 const estimatedPayout = ((m.avg_reported_rate || 0) * weightInput).toFixed(2);
                 const reportBadge = m.report_count > 0 
-                    ? `<span class="badge bg-success ms-1"><span class="pulse-dot-green me-1"></span> ${m.report_count} user report${m.report_count > 1 ? 's' : ''}</span>`
+                    ? `<span class="badge bg-success ms-1">${m.report_count} user report${m.report_count > 1 ? 's' : ''}</span>`
                     : `<span class="badge bg-secondary ms-1">Base Rate</span>`;
-
-                const isHighDemand = (index % 2 === 0);
-                const demandBadge = isHighDemand 
-                    ? `<span class="trending-tag">🔥 High Payout</span>` 
-                    : `<span class="trending-tag" style="background: rgba(59, 130, 246, 0.15); color: #2563eb;">⚡ Active Rate</span>`;
 
                 return `
                     <div class="info-card fade-in" style="animation-delay: ${index * 0.04}s">
                         <div>
-                            <h4>
-                                <span>${m.name || 'Unknown Material'}</span>
-                                ${demandBadge}
-                            </h4>
+                            <h4>${m.name || 'Unknown Material'}</h4>
                             <p><strong>Category:</strong> ${m.category || 'General'}</p>
                             <p>${m.tips || 'Clean and prepare materials prior to drop-off.'}</p>
                         </div>
@@ -992,7 +1014,7 @@
 
     async function fetchHubs(city = '') {
         const container = document.getElementById('hubs-list');
-        container.innerHTML = getLoadingSpinner('Locating active drop-off hubs...');
+        container.innerHTML = getLoadingSpinner('Locating hubs near you...');
         
         try {
             const url = city ? `/api/hubs?city=${encodeURIComponent(city)}` : '/api/hubs';
@@ -1038,53 +1060,77 @@
     function renderHubs() {
         const container = document.getElementById('hubs-list');
         const loadMoreBtnContainer = document.getElementById('load-more-hubs-container');
+        const summaryPill = document.getElementById('hubs-summary-pill');
         
         const toDisplay = currentHubsData.slice(0, hubDisplayLimit);
 
         if (toDisplay.length === 0) {
             container.innerHTML = '<p class="loading-text text-center fade-in">No recycling hubs found for selected filters.</p>';
             loadMoreBtnContainer.style.display = 'none';
+            summaryPill.className = 'live-status-pill gray';
+            summaryPill.innerHTML = `<span class="pulse-dot-gray"></span> NO HUBS FOUND`;
             return;
         }
 
-        container.innerHTML = toDisplay.map((h, index) => `
-            <div class="list-row-item fade-in" style="animation-delay: ${index * 0.03}s">
-                <div class="list-details">
-                    <h6>
-                        <span>${h.name}</span>
-                        <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-20 rounded-pill px-2 py-0.5 style="font-size: 0.7rem;">
-                            <span class="pulse-dot-green me-1"></span> Open Now
-                        </span>
-                    </h6>
-                    <p>📍 ${h.address || 'Address not provided'}, ${h.city}</p>
+        let openCount = 0;
+
+        container.innerHTML = toDisplay.map((h, index) => {
+            const open = isHubOpen(h.hours);
+            if (open) openCount++;
+
+            const statusBadge = open 
+                ? `<span class="live-status-pill green" style="padding: 2px 8px; font-size: 0.65rem;">
+                     <span class="pulse-dot-green"></span> OPEN NOW
+                   </span>`
+                : `<span class="live-status-pill gray" style="padding: 2px 8px; font-size: 0.65rem;">
+                     <span class="pulse-dot-gray"></span> CLOSED
+                   </span>`;
+
+            return `
+                <div class="list-row-item fade-in" style="animation-delay: ${index * 0.03}s">
+                    <div class="list-details">
+                        <h6>
+                            <span>${h.name}</span>
+                            ${statusBadge}
+                        </h6>
+                        <p>📍 ${h.address || 'Address not provided'}, ${h.city}</p>
+                    </div>
+                    <div class="list-right-col">
+                        <div style="margin-bottom: 0.15rem;">🕒 ${h.hours || 'N/A'}</div>
+                        <div>📞 ${h.phone || 'N/A'}</div>
+                    </div>
                 </div>
-                <div class="list-right-col">
-                    <div style="margin-bottom: 0.15rem;">🕒 ${h.hours || 'N/A'}</div>
-                    <div>📞 ${h.phone || 'N/A'}</div>
-                </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
+
+        if (openCount > 0) {
+            summaryPill.className = 'live-status-pill green';
+            summaryPill.innerHTML = `<span class="pulse-dot-green"></span> ${openCount} OPEN NOW`;
+        } else {
+            summaryPill.className = 'live-status-pill gray';
+            summaryPill.innerHTML = `<span class="pulse-dot-gray"></span> ALL CLOSED FOR TONIGHT`;
+        }
 
         loadMoreBtnContainer.style.display = currentHubsData.length > hubDisplayLimit ? 'block' : 'none';
     }
 
-    async function fetchRecentContributions() {
+    async function fetchRecentContributions(silentCheck = false) {
         const container = document.getElementById('contributions-list');
         const loadMoreBtnContainer = document.getElementById('load-more-contributions-container');
         
-        container.innerHTML = getLoadingSpinner('Connecting to live transaction stream...');
+        if (!silentCheck) {
+            container.innerHTML = getLoadingSpinner('Loading latest community activity...');
+        }
 
         try {
             const res = await fetch('/api/recent_contributions');
-            
-            if (!res.ok) {
-                throw new Error(`Server returned HTTP ${res.status}`);
-            }
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
             const data = await res.json();
             
             if (data.status === 'success' && Array.isArray(data.data) && data.data.length > 0) {
-                allContributions = data.data.map(c => ({
+                const newItems = data.data.map(c => ({
+                    id: c.id || `${c.material_name}-${c.created_at}`,
                     material_name: c.material_name || 'Unknown Material',
                     hub_name: c.hub_name || 'Unknown Hub',
                     weight: parseFloat(c.weight || 0).toFixed(1),
@@ -1093,20 +1139,32 @@
                         ? formatTimeAgo(c.seconds_ago) 
                         : (c.created_at ? formatTimeAgo((new Date() - new Date(c.created_at)) / 1000) : 'Just now')
                 }));
+
+                // Check for actual new entry from DB to show real notification toast
+                if (latestKnownContributionId && newItems[0].id !== latestKnownContributionId) {
+                    showNewContributionToast(newItems[0]);
+                }
+                latestKnownContributionId = newItems[0].id;
+
+                allContributions = newItems;
                 filteredContributions = [...allContributions];
                 renderContributions();
             } else {
                 allContributions = [];
                 filteredContributions = [];
-                container.innerHTML = '<p class="loading-text text-center fade-in">No recent contributions found in database.</p>';
-                loadMoreBtnContainer.style.display = 'none';
+                if (!silentCheck) {
+                    container.innerHTML = '<p class="loading-text text-center fade-in">No recent contributions found in database.</p>';
+                    loadMoreBtnContainer.style.display = 'none';
+                }
             }
         } catch (err) {
-            console.error("Failed to fetch contributions from DB:", err);
-            allContributions = [];
-            filteredContributions = [];
-            container.innerHTML = '<p class="loading-text text-center fade-in text-danger">Unable to load database contributions.</p>';
-            loadMoreBtnContainer.style.display = 'none';
+            console.error("Failed to fetch contributions:", err);
+            if (!silentCheck) {
+                allContributions = [];
+                filteredContributions = [];
+                container.innerHTML = '<p class="loading-text text-center fade-in text-danger">Unable to load database contributions.</p>';
+                loadMoreBtnContainer.style.display = 'none';
+            }
         }
     }
 
@@ -1123,12 +1181,9 @@
         }
         
         container.innerHTML = toDisplay.map((c, index) => `
-            <div class="list-row-item fade-in ${index === 0 ? 'new-entry-flash' : ''}" style="animation-delay: ${index * 0.03}s">
+            <div class="list-row-item fade-in" style="animation-delay: ${index * 0.03}s">
                 <div class="list-details">
-                    <h6>
-                        <span class="pulse-dot-red"></span>
-                        ${c.material_name} (${c.weight} kg)
-                    </h6>
+                    <h6>${c.material_name} (${c.weight} kg)</h6>
                     <p>Dropped off at <strong>${c.hub_name}</strong> • ${c.time_ago}</p>
                 </div>
                 <div class="list-right-col">
@@ -1140,37 +1195,19 @@
         loadMoreBtnContainer.style.display = filteredContributions.length > contribDisplayLimit ? 'block' : 'none';
     }
 
-    // --- REAL-TIME POPUP TOAST SYSTEM ---
-    const sampleNames = ["Ahmad", "Chong", "Devi", "Siti", "Ken", "Nurul", "Rajesh", "Mei Ling"];
-    function triggerLiveActivityToast() {
-        if (!allContributions || allContributions.length === 0) return;
-        
-        const randomItem = allContributions[Math.floor(Math.random() * allContributions.length)];
-        const randomName = sampleNames[Math.floor(Math.random() * sampleNames.length)];
-        
+    // Authentic Toast triggered ONLY when real database entries arrive
+    function showNewContributionToast(item) {
         const toast = document.getElementById('liveActivityToast');
         const msg = document.getElementById('toastMessage');
         const meta = document.getElementById('toastMeta');
 
-        msg.innerHTML = `<strong>${randomName}</strong> dropped off <strong>${randomItem.weight}kg ${randomItem.material_name}</strong>`;
-        meta.innerText = `Just now at ${randomItem.hub_name} • Earned RM ${randomItem.payout}`;
+        msg.innerHTML = `New log: <strong>${item.weight}kg ${item.material_name}</strong>`;
+        meta.innerText = `${item.hub_name} • Payout: RM ${item.payout}`;
 
         toast.classList.add('show');
         setTimeout(() => {
             toast.classList.remove('show');
         }, 4500);
-    }
-
-    // --- Dynamic Live Refresh Polling ---
-    function startLiveHeartbeat() {
-        // Trigger live toast notification every 10 seconds
-        setInterval(triggerLiveActivityToast, 11000);
-
-        // Periodic light background data sync every 30s
-        setInterval(() => {
-            fetchStats();
-            fetchRecentContributions();
-        }, 30000);
     }
 
     // --- Event Listeners ---
@@ -1186,7 +1223,7 @@
 
     document.getElementById('search-contributions').addEventListener('input', (e) => {
         clearTimeout(searchTimeout);
-        document.getElementById('contributions-list').innerHTML = getLoadingSpinner('Searching live logs...');
+        document.getElementById('contributions-list').innerHTML = getLoadingSpinner('Searching...');
         
         searchTimeout = setTimeout(() => {
             const query = e.target.value.toLowerCase().trim();
@@ -1217,20 +1254,24 @@
         renderMaterials();
     });
 
-    // Run all fetches concurrently on load for better performance
+    // Run all fetches concurrently on load
     document.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('materials-list').innerHTML = getLoadingSpinner('Fetching live market rates...');
-        document.getElementById('hubs-list').innerHTML = getLoadingSpinner('Locating active drop-off hubs...');
-        document.getElementById('contributions-list').innerHTML = getLoadingSpinner('Connecting to live transaction stream...');
+        document.getElementById('materials-list').innerHTML = getLoadingSpinner('Fetching current rates...');
+        document.getElementById('hubs-list').innerHTML = getLoadingSpinner('Locating hubs near you...');
+        document.getElementById('contributions-list').innerHTML = getLoadingSpinner('Loading latest community activity...');
         
         Promise.all([
             fetchStats(),
             fetchHubs(),
             fetchMaterials(),
             fetchRecentContributions()
-        ]).then(() => {
-            startLiveHeartbeat();
-        });
+        ]);
+
+        // Background poll every 30 seconds for genuine updates
+        setInterval(() => {
+            fetchRecentContributions(true);
+            fetchStats();
+        }, 30000);
     });
 </script>
 {% endblock %}
