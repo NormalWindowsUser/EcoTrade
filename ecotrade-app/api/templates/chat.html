@@ -4,38 +4,38 @@
 <!-- Include Marked.js to render AI Markdown responses into HTML -->
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-<!-- Full Page AI Layout Container -->
-<div class="ai-page-wrapper d-flex flex-column pb-3">
+<!-- ChatGPT-Style Full-Width Wrapper -->
+<div class="ai-page-wrapper d-flex flex-column mx-auto px-2 px-md-3" style="max-width: 800px; min-height: 100vh;">
     
-    <!-- Top Header Controls (Centered layout as requested) -->
-    <div id="aiHeader" class="ai-header flex-column align-items-center justify-content-center text-center pb-3 border-bottom border-secondary mb-3 position-relative d-none">
+    <!-- Centered Header -->
+    <div id="aiHeader" class="ai-header flex-column align-items-center justify-content-center text-center pt-2 pb-3 border-bottom border-secondary-subtle mb-3 position-relative d-none">
         <div class="d-flex flex-column align-items-center justify-content-center">
-            <div class="d-inline-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success rounded-circle mb-2" style="width: 48px; height: 48px;">
-                <i class="bi bi-robot fs-3"></i>
+            <div class="d-inline-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success rounded-circle mb-2" style="width: 42px; height: 42px;">
+                <i class="bi bi-robot fs-4"></i>
             </div>
-            <h5 class="fw-bold text-success mb-1 lh-1 fs-4">Eco Assistant</h5>
-            <small class="text-secondary" style="font-size: 0.8rem;">AI-powered recycling guide</small>
+            <h5 class="fw-bold text-success mb-0 lh-1 fs-5">Eco Assistant</h5>
+            <small class="text-secondary mt-1" style="font-size: 0.78rem;">AI-powered recycling guide</small>
         </div>
         
-        <button class="btn btn-outline-danger btn-sm rounded-pill px-3 py-1 icon-hover-btn position-absolute top-0 end-0 d-flex align-items-center gap-1" id="clearBtn" title="Clear chat history">
+        <button class="btn btn-outline-danger btn-sm rounded-pill px-3 py-1 icon-hover-btn position-absolute top-50 end-0 translate-middle-y d-flex align-items-center gap-1.5" id="clearBtn" title="Clear chat history">
             <i class="bi bi-trash"></i>
             <span class="d-none d-sm-inline">Clear History</span>
         </button>
     </div>
     
-    <!-- Empty State View (Centered Landing View) -->
-    <div id="landingView" class="d-flex flex-column justify-content-center align-items-center flex-grow-1 w-100 my-auto py-4">
+    <!-- Empty State View (Landing View) -->
+    <div id="landingView" class="d-flex flex-column justify-content-center align-items-center flex-grow-1 w-100 my-auto py-5">
         <div class="text-center mb-4">
-            <div class="d-inline-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success rounded-circle mb-3" style="width: 64px; height: 64px;">
+            <div class="d-inline-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success rounded-circle mb-3" style="width: 68px; height: 68px;">
                 <i class="bi bi-robot fs-1"></i>
             </div>
-            <h2 class="fw-bold text-body mb-1">Welcome to Eco Assistant</h2>
-            <p class="text-secondary mb-0">Your AI-powered recycling & sustainability guide</p>
+            <h2 class="fw-bold text-body mb-2 fs-3">Welcome to Eco Assistant</h2>
+            <p class="text-secondary mb-0" style="font-size: 0.95rem;">Your AI-powered recycling & sustainability guide</p>
         </div>
 
-        <!-- Input Box inside Landing View -->
-        <div class="w-100" style="max-width: 680px;">
-            <div class="bg-body-tertiary border border-secondary rounded-4 p-3 shadow-sm position-relative custom-input-box mb-3">
+        <!-- Input Box (Landing View) -->
+        <div class="w-100 px-2" style="max-width: 720px;">
+            <div class="bg-body-tertiary border border-secondary-subtle rounded-4 p-3 shadow-sm position-relative custom-input-box mb-3">
                 <textarea id="landingChatInput" class="form-control border-0 shadow-none p-0 text-body custom-textarea-bg" rows="2" placeholder="Ask AI anything about recycling..."></textarea>
                 
                 <div class="d-flex justify-content-between align-items-center mt-2">
@@ -43,13 +43,13 @@
                         <i class="bi bi-x-lg fs-6 lh-1"></i>
                     </button>
                     
-                    <button class="btn btn-success rounded-circle p-0 shadow-sm d-inline-flex align-items-center justify-content-center landing-send-btn" type="button" title="Send message" style="width: 40px; height: 40px;">
+                    <button class="btn btn-success rounded-circle p-0 shadow-sm d-inline-flex align-items-center justify-content-center landing-send-btn" type="button" title="Send message" style="width: 38px; height: 38px;">
                         <i class="bi bi-arrow-up-short fs-3 text-white lh-1"></i>
                     </button>
                 </div>
             </div>
 
-            <!-- Custom Prompt Suggestion Chips (Pre-fills text into input with clean icon gaps) -->
+            <!-- Custom Prompt Suggestion Chips -->
             <div class="d-flex flex-wrap justify-content-center gap-2">
                 <button class="btn btn-outline-secondary rounded-pill btn-sm prompt-chip px-3 py-2 d-inline-flex align-items-center gap-2" data-template="Scrap metal and plastic market prices for ">
                     <i class="bi bi-currency-dollar text-success fs-6"></i>
@@ -71,13 +71,13 @@
         </div>
     </div>
 
-    <!-- Active Chat Stream Container -->
-    <div id="chatBox" class="ai-chat-stream flex-grow-1 custom-scrollbar px-2 overflow-y-auto d-none">
+    <!-- Active Chat Stream Container (Normal Scroll Flow) -->
+    <div id="chatBox" class="ai-chat-stream flex-grow-1 w-100 pb-5 d-none">
     </div>
     
-    <!-- Floating Bottom Input Console (Active Chat Mode) -->
-    <div id="activeInputWrapper" class="ai-input-wrapper pt-2 mt-auto mb-2 d-none">
-        <div class="bg-body-tertiary border border-secondary rounded-4 p-3 shadow-sm position-relative custom-input-box">
+    <!-- Floating Bottom Input Console (Sticky above Bottom Nav) -->
+    <div id="activeInputWrapper" class="ai-input-wrapper sticky-bottom bg-body pt-2 pb-3 mt-auto d-none" style="z-index: 1020;">
+        <div class="bg-body-tertiary border border-secondary-subtle rounded-4 p-3 shadow-sm position-relative custom-input-box">
             <textarea id="activeChatInput" class="form-control border-0 shadow-none p-0 text-body custom-textarea-bg" rows="2" placeholder="Ask AI anything about recycling..."></textarea>
             
             <div class="d-flex justify-content-between align-items-center mt-2">
@@ -85,7 +85,7 @@
                     <i class="bi bi-x-lg fs-6 lh-1"></i>
                 </button>
                 
-                <button class="btn btn-success rounded-circle p-0 shadow-sm d-inline-flex align-items-center justify-content-center active-send-btn" type="button" title="Send message" style="width: 40px; height: 40px;">
+                <button class="btn btn-success rounded-circle p-0 shadow-sm d-inline-flex align-items-center justify-content-center active-send-btn" type="button" title="Send message" style="width: 38px; height: 38px;">
                     <i class="bi bi-arrow-up-short fs-3 text-white lh-1"></i>
                 </button>
             </div>
@@ -171,15 +171,14 @@
     }
 
     function scrollToBottom() {
-        const box = document.getElementById('chatBox');
-        box.scrollTop = box.scrollHeight;
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     }
 
     function renderUserBubble(text) {
         const box = document.getElementById('chatBox');
         box.innerHTML += `
-            <div class="d-flex justify-content-end mb-4 animate-fade-in pe-2">
-                <div class="user-bubble px-4 py-2" style="max-width: 80%; font-size: 0.95rem; background-color: #10b981; color: #ffffff; border-radius: 20px; word-break: break-word;">
+            <div class="d-flex justify-content-end mb-4 animate-fade-in">
+                <div class="user-bubble px-3.5 py-2.5 shadow-sm" style="max-width: 82%; font-size: 0.95rem; background-color: #10b981; color: #ffffff; border-radius: 18px 18px 4px 18px; word-break: break-word; line-height: 1.5;">
                     ${escapeHtml(text)}
                 </div>
             </div>
@@ -192,14 +191,19 @@
         const copyBtnId = 'copy-btn-' + Date.now();
         
         const wrapper = document.createElement('div');
-        wrapper.className = 'd-flex justify-content-start mb-4 animate-fade-in ps-2';
+        wrapper.className = 'd-flex justify-content-start mb-4 animate-fade-in';
         wrapper.innerHTML = `
-            <div class="d-flex flex-column align-items-start" style="max-width: 90%; word-break: break-word;">
-                <div id="${bubbleId}" class="ai-reply-content text-body" style="font-size: 0.95rem; line-height: 1.6;"></div>
-                <div class="mt-1">
-                    <button class="btn btn-link text-secondary p-0 border-0 me-2" id="${copyBtnId}" title="Copy message" style="font-size: 0.9rem;">
-                        <i class="bi bi-copy"></i>
-                    </button>
+            <div class="d-flex gap-3 w-100" style="max-width: 100%;">
+                <div class="avatar-icon flex-shrink-0 d-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success rounded-circle" style="width: 32px; height: 32px;">
+                    <i class="bi bi-robot fs-6"></i>
+                </div>
+                <div class="d-flex flex-column align-items-start flex-grow-1" style="word-break: break-word; min-width: 0;">
+                    <div id="${bubbleId}" class="ai-reply-content text-body w-100" style="font-size: 0.95rem; line-height: 1.65;"></div>
+                    <div class="mt-2">
+                        <button class="btn btn-link text-secondary p-0 border-0 me-2" id="${copyBtnId}" title="Copy message" style="font-size: 0.85rem;">
+                            <i class="bi bi-copy"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         `;
@@ -214,7 +218,7 @@
         box.appendChild(wrapper);
         const targetElem = document.getElementById(bubbleId);
         let index = 0;
-        const typingSpeed = 12;
+        const typingSpeed = 10;
 
         function typeChar() {
             if (index < markdownContent.length) {
@@ -266,13 +270,18 @@
         const box = document.getElementById('chatBox');
         const loadingId = 'loading-' + Date.now();
         box.innerHTML += `
-            <div id="${loadingId}" class="d-flex justify-content-start mb-4 animate-fade-in ps-2">
-                <div class="text-secondary thinking-bubble py-1" style="font-size: 0.9rem;">
-                    <span class="spinner-grow spinner-grow-sm text-success me-2" role="status"></span>
-                    <span class="me-1">Eco AI is thinking</span>
-                    <span class="typing-dots">
-                        <span>.</span><span>.</span><span>.</span>
-                    </span>
+            <div id="${loadingId}" class="d-flex justify-content-start mb-4 animate-fade-in">
+                <div class="d-flex gap-3 align-items-center">
+                    <div class="avatar-icon flex-shrink-0 d-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success rounded-circle" style="width: 32px; height: 32px;">
+                        <i class="bi bi-robot fs-6"></i>
+                    </div>
+                    <div class="text-secondary thinking-bubble py-1" style="font-size: 0.9rem;">
+                        <span class="spinner-grow spinner-grow-sm text-success me-2" role="status"></span>
+                        <span class="me-1">Eco AI is thinking</span>
+                        <span class="typing-dots">
+                            <span>.</span><span>.</span><span>.</span>
+                        </span>
+                    </div>
                 </div>
             </div>
         `;
@@ -316,7 +325,6 @@
             btn.addEventListener('click', () => sendMessage());
         });
 
-        /* Option Chip Event: Inserts pre-filled text template into input instead of immediate sending */
         document.querySelectorAll('.prompt-chip').forEach(chip => {
             chip.addEventListener('click', () => {
                 const template = chip.getAttribute('data-template');
@@ -326,7 +334,6 @@
                 
                 targetInput.value = template;
                 targetInput.focus();
-                // Set cursor position to end of input box
                 targetInput.setSelectionRange(targetInput.value.length, targetInput.value.length);
             });
         });
@@ -362,11 +369,6 @@
 </script>
 
 <style>
-    .ai-page-wrapper {
-        height: calc(100vh - 140px);
-        width: 100%;
-    }
-
     .custom-textarea-bg {
         background-color: transparent !important;
     }
@@ -376,7 +378,7 @@
     }
     .custom-input-box:focus-within {
         border-color: #10b981 !important;
-        box-shadow: 0 0 0 0.2rem rgba(16, 185, 129, 0.15) !important;
+        box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.12) !important;
     }
 
     .prompt-chip {
@@ -385,9 +387,6 @@
         border-color: var(--bs-border-color);
         background-color: var(--bs-body-bg);
         color: var(--bs-body-color);
-    }
-    .prompt-chip i {
-        margin-right: 0.15rem;
     }
     .prompt-chip:hover {
         border-color: #10b981;
@@ -403,31 +402,17 @@
         color: var(--bs-secondary-color);
     }
 
-    .custom-scrollbar::-webkit-scrollbar {
-        width: 6px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-track {
-        background: transparent;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-        background-color: var(--bs-border-color);
-        border-radius: 10px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-        background-color: var(--bs-secondary-color);
-    }
-
     .animate-fade-in {
-        animation: fadeIn 0.3s ease-out forwards;
+        animation: fadeIn 0.25s ease-out forwards;
     }
 
     @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
+        from { opacity: 0; transform: translateY(8px); }
         to { opacity: 1; transform: translateY(0); }
     }
 
     .ai-reply-content {
-        line-height: 1.6;
+        line-height: 1.65;
         word-wrap: break-word;
         overflow-wrap: break-word;
     }
@@ -442,7 +427,7 @@
         font-size: 1.05rem;
         font-weight: 700;
         color: #10b981;
-        margin-top: 0.5rem;
+        margin-top: 0.75rem;
         margin-bottom: 0.5rem;
     }
     .ai-reply-content h1:first-child, .ai-reply-content h2:first-child, .ai-reply-content h3:first-child {
