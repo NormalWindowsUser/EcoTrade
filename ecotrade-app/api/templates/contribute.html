@@ -1,197 +1,217 @@
 {% extends "base.html" %}
 
 {% block content %}
-<style>
-    /* Card Container - Matching exact compact structure */
-    .contribution-card {
-        max-width: 520px;
-        margin: 1.5rem auto 6rem; /* Bottom margin to ensure floating navbar never overlaps */
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 16px;
-        padding: 1.75rem;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
-    }
+<!-- Cloudflare Turnstile API Script -->
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
-    .card-title {
-        color: #047857;
-        font-size: 1.4rem;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        margin-bottom: 1.25rem;
-    }
-
-    .form-label {
-        font-weight: 600;
-        font-size: 0.88rem;
-        color: #1e293b;
-        margin-bottom: 0.35rem;
-    }
-
-    .input-group-search {
-        position: relative;
-        margin-bottom: 0.5rem;
-    }
-
-    .input-group-search svg {
-        position: absolute;
-        left: 12px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #94a3b8;
-        pointer-events: none;
-    }
-
-    .input-group-search input {
-        padding-left: 2.25rem;
-        font-size: 0.9rem;
-    }
-
-    .form-control, .form-select {
-        border-radius: 8px;
-        border-color: #cbd5e1;
-        padding: 0.6rem 0.75rem;
-        font-size: 0.9rem;
-    }
-
-    .form-control:focus, .form-select:focus {
-        border-color: #10b981;
-        box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.15);
-    }
-
-    .grid-2col {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1rem;
-    }
-
-    .cf-turnstile-wrapper {
-        display: flex;
-        justify-content: center;
-        margin: 1rem 0;
-    }
-
-    .btn-submit {
-        width: 100%;
-        background-color: #059669;
-        color: #ffffff;
-        font-weight: 600;
-        font-size: 0.95rem;
-        padding: 0.75rem;
-        border-radius: 8px;
-        border: none;
-        transition: background-color 0.2s ease;
-    }
-
-    .btn-submit:hover {
-        background-color: #047857;
-    }
-</style>
-
-<div class="container">
-    <div class="contribution-card">
-        <!-- Title -->
-        <h3 class="card-title">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="8" x2="12" y2="16"></line>
-                <line x1="8" y1="12" x2="16" y2="12"></line>
-            </svg>
-            Submit Contribution
-        </h3>
-
-        <form action="/submit-contribution" method="POST" id="contributionForm">
-            <!-- Hub Location Select -->
-            <div class="mb-3">
-                <label for="hubSearch" class="form-label">Select Recycling Hub Location</label>
-                <div class="input-group-search">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                    </svg>
-                    <input type="text" id="hubSearch" class="form-control" placeholder="Search hub name or city..." autocomplete="off">
+<div class="row justify-content-center">
+    <div class="col-md-7 col-lg-6">
+        <div class="card-custom p-4">
+            <h4 class="fw-bold text-success mb-3"><i class="bi bi-plus-circle"></i> Submit Contribution</h4>
+            
+            <form id="contribForm">
+                <!-- Recycling Center Search & Selection -->
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold text-light">Select Recycling Hub Location</label>
+                    <input type="text" id="hubSearchInput" class="form-control bg-dark text-light border-secondary mb-2 form-control-sm" placeholder="🔍 Search hub name or city...">
+                    <select class="form-select bg-dark text-light border-secondary" id="hubSelect" required>
+                        <option value="" disabled selected>Loading locations...</option>
+                    </select>
                 </div>
-                <select id="hub_id" name="hub_id" class="form-select" required>
-                    <option value="" disabled selected>Select a recycling center...</option>
-                    {% for hub in hubs %}
-                        <option value="{{ hub.id }}" data-city="{{ hub.city }}">{{ hub.name }} ({{ hub.city }})</option>
-                    {% endfor %}
-                </select>
-            </div>
 
-            <!-- Material Select -->
-            <div class="mb-3">
-                <label for="material_id" class="form-label">Material Type</label>
-                <select id="material_id" name="material_id" class="form-select" required>
-                    <option value="" disabled selected data-rate="0">Select a material...</option>
-                    {% for mat in materials %}
-                        <option value="{{ mat.id }}" data-rate="{{ mat.avg_reported_rate or mat.base_rate or 0 }}">
-                            {{ mat.name }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <!-- Side-by-Side: Weight and Total Payout -->
-            <div class="grid-2col mb-3">
-                <div>
-                    <label for="weight" class="form-label">Weight (kg)</label>
-                    <input type="number" id="weight" name="weight" class="form-control" placeholder="e.g. 2.5" min="0.1" step="0.1" required>
+                <!-- Selected Hub Location Info Card -->
+                <div id="hubInfoCard" class="card-custom p-3 mb-3 d-none bg-dark border-secondary">
+                    <div class="small text-success fw-bold mb-1" id="hubInfoName">--</div>
+                    <div class="small text-secondary mb-1" id="hubInfoAddress"><i class="bi bi-geo-alt me-1"></i> --</div>
+                    <div class="small text-muted" id="hubInfoHours"><i class="bi bi-clock me-1"></i> --</div>
                 </div>
-                <div>
-                    <label for="calculated_payout" class="form-label">Total Payout (RM)</label>
-                    <input type="number" id="calculated_payout" name="calculated_payout" class="form-control" placeholder="0.00" min="0.00" step="0.01" required>
+
+                <!-- Material Type Selection -->
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold text-light">Material Type</label>
+                    <select class="form-select bg-dark text-light border-secondary" id="materialSelect" required>
+                        <option value="" disabled selected>Loading materials...</option>
+                    </select>
                 </div>
-            </div>
 
-            <!-- Captcha -->
-            <div class="cf-turnstile-wrapper">
-                <div class="cf-turnstile" data-sitekey="{{ config.CF_TURNSTILE_SITE_KEY or '1x00000000000000000000AA' }}"></div>
-            </div>
+                <!-- Weight and Total Payout -->
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <label class="form-label small fw-semibold text-light">Weight (kg)</label>
+                        <input type="number" step="0.1" class="form-control bg-dark text-light border-secondary" id="weightInput" placeholder="e.g. 2.5" required>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label small fw-semibold text-light">Total Payout (RM)</label>
+                        <input type="number" step="0.01" class="form-control bg-dark text-light border-secondary" id="calculatedPayoutInput" placeholder="0.00" required>
+                    </div>
+                </div>
 
-            <!-- Submit Button -->
-            <button type="submit" class="btn-submit">Submit Recycling Batch</button>
-        </form>
+                <!-- Cloudflare Turnstile Anti-Bot Widget -->
+                <div class="mb-3 text-center">
+                    <div class="cf-turnstile" data-sitekey="1x00000000000000000000AA"></div>
+                </div>
+
+                <button type="submit" class="btn btn-success w-100 fw-bold py-2">Submit Recycling Batch</button>
+            </form>
+
+            <div id="resultMsg" class="mt-3"></div>
+        </div>
     </div>
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const hubSearch = document.getElementById('hubSearch');
-        const hubSelect = document.getElementById('hub_id');
-        const materialSelect = document.getElementById('material_id');
-        const weightInput = document.getElementById('weight');
-        const payoutInput = document.getElementById('calculated_payout');
+    let hubsList = [];
+    let materialsList = [];
 
-        // Hub Search Filter
-        if (hubSearch && hubSelect) {
-            const originalOptions = Array.from(hubSelect.options);
-            hubSearch.addEventListener('input', (e) => {
-                const term = e.target.value.toLowerCase().trim();
-                hubSelect.innerHTML = '';
-                originalOptions.forEach(opt => {
-                    const text = opt.text.toLowerCase();
-                    const city = (opt.dataset.city || '').toLowerCase();
-                    if (!term || text.includes(term) || city.includes(term) || opt.value === "") {
-                        hubSelect.appendChild(opt.cloneNode(true));
-                    }
-                });
+    // --- HUB LOGIC ---
+    async function fetchHubs() {
+        try {
+            const res = await fetch('/api/hubs');
+            const data = await res.json();
+            if (data.status === 'success') {
+                hubsList = data.data;
+                renderHubOptions(hubsList);
+            }
+        } catch (e) {
+            console.error('Error fetching hubs:', e);
+        }
+    }
+
+    function renderHubOptions(list) {
+        const select = document.getElementById('hubSelect');
+        if (list.length === 0) {
+            select.innerHTML = '<option value="" disabled selected>No matching hubs found</option>';
+            return;
+        }
+        select.innerHTML = '<option value="" disabled selected>Select a recycling center...</option>' +
+            list.map(h => `<option value="${h.id}">${h.name} (${h.city})</option>`).join('');
+    }
+
+    document.getElementById('hubSearchInput').addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase();
+        const filtered = hubsList.filter(h => 
+            h.name.toLowerCase().includes(query) || 
+            h.city.toLowerCase().includes(query) ||
+            h.address.toLowerCase().includes(query)
+        );
+        renderHubOptions(filtered);
+    });
+
+    document.getElementById('hubSelect').addEventListener('change', (e) => {
+        const selectedId = parseInt(e.target.value);
+        const hub = hubsList.find(h => h.id === selectedId);
+        const infoCard = document.getElementById('hubInfoCard');
+        if (hub) {
+            document.getElementById('hubInfoName').innerText = hub.name;
+            document.getElementById('hubInfoAddress').innerHTML = `<i class="bi bi-geo-alt me-1"></i> ${hub.address}, ${hub.city}`;
+            document.getElementById('hubInfoHours').innerHTML = `<i class="bi bi-clock me-1"></i> ${hub.hours}`;
+            infoCard.classList.remove('d-none');
+        } else {
+            infoCard.classList.add('d-none');
+        }
+    });
+
+    // --- MATERIAL LOGIC ---
+    async function fetchMaterials() {
+        try {
+            const res = await fetch('/api/materials');
+            const data = await res.json();
+            if (data.status === 'success') {
+                materialsList = data.data;
+                renderMaterialOptions(materialsList);
+            }
+        } catch (e) {
+            console.error('Error fetching materials:', e);
+        }
+    }
+
+    function renderMaterialOptions(list) {
+        const select = document.getElementById('materialSelect');
+        
+        // Group materials by their category
+        const groupedMaterials = list.reduce((acc, material) => {
+            if (!acc[material.category]) acc[material.category] = [];
+            acc[material.category].push(material);
+            return acc;
+        }, {});
+
+        let html = '<option value="" disabled selected>Select a material...</option>';
+        
+        // Generate optgroups and options dynamically
+        for (const category in groupedMaterials) {
+            html += `<optgroup label="${category}">`;
+            groupedMaterials[category].forEach(m => {
+                // Store the base_price in a data attribute
+                html += `<option value="${m.name}" data-price="${m.base_price}">${m.name}</option>`;
             });
+            html += `</optgroup>`;
+        }
+        
+        select.innerHTML = html;
+    }
+
+    // Automatically calculate Total Payout when Material or Weight changes
+    function updatePayout() {
+        const materialSelect = document.getElementById('materialSelect');
+        const selectedOption = materialSelect.options[materialSelect.selectedIndex];
+        const basePrice = parseFloat(selectedOption ? selectedOption.getAttribute('data-price') : 0) || 0;
+        const weight = parseFloat(document.getElementById('weightInput').value) || 0;
+        
+        document.getElementById('calculatedPayoutInput').value = (weight * basePrice).toFixed(2);
+    }
+
+    document.getElementById('materialSelect').addEventListener('change', updatePayout);
+    document.getElementById('weightInput').addEventListener('input', updatePayout);
+
+    // --- FORM SUBMISSION ---
+    document.getElementById('contribForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const msgDiv = document.getElementById('resultMsg');
+        
+        const turnstileResponse = turnstile.getResponse();
+        if (!turnstileResponse) {
+            msgDiv.innerHTML = `<div class="alert alert-warning py-2 small">Please complete the anti-bot verification.</div>`;
+            return;
         }
 
-        // Auto-calculate total payout directly into calculated_payout field
-        function calculatePayout() {
-            const selectedOption = materialSelect.options[materialSelect.selectedIndex];
-            const rate = parseFloat(selectedOption ? selectedOption.dataset.rate : 0) || 0;
-            const weight = parseFloat(weightInput.value) || 0;
-            
-            payoutInput.value = (weight * rate).toFixed(2);
+        const hubId = document.getElementById('hubSelect').value;
+        if (!hubId) {
+            msgDiv.innerHTML = `<div class="alert alert-warning py-2 small">Please select a recycling center.</div>`;
+            return;
         }
 
-        materialSelect.addEventListener('change', calculatePayout);
-        weightInput.addEventListener('input', calculatePayout);
+        try {
+            const res = await fetch('/api/contribute', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    cf_turnstile_response: turnstileResponse,
+                    hub_id: parseInt(hubId),
+                    material_name: document.getElementById('materialSelect').value,
+                    weight: parseFloat(document.getElementById('weightInput').value),
+                    calculated_payout: parseFloat(document.getElementById('calculatedPayoutInput').value)
+                })
+            });
+            const data = await res.json();
+            if (data.status === 'success') {
+                msgDiv.innerHTML = `<div class="alert alert-success py-2 small">Contribution recorded! Calculated Payout: <strong>RM ${data.payout.toFixed(2)}</strong></div>`;
+                document.getElementById('contribForm').reset();
+                document.getElementById('hubInfoCard').classList.add('d-none');
+                turnstile.reset();
+            } else {
+                msgDiv.innerHTML = `<div class="alert alert-danger py-2 small">${data.message}</div>`;
+                turnstile.reset();
+            }
+        } catch (err) {
+            msgDiv.innerHTML = `<div class="alert alert-danger py-2 small">Submission error. Please try again.</div>`;
+            turnstile.reset();
+        }
+    });
+
+    // --- INITIALIZATION ---
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchHubs();
+        fetchMaterials(); // Fetch materials on load
     });
 </script>
 {% endblock %}
