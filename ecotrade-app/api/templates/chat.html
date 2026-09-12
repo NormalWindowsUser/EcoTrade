@@ -4,12 +4,12 @@
 <!-- Include Marked.js to render AI Markdown responses into HTML -->
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-<!-- Full-width layout wrapper to clear restrictive container limits -->
-<div class="container-fluid px-2 px-md-3 py-2 h-100">
+<!-- Full Viewport Width Wrapper to bypass parent container restrictions -->
+<div class="full-width-wrapper">
     <div class="ai-dashboard-container d-flex w-100 overflow-hidden rounded-4 border border-secondary border-opacity-25 shadow-sm bg-body">
 
-        <!-- LEFT SIDEBAR: Controls & History -->
-        <aside class="ai-sidebar d-flex flex-column p-3 bg-body-tertiary border-end border-secondary border-opacity-25" style="width: 300px; min-width: 280px;">
+        <!-- LEFT SIDEBAR: History Only -->
+        <aside class="ai-sidebar d-flex flex-column p-3 bg-body-tertiary border-end border-secondary border-opacity-25" style="width: 280px; min-width: 260px;">
             
             <!-- App Identity -->
             <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom border-secondary border-opacity-25">
@@ -24,44 +24,13 @@
                 </div>
             </div>
 
-            <!-- New Chat Action -->
+            <!-- New Chat Action Button -->
             <button id="newChatBtn" class="btn btn-success w-100 fw-semibold d-flex align-items-center justify-content-center gap-2 py-2 mb-3 shadow-sm rounded-3">
                 <i class="bi bi-plus-lg fs-6"></i>
                 <span>New Chat</span>
             </button>
 
-            <!-- Advisor Selector -->
-            <div class="mb-3">
-                <label class="text-secondary fs-7 fw-bold mb-2 d-block text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Choose Advisor</label>
-                <div class="row g-2">
-                    <div class="col-6">
-                        <button class="advisor-card btn btn-outline-secondary w-100 active p-2 text-center rounded-3 border-opacity-25" data-persona="GreenBot">
-                            <i class="bi bi-leaf d-block fs-5 mb-1 text-success"></i>
-                            <span class="d-block text-truncate small fw-medium">GreenBot</span>
-                        </button>
-                    </div>
-                    <div class="col-6">
-                        <button class="advisor-card btn btn-outline-secondary w-100 p-2 text-center rounded-3 border-opacity-25" data-persona="Waste Wizard">
-                            <i class="bi bi-recycle d-block fs-5 mb-1 text-info"></i>
-                            <span class="d-block text-truncate small fw-medium">Waste Wizard</span>
-                        </button>
-                    </div>
-                    <div class="col-6">
-                        <button class="advisor-card btn btn-outline-secondary w-100 p-2 text-center rounded-3 border-opacity-25" data-persona="EcoLife Guide">
-                            <i class="bi bi-house-heart d-block fs-5 mb-1 text-warning"></i>
-                            <span class="d-block text-truncate small fw-medium">EcoLife Guide</span>
-                        </button>
-                    </div>
-                    <div class="col-6">
-                        <button class="advisor-card btn btn-outline-secondary w-100 p-2 text-center rounded-3 border-opacity-25" data-persona="Climate Sage">
-                            <i class="bi bi-globe-americas d-block fs-5 mb-1 text-primary"></i>
-                            <span class="d-block text-truncate small fw-medium">Climate Sage</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Chat History List -->
+            <!-- Chat History List (Occupies full sidebar height) -->
             <div class="flex-grow-1 overflow-y-auto custom-scrollbar mb-3">
                 <label class="text-secondary fs-7 fw-bold mb-2 d-block text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Chat History</label>
                 <div id="historyList" class="d-flex flex-column gap-1 pe-1">
@@ -103,21 +72,18 @@
                         <i class="bi bi-robot fs-1"></i>
                     </div>
                     <h4 class="fw-bold mb-2">How can I assist your eco-goals today?</h4>
-                    <p class="text-secondary small mb-4" style="max-width: 520px;">Ask anything about material recyclability, local scrap market trends, or proper waste separation.</p>
+                    <p class="text-secondary small mb-4" style="max-width: 550px;">Ask anything about material recyclability, local scrap market trends, or proper waste separation in Malaysia.</p>
                     
                     <!-- Quick Suggestion Chips -->
-                    <div class="d-flex flex-wrap justify-content-center gap-2" style="max-width: 720px;">
-                        <button class="btn btn-outline-secondary rounded-pill btn-sm prompt-chip px-3 py-2" data-template="What is the current market price for scrap aluminum and PET bottles?">
-                            <i class="bi bi-currency-dollar text-success me-1"></i> Market Prices
+                    <div class="d-flex flex-wrap justify-content-center gap-2" style="max-width: 800px;">
+                        <button class="btn btn-outline-secondary rounded-pill btn-sm prompt-chip px-3 py-2" data-template="Where is the nearest recycling center in Petaling Jaya?">
+                            <i class="bi bi-geo-alt text-success me-1"></i> Nearby Centers
                         </button>
-                        <button class="btn btn-outline-secondary rounded-pill btn-sm prompt-chip px-3 py-2" data-template="How should I prepare electronic waste before dropping it off?">
+                        <button class="btn btn-outline-secondary rounded-pill btn-sm prompt-chip px-3 py-2" data-template="How should I prepare my PET plastic bottles before recycling?">
                             <i class="bi bi-box-seam text-info me-1"></i> Prep Instructions
                         </button>
-                        <button class="btn btn-outline-secondary rounded-pill btn-sm prompt-chip px-3 py-2" data-template="What is the environmental carbon reduction of recycling 10kg of paper?">
-                            <i class="bi bi-tree text-success me-1"></i> Carbon Impact
-                        </button>
-                        <button class="btn btn-outline-secondary rounded-pill btn-sm prompt-chip px-3 py-2" data-template="Where can I safely dispose of used cooking oil and household batteries?">
-                            <i class="bi bi-geo-alt text-warning me-1"></i> Drop-off Locations
+                        <button class="btn btn-outline-secondary rounded-pill btn-sm prompt-chip px-3 py-2" data-template="What is the current buy-back price for Aluminum Drink Cans?">
+                            <i class="bi bi-currency-dollar text-success me-1"></i> Buy-back Prices
                         </button>
                     </div>
                 </div>
@@ -155,12 +121,11 @@
 </div>
 
 <script>
-    const SESSIONS_KEY = 'eco_ai_chat_sessions_v2';
+    const SESSIONS_KEY = 'eco_ai_chat_sessions_v3';
     const ACTIVE_SESSION_KEY = 'eco_ai_active_session_id';
 
     let sessions = [];
     let currentSessionId = null;
-    let currentPersona = 'GreenBot';
     let isGenerating = false;
 
     const ecoTips = [
@@ -201,7 +166,6 @@
         const newSession = {
             id: 'session_' + Date.now(),
             title: 'New Conversation',
-            persona: currentPersona,
             messages: []
         };
         sessions.unshift(newSession);
@@ -303,7 +267,6 @@
         const chatBox = document.getElementById('chatBox');
         const bubbleId = 'ai-msg-' + Date.now();
         const copyBtnId = 'copy-btn-' + Date.now();
-        const activeSession = sessions.find(s => s.id === currentSessionId);
 
         const aiCard = document.createElement('div');
         aiCard.className = 'd-flex justify-content-start mb-4 animate-fade-in ps-2';
@@ -311,7 +274,7 @@
             <div class="ai-card p-3 rounded-4 bg-body-tertiary border border-secondary border-opacity-25 shadow-sm" style="max-width: 85%; width: 100%;">
                 <div class="d-flex align-items-center gap-2 mb-2 pb-2 border-bottom border-secondary border-opacity-10">
                     <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-2 py-1 fs-7">
-                        <i class="bi bi-robot me-1"></i>${activeSession ? activeSession.persona : currentPersona}
+                        <i class="bi bi-robot me-1"></i>EcoTrade Assistant
                     </span>
                     <small class="text-secondary ms-auto" style="font-size: 0.7rem;">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</small>
                 </div>
@@ -384,7 +347,7 @@
             <div id="${loadingId}" class="d-flex justify-content-start mb-4 ps-2">
                 <div class="bg-body-tertiary border border-secondary border-opacity-25 rounded-4 p-3 text-secondary" style="font-size: 0.9rem;">
                     <span class="spinner-grow spinner-grow-sm text-success me-2" role="status"></span>
-                    <span>${activeSession.persona} is thinking...</span>
+                    <span>EcoTrade Assistant is thinking...</span>
                 </div>
             </div>
         `);
@@ -394,7 +357,7 @@
             const res = await fetch('/api/chat', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ prompt: userMsg, persona: activeSession.persona })
+                body: JSON.stringify({ prompt: userMsg })
             });
             const data = await res.json();
             document.getElementById(loadingId)?.remove();
@@ -427,20 +390,6 @@
 
         document.getElementById('clearInputBtn').addEventListener('click', () => {
             document.getElementById('chatInput').value = '';
-        });
-
-        document.querySelectorAll('.advisor-card').forEach(card => {
-            card.addEventListener('click', () => {
-                document.querySelectorAll('.advisor-card').forEach(c => c.classList.remove('active'));
-                card.classList.add('active');
-                currentPersona = card.getAttribute('data-persona');
-                const activeSession = sessions.find(s => s.id === currentSessionId);
-                if (activeSession) {
-                    activeSession.persona = currentPersona;
-                    saveStorage();
-                    renderActiveSessionMessages();
-                }
-            });
         });
 
         bindPromptChips();
@@ -495,10 +444,23 @@
 </script>
 
 <style>
-    /* Dynamic Screen Filling Height */
+    /* Break out of standard parent container width to span edge-to-edge */
+    .full-width-wrapper {
+        width: 100vw;
+        position: relative;
+        left: 50%;
+        right: 50%;
+        margin-left: -50vw;
+        margin-right: -50vw;
+        padding: 0 1.5rem;
+    }
+
+    /* Screen Filling Dashboard Box */
     .ai-dashboard-container {
-        height: calc(100vh - 170px);
-        min-height: 580px;
+        height: calc(100vh - 150px);
+        min-height: 600px;
+        width: 100% !important;
+        max-width: 100% !important;
     }
 
     .cursor-pointer { cursor: pointer; }
@@ -509,12 +471,6 @@
 
     .hover-danger:hover {
         color: var(--bs-danger) !important;
-    }
-
-    .advisor-card.active {
-        border-color: #10b981 !important;
-        background-color: rgba(16, 185, 129, 0.12) !important;
-        color: #10b981 !important;
     }
 
     .focus-within-ring:focus-within {
