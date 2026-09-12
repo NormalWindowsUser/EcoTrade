@@ -4,59 +4,52 @@
 <!-- Include Marked.js to render AI Markdown responses into HTML -->
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-<!-- Full Page Container wrapper -->
-<div class="container-fluid px-0 py-2 d-flex flex-column" style="height: calc(100vh - 170px);">
-    <div class="row g-0 flex-grow-1 justify-content-center h-100">
-        <div class="col-12 h-100 d-flex flex-column">
+<!-- Full Page AI Layout Container -->
+<div class="ai-page-wrapper d-flex flex-column">
+    
+    <!-- Header Controls -->
+    <div class="ai-header d-flex align-items-center justify-content-between pb-3 border-bottom border-secondary mb-2">
+        <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-robot text-success fs-4"></i>
+            <div>
+                <h5 class="fw-bold text-success mb-0 lh-1">Eco Assistant</h5>
+                <small class="text-secondary" style="font-size: 0.75rem;">AI-powered recycling guide</small>
+            </div>
+        </div>
+        
+        <button class="btn btn-outline-danger btn-sm rounded-pill px-3 py-1 icon-hover-btn d-flex align-items-center gap-1" id="clearBtn" title="Clear chat history">
+            <i class="bi bi-trash"></i>
+            <span>Clear History</span>
+        </button>
+    </div>
+    
+    <!-- Chat Stream (Main Container Body) -->
+    <div id="chatBox" class="ai-chat-stream flex-grow-1 custom-scrollbar pe-2 overflow-y-auto">
+        <div class="text-center my-auto py-5" id="defaultWelcome">
+            <div class="badge bg-secondary bg-opacity-10 text-body border px-3 py-2 rounded-pill mb-2">
+                👋 Welcome!
+            </div>
+            <p class="text-secondary small">Ask questions about material prices, preparation tips, or recycling impact!</p>
+        </div>
+    </div>
+    
+    <!-- Bottom Floating Input Console -->
+    <div class="ai-input-wrapper pt-3 mt-auto">
+        <div class="bg-body-tertiary border border-secondary rounded-4 p-3 shadow-sm position-relative custom-input-box">
+            <textarea id="chatInput" class="form-control border-0 shadow-none p-0 text-body custom-textarea-bg" rows="2" placeholder="Ask AI anything about recycling..."></textarea>
             
-            <!-- Main Full-Page Chat Card -->
-            <div class="card bg-body border shadow-sm rounded-4 flex-grow-1 d-flex flex-column overflow-hidden h-100">
+            <div class="d-flex justify-content-between align-items-center mt-2">
+                <button class="btn btn-body-tertiary rounded-circle p-0 text-secondary border-0 icon-hover-btn d-inline-flex align-items-center justify-content-center" id="resetInputBtn" type="button" title="Clear input text" style="width: 36px; height: 36px;">
+                    <i class="bi bi-x-lg fs-6 lh-1"></i>
+                </button>
                 
-                <!-- Header with Inline Robot Icon & Centered Title -->
-                <div class="card-header bg-body border-bottom p-3 position-relative d-flex align-items-center justify-content-center">
-                    <div class="text-center">
-                        <div class="d-flex align-items-center justify-content-center gap-2">
-                            <i class="bi bi-robot text-success fs-5"></i>
-                            <h5 class="fw-bold text-success mb-0" style="font-size: 1.1rem; line-height: 1.2;">Eco Assistant</h5>
-                        </div>
-                        <small class="text-secondary d-block mt-1" style="font-size: 0.75rem;">AI-powered recycling guide</small>
-                    </div>
-                    
-                    <button class="btn btn-link text-secondary p-0 border-0 position-absolute end-0 me-3 icon-hover-btn" id="clearBtn" title="Clear chat history" style="font-size: 1.25rem;">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </div>
-                
-                <!-- Chat History Area -->
-                <div id="chatBox" class="card-body px-4 py-3 flex-grow-1 custom-scrollbar chat-history-bg" style="overflow-y: auto;">
-                    <div class="text-center mt-5" id="defaultWelcome">
-                        <div class="badge bg-secondary bg-opacity-10 text-body border px-3 py-2 rounded-pill mb-2">
-                            👋 Welcome!
-                        </div>
-                        <p class="text-secondary small">Ask questions about material prices, preparation tips, or recycling impact!</p>
-                    </div>
-                </div>
-                
-                <!-- Input Area Container -->
-                <div class="card-footer chat-history-bg border-0 p-3 pt-0">
-                    <div class="bg-body-tertiary border rounded-4 p-3 shadow-sm position-relative custom-input-box">
-                        <textarea id="chatInput" class="form-control border-0 shadow-none p-0 text-body custom-textarea-bg" rows="2" placeholder="Ask AI anything about recycling..."></textarea>
-                        
-                        <div class="d-flex justify-content-between align-items-center mt-2">
-                            <button class="btn btn-body-tertiary rounded-circle p-0 text-secondary border-0 icon-hover-btn d-inline-flex align-items-center justify-content-center" id="resetInputBtn" type="button" title="Clear input text" style="width: 36px; height: 36px;">
-                                <i class="bi bi-x-lg fs-6 lh-1"></i>
-                            </button>
-                            
-                            <button class="btn btn-success rounded-circle p-0 shadow-sm d-inline-flex align-items-center justify-content-center" id="sendBtn" type="button" title="Send message" style="width: 40px; height: 40px;">
-                                <i class="bi bi-arrow-up-short fs-3 text-white lh-1"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
+                <button class="btn btn-success rounded-circle p-0 shadow-sm d-inline-flex align-items-center justify-content-center" id="sendBtn" type="button" title="Send message" style="width: 40px; height: 40px;">
+                    <i class="bi bi-arrow-up-short fs-3 text-white lh-1"></i>
+                </button>
             </div>
         </div>
     </div>
+
 </div>
 
 <script>
@@ -117,7 +110,7 @@
         const box = document.getElementById('chatBox');
         box.innerHTML += `
             <div class="d-flex justify-content-end mb-4 animate-fade-in pe-2">
-                <div class="user-bubble px-4 py-2" style="max-width: 80%; font-size: 0.95rem; background-color: #BBD9D0; color: #1a2e28; border-radius: 20px; word-break: break-word;">
+                <div class="user-bubble px-4 py-2" style="max-width: 80%; font-size: 0.95rem; background-color: #10b981; color: #ffffff; border-radius: 20px; word-break: break-word;">
                     ${escapeHtml(text)}
                 </div>
             </div>
@@ -176,7 +169,7 @@
         btn.addEventListener('click', () => {
             navigator.clipboard.writeText(text).then(() => {
                 const icon = btn.querySelector('i');
-                icon.className = 'bi bi-check2';
+                icon.className = 'bi bi-check2 text-success';
                 setTimeout(() => { icon.className = 'bi bi-copy'; }, 2000);
             });
         });
@@ -272,7 +265,7 @@
         if (isGenerating) return;
         localStorage.removeItem(STORAGE_KEY);
         document.getElementById('chatBox').innerHTML = `
-            <div class="text-center mt-5" id="defaultWelcome">
+            <div class="text-center my-auto py-5" id="defaultWelcome">
                 <div class="badge bg-secondary bg-opacity-10 text-body border px-3 py-2 rounded-pill mb-2">
                     👋 Welcome!
                 </div>
@@ -283,8 +276,9 @@
 </script>
 
 <style>
-    .chat-history-bg {
-        background-color: var(--bs-tertiary-bg);
+    .ai-page-wrapper {
+        height: calc(100vh - 120px);
+        width: 100%;
     }
 
     .custom-textarea-bg {
@@ -295,22 +289,14 @@
         transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
     .custom-input-box:focus-within {
-        border-color: #198754 !important;
-        box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.15) !important;
+        border-color: #10b981 !important;
+        box-shadow: 0 0 0 0.2rem rgba(16, 185, 129, 0.15) !important;
     }
     #chatInput {
         resize: none;
     }
     #chatInput::placeholder {
         color: var(--bs-secondary-color);
-    }
-
-    .icon-hover-btn {
-        transition: opacity 0.2s ease, color 0.2s ease;
-    }
-    .icon-hover-btn:hover {
-        color: #dc3545 !important;
-        opacity: 0.8;
     }
 
     .custom-scrollbar::-webkit-scrollbar {
@@ -351,7 +337,7 @@
     .ai-reply-content h1, .ai-reply-content h2, .ai-reply-content h3, .ai-reply-content h4 {
         font-size: 1.05rem;
         font-weight: 700;
-        color: #198754;
+        color: #10b981;
         margin-top: 0.5rem;
         margin-bottom: 0.5rem;
     }
@@ -361,8 +347,8 @@
 
     /* Inline single-word code highlights */
     .ai-reply-content code {
-        background-color: rgba(25, 135, 84, 0.1);
-        color: #198754;
+        background-color: rgba(16, 185, 129, 0.1);
+        color: #10b981;
         padding: 0.15rem 0.4rem;
         border-radius: 0.3rem;
         font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
@@ -389,7 +375,7 @@
     .typing-dots span {
         display: inline-block;
         font-weight: bold;
-        color: #198754;
+        color: #10b981;
         animation: waveDots 1.4s infinite ease-in-out;
     }
 
