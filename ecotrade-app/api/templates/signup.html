@@ -4,54 +4,172 @@
 <!-- Cloudflare Turnstile API Script -->
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
-<div class="row justify-content-center py-3">
-    <div class="col-md-6 col-lg-5">
-        <div class="card-custom p-4">
-            <h4 class="fw-bold text-success mb-1 text-center"><i class="bi bi-person-plus"></i> Create Account</h4>
-            <p class="text-secondary small text-center mb-4">Join EcoTrade to submit recycling batches and receive rewards.</p>
-            
-            <form id="signupForm">
-                <div class="mb-3">
-                    <label class="form-label small fw-semibold text-light">Full Name</label>
-                    <input type="text" id="signupName" class="form-control bg-dark text-light border-secondary" placeholder="e.g. John Doe" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label small fw-semibold text-light">Email Address</label>
-                    <input type="email" id="signupEmail" class="form-control bg-dark text-light border-secondary" placeholder="name@example.com" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label small fw-semibold text-light">Password</label>
-                    <input type="password" id="signupPassword" class="form-control bg-dark text-light border-secondary" placeholder="At least 6 characters" minlength="6" required>
-                </div>
-                
-                <div class="row g-2 mb-3">
-                    <div class="col-6">
-                        <label class="form-label small fw-semibold text-light">Account Role</label>
-                        <select id="signupRole" class="form-select bg-dark text-light border-secondary">
-                            <option value="public" selected>General Public</option>
-                            <option value="student">Student</option>
-                        </select>
-                    </div>
-                    <div class="col-6" id="schoolFieldWrapper" style="display: none;">
-                        <label class="form-label small fw-semibold text-light">School Name</label>
-                        <input type="text" id="signupSchool" class="form-control bg-dark text-light border-secondary" placeholder="e.g. SMK Victoria">
-                    </div>
-                </div>
+<style>
+    /* Card Container - Compact vertical sizing to fit above floating navbar */
+    .signup-card {
+        max-width: 480px;
+        margin: 1rem auto 6.5rem; /* Generous bottom margin to clear floating bottom navbar */
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 1.5rem 1.75rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    }
 
-                <!-- Cloudflare Turnstile Anti-Bot Widget -->
-                <div class="mb-3 text-center">
-                    <div class="cf-turnstile" data-sitekey="1x00000000000000000000AA"></div>
-                </div>
+    .card-header-compact {
+        text-align: center;
+        margin-bottom: 1.25rem;
+    }
 
-                <button type="submit" class="btn btn-success w-100 fw-bold py-2 mb-3">Register Account</button>
-            </form>
+    .card-title-text {
+        color: #047857;
+        font-size: 1.35rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+        margin-bottom: 0.25rem;
+    }
 
-            <div id="signupMsg"></div>
+    .card-subtitle-text {
+        color: #64748b;
+        font-size: 0.82rem;
+        margin-bottom: 0;
+    }
 
-            <div class="text-center pt-2 border-top border-secondary mt-3">
-                <span class="small text-secondary">Already have an account?</span>
-                <a href="/login" class="small text-success fw-bold text-decoration-none ms-1">Log In</a>
+    .form-label-custom {
+        font-weight: 600;
+        font-size: 0.82rem;
+        color: #1e293b;
+        margin-bottom: 0.3rem;
+        display: block;
+    }
+
+    .form-control-custom, .form-select-custom {
+        width: 100%;
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+        padding: 0.55rem 0.75rem;
+        font-size: 0.88rem;
+        background-color: #ffffff;
+        color: #0f172a;
+        outline: none;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .form-control-custom:focus, .form-select-custom:focus {
+        border-color: #10b981;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+    }
+
+    .field-spacing {
+        margin-bottom: 0.85rem;
+    }
+
+    .cf-turnstile-wrapper {
+        display: flex;
+        justify-content: center;
+        margin: 0.85rem 0;
+        min-height: 65px;
+    }
+
+    .btn-submit-signup {
+        width: 100%;
+        background-color: #059669;
+        color: #ffffff;
+        font-weight: 600;
+        font-size: 0.92rem;
+        padding: 0.65rem;
+        border-radius: 8px;
+        border: none;
+        transition: background-color 0.2s ease;
+    }
+
+    .btn-submit-signup:hover {
+        background-color: #047857;
+    }
+
+    .login-footer-link {
+        text-align: center;
+        padding-top: 0.75rem;
+        margin-top: 0.85rem;
+        border-top: 1px solid #e2e8f0;
+        font-size: 0.82rem;
+        color: #64748b;
+    }
+
+    .login-footer-link a {
+        color: #059669;
+        font-weight: 700;
+        text-decoration: none;
+        margin-left: 0.25rem;
+    }
+
+    .login-footer-link a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<div class="container">
+    <div class="signup-card">
+        <!-- Header -->
+        <div class="card-header-compact">
+            <h4 class="card-title-text">
+                <i class="bi bi-person-plus"></i> Create Account
+            </h4>
+            <p class="card-subtitle-text">Join EcoTrade to submit recycling batches and receive rewards.</p>
+        </div>
+
+        <form id="signupForm">
+            <!-- Full Name -->
+            <div class="field-spacing">
+                <label for="signupName" class="form-label-custom">Full Name</label>
+                <input type="text" id="signupName" class="form-control-custom" placeholder="e.g. John Doe" required>
             </div>
+
+            <!-- Email Address -->
+            <div class="field-spacing">
+                <label for="signupEmail" class="form-label-custom">Email Address</label>
+                <input type="email" id="signupEmail" class="form-control-custom" placeholder="name@example.com" required>
+            </div>
+
+            <!-- Password -->
+            <div class="field-spacing">
+                <label for="signupPassword" class="form-label-custom">Password</label>
+                <input type="password" id="signupPassword" class="form-control-custom" placeholder="At least 6 characters" minlength="6" required>
+            </div>
+
+            <!-- Role & Conditional School Field -->
+            <div class="row g-2 field-spacing">
+                <div class="col-12" id="roleCol">
+                    <label for="signupRole" class="form-label-custom">Account Role</label>
+                    <select id="signupRole" class="form-select-custom">
+                        <option value="public" selected>General Public</option>
+                        <option value="student">Student</option>
+                    </select>
+                </div>
+                <div class="col-6" id="schoolFieldWrapper" style="display: none;">
+                    <label for="signupSchool" class="form-label-custom">School Name</label>
+                    <input type="text" id="signupSchool" class="form-control-custom" placeholder="e.g. SMK Victoria">
+                </div>
+            </div>
+
+            <!-- Cloudflare Turnstile Anti-Bot Widget -->
+            <div class="cf-turnstile-wrapper">
+                <div class="cf-turnstile" data-sitekey="1x00000000000000000000AA"></div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn-submit-signup">Register Account</button>
+        </form>
+
+        <div id="signupMsg" class="mt-2"></div>
+
+        <!-- Footer link -->
+        <div class="login-footer-link">
+            <span>Already have an account?</span>
+            <a href="/login">Log In</a>
         </div>
     </div>
 </div>
@@ -59,7 +177,14 @@
 <script>
     document.getElementById('signupRole').addEventListener('change', (e) => {
         const schoolWrapper = document.getElementById('schoolFieldWrapper');
-        schoolWrapper.style.display = (e.target.value === 'student') ? 'block' : 'none';
+        const roleCol = document.getElementById('roleCol');
+        if (e.target.value === 'student') {
+            roleCol.className = 'col-6';
+            schoolWrapper.style.display = 'block';
+        } else {
+            roleCol.className = 'col-12';
+            schoolWrapper.style.display = 'none';
+        }
     });
 
     document.getElementById('signupForm').addEventListener('submit', async (e) => {
@@ -69,7 +194,7 @@
 
         const turnstileResponse = turnstile.getResponse();
         if (!turnstileResponse) {
-            msgDiv.innerHTML = `<div class="alert alert-warning py-2 small">Please complete the anti-bot verification.</div>`;
+            msgDiv.innerHTML = `<div class="alert alert-warning py-2 small mb-0">Please complete the anti-bot verification.</div>`;
             return;
         }
 
@@ -88,14 +213,14 @@
             });
             const data = await res.json();
             if (data.status === 'success') {
-                msgDiv.innerHTML = `<div class="alert alert-success py-2 small">Account created! Redirecting to account dashboard...</div>`;
+                msgDiv.innerHTML = `<div class="alert alert-success py-2 small mb-0">Account created! Redirecting to account dashboard...</div>`;
                 setTimeout(() => window.location.href = '/account', 800);
             } else {
-                msgDiv.innerHTML = `<div class="alert alert-danger py-2 small">${data.message}</div>`;
+                msgDiv.innerHTML = `<div class="alert alert-danger py-2 small mb-0">${data.message}</div>`;
                 turnstile.reset();
             }
         } catch (err) {
-            msgDiv.innerHTML = `<div class="alert alert-danger py-2 small">Connection error. Please try again.</div>`;
+            msgDiv.innerHTML = `<div class="alert alert-danger py-2 small mb-0">Connection error. Please try again.</div>`;
             turnstile.reset();
         }
     });
