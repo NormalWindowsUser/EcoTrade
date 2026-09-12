@@ -4,24 +4,31 @@
 <!-- Include Marked.js to render AI Markdown responses into HTML -->
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-<!-- Full Viewport Width Wrapper -->
-<div class="full-width-wrapper">
-    <div class="ai-dashboard-container d-flex w-100 overflow-hidden rounded-4 border border-secondary border-opacity-25 shadow-sm bg-body">
+<!-- Mobile Sidebar Backdrop Overlay -->
+<div id="sidebarBackdrop" class="sidebar-backdrop d-md-none"></div>
 
-        <!-- LEFT SIDEBAR: History Only -->
-        <aside class="ai-sidebar d-flex flex-column p-3 bg-body-tertiary border-end border-secondary border-opacity-25" style="width: 280px; min-width: 260px;">
+<!-- Full Viewport Width Wrapper with Bottom Clearance for Floating Navigation -->
+<div class="full-width-wrapper pb-5">
+    <div class="ai-dashboard-container d-flex w-100 overflow-hidden rounded-4 border border-secondary border-opacity-25 shadow-sm bg-body position-relative">
+
+        <!-- LEFT SIDEBAR: History (Drawer on mobile, fixed on desktop) -->
+        <aside id="aiSidebar" class="ai-sidebar d-flex flex-column p-3 bg-body-tertiary border-end border-secondary border-opacity-25">
             
-            <!-- App Identity -->
+            <!-- App Identity & Close Mobile Drawer Button -->
             <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom border-secondary border-opacity-25">
                 <div class="d-flex align-items-center gap-2">
-                    <div class="bg-success bg-opacity-10 text-success rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                    <div class="bg-success bg-opacity-10 text-success rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
                         <i class="bi bi-tree-fill fs-5"></i>
                     </div>
                     <div>
                         <h6 class="fw-bold mb-0 text-body">EcoTrade AI</h6>
-                        <small class="text-secondary" style="font-size: 0.725rem;">v2.4 Smart Assistant</small>
+                        <small class="text-secondary" style="font-size: 0.7rem;">v2.4 Smart Assistant</small>
                     </div>
                 </div>
+                <!-- Close Button (Mobile Only) -->
+                <button id="closeSidebarBtn" class="btn btn-sm btn-link text-secondary d-md-none p-0 border-0" aria-label="Close sidebar">
+                    <i class="bi bi-x-lg fs-5"></i>
+                </button>
             </div>
 
             <!-- New Chat Action Button -->
@@ -48,34 +55,39 @@
         </aside>
 
         <!-- RIGHT MAIN CANVAS -->
-        <main class="ai-main-content d-flex flex-column flex-grow-1 bg-body">
+        <main class="ai-main-content d-flex flex-column flex-grow-1 bg-body overflow-hidden">
 
             <!-- Top Navigation Header -->
-            <header class="d-flex align-items-center justify-content-between px-4 py-3 border-bottom border-secondary border-opacity-25 bg-body">
-                <div class="d-flex align-items-center gap-2">
-                    <i class="bi bi-chat-left-text text-success fs-5"></i>
-                    <h6 id="activeChatTitle" class="fw-bold mb-0 text-body">New Conversation</h6>
+            <header class="d-flex align-items-center justify-content-between px-3 px-md-4 py-3 border-bottom border-secondary border-opacity-25 bg-body">
+                <div class="d-flex align-items-center gap-2 text-truncate me-2">
+                    <!-- Hamburger Toggle Button for Mobile Menu -->
+                    <button id="sidebarToggleBtn" class="btn btn-outline-secondary btn-sm d-md-none p-1.5 rounded-3 border-opacity-50 me-1" type="button" aria-label="Toggle Navigation">
+                        <i class="bi bi-list fs-5 text-body"></i>
+                    </button>
+                    <i class="bi bi-chat-left-text text-success fs-5 d-none d-sm-inline-block"></i>
+                    <h6 id="activeChatTitle" class="fw-bold mb-0 text-body text-truncate">New Conversation</h6>
                 </div>
-                <div class="d-flex align-items-center gap-2">
-                    <button class="btn btn-sm btn-outline-success rounded-pill px-3 d-flex align-items-center gap-1 fw-medium" data-bs-toggle="modal" data-bs-target="#quizModal" onclick="startQuiz()">
+                <div class="d-flex align-items-center gap-2 flex-shrink-0">
+                    <button class="btn btn-sm btn-outline-success rounded-pill px-2.5 px-sm-3 py-1.5 d-flex align-items-center gap-1.5 fw-medium" data-bs-toggle="modal" data-bs-target="#quizModal" onclick="startQuiz()">
                         <i class="bi bi-journal-check"></i>
-                        <span>Take Sustainability Quiz</span>
+                        <span class="d-none d-sm-inline">Take Sustainability Quiz</span>
+                        <span class="d-inline d-sm-none">Quiz</span>
                     </button>
                 </div>
             </header>
 
             <!-- Dynamic Chat Stream -->
-            <div id="chatBox" class="flex-grow-1 overflow-y-auto p-4 custom-scrollbar">
+            <div id="chatBox" class="flex-grow-1 overflow-y-auto p-3 p-md-4 custom-scrollbar">
                 <!-- Landing Suggestions -->
-                <div id="landingView" class="h-100 d-flex flex-column align-items-center justify-content-center text-center my-auto">
+                <div id="landingView" class="h-100 d-flex flex-column align-items-center justify-content-center text-center my-auto py-4">
                     <div class="bg-success bg-opacity-10 text-success rounded-circle p-3 mb-3">
                         <i class="bi bi-robot fs-1"></i>
                     </div>
-                    <h4 class="fw-bold mb-2">How can I assist your eco-goals today?</h4>
-                    <p class="text-secondary small mb-4" style="max-width: 550px;">Ask anything about material recyclability, local scrap market trends, or proper waste separation in Malaysia.</p>
+                    <h4 class="fw-bold mb-2 fs-5 fs-md-4">How can I assist your eco-goals today?</h4>
+                    <p class="text-secondary small mb-4 px-2" style="max-width: 550px;">Ask anything about material recyclability, local scrap market trends, or proper waste separation in Malaysia.</p>
                     
                     <!-- Quick Suggestion Chips -->
-                    <div class="d-flex flex-wrap justify-content-center gap-2" style="max-width: 800px;">
+                    <div class="d-flex flex-wrap justify-content-center gap-2 px-2" style="max-width: 800px;">
                         <button class="btn btn-outline-secondary rounded-pill btn-sm prompt-chip px-3 py-2" data-template="Where is the nearest recycling center in Petaling Jaya?">
                             <i class="bi bi-geo-alt text-success me-1"></i> Nearby Centers
                         </button>
@@ -89,8 +101,8 @@
                 </div>
             </div>
 
-            <!-- COMPACT INPUT FOOTER -->
-            <footer class="p-2 px-3 bg-body border-top border-secondary border-opacity-25 pb-4">
+            <!-- COMPACT INPUT FOOTER WITH EXTRA PADDING FOR BASE NAV CLEARANCE -->
+            <footer class="p-2 px-3 bg-body border-top border-secondary border-opacity-25 pb-3">
                 <div class="position-relative bg-body-tertiary rounded-4 border border-secondary border-opacity-50 px-3 py-1.5 shadow-sm focus-within-ring d-flex align-items-center gap-2">
                     <textarea id="chatInput" class="form-control border-0 bg-transparent shadow-none text-body p-1" rows="1" placeholder="Recycle your thoughts here..." style="resize: none; max-height: 100px; line-height: 1.4;"></textarea>
                     
@@ -106,8 +118,8 @@
                 </div>
 
                 <!-- Dynamic Eco Ticker Footer -->
-                <div class="text-center mt-1.5">
-                    <small class="text-secondary" style="font-size: 0.725rem;">
+                <div class="text-center mt-2 mb-1 px-2">
+                    <small class="text-secondary d-inline-block text-truncate" style="font-size: 0.725rem; max-width: 100%;">
                         <i class="bi bi-heart-fill text-success me-1"></i>
                         <span id="ecoTipTicker">Electric vehicles emit 54% fewer carbon emissions on average than gasoline-powered cars.</span>
                     </small>
@@ -120,13 +132,13 @@
 
 <!-- SUSTAINABILITY QUIZ MODAL -->
 <div class="modal fade" id="quizModal" tabindex="-1" aria-labelledby="quizModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-dialog modal-dialog-centered modal-lg px-2">
         <div class="modal-content bg-body border border-secondary border-opacity-25 rounded-4 shadow-lg overflow-hidden">
             
             <!-- Quiz Header -->
             <div class="modal-header border-bottom border-secondary border-opacity-25 px-4 py-3 bg-body-tertiary">
                 <div class="d-flex align-items-center justify-content-between w-100 me-2">
-                    <h5 class="modal-title fw-bold text-body m-0" id="quizModalLabel">General Sustainability Quiz</h5>
+                    <h5 class="modal-title fw-bold text-body m-0 fs-6 fs-md-5" id="quizModalLabel">General Sustainability Quiz</h5>
                     <span id="quizCounter" class="badge bg-success bg-opacity-10 text-success fw-bold px-3 py-2 rounded-pill fs-7">1/5</span>
                 </div>
             </div>
@@ -137,12 +149,12 @@
             </div>
 
             <!-- Quiz Body Container -->
-            <div class="modal-body p-4">
+            <div class="modal-body p-3 p-md-4">
                 <div id="quizQuestionContainer">
-                    <h5 id="quizQuestionText" class="fw-bold text-body mb-4 lh-base">Loading question...</h5>
+                    <h5 id="quizQuestionText" class="fw-bold text-body mb-4 lh-base fs-6 fs-md-5">Loading question...</h5>
 
                     <!-- Multiple Choice Options -->
-                    <div id="quizOptionsContainer" class="d-flex flex-column gap-3">
+                    <div id="quizOptionsContainer" class="d-flex flex-column gap-2.5">
                         <!-- Dynamic Options loaded via JS -->
                     </div>
                 </div>
@@ -245,11 +257,36 @@
     document.addEventListener('DOMContentLoaded', () => {
         loadStorage();
         setupEventListeners();
+        setupMobileDrawer();
         cycleEcoTips();
         autoResizeTextarea();
     });
 
-    // Toggle visual state for like / dislike buttons
+    // Mobile Sidebar Drawer Controller
+    function setupMobileDrawer() {
+        const toggleBtn = document.getElementById('sidebarToggleBtn');
+        const closeBtn = document.getElementById('closeSidebarBtn');
+        const sidebar = document.getElementById('aiSidebar');
+        const backdrop = document.getElementById('sidebarBackdrop');
+
+        function openDrawer() {
+            sidebar.classList.add('show-drawer');
+            backdrop.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDrawer() {
+            sidebar.classList.remove('show-drawer');
+            backdrop.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        toggleBtn?.addEventListener('click', openDrawer);
+        closeBtn?.addEventListener('click', closeDrawer);
+        backdrop?.addEventListener('click', closeDrawer);
+    }
+
+    // Visual State Toggle for Like / Dislike
     function toggleFeedback(btn, type) {
         const container = btn.closest('.d-flex');
         const likeBtn = container.querySelector('.like-btn');
@@ -257,11 +294,9 @@
 
         if (type === 'like') {
             if (likeBtn.classList.contains('text-success')) {
-                // Toggle off
                 likeBtn.classList.remove('text-success');
                 likeBtn.classList.add('text-secondary');
             } else {
-                // Activate green like, deactivate red dislike
                 likeBtn.classList.remove('text-secondary');
                 likeBtn.classList.add('text-success');
                 dislikeBtn.classList.remove('text-danger');
@@ -269,11 +304,9 @@
             }
         } else if (type === 'dislike') {
             if (dislikeBtn.classList.contains('text-danger')) {
-                // Toggle off
                 dislikeBtn.classList.remove('text-danger');
                 dislikeBtn.classList.add('text-secondary');
             } else {
-                // Activate red dislike, deactivate green like
                 dislikeBtn.classList.remove('text-secondary');
                 dislikeBtn.classList.add('text-danger');
                 likeBtn.classList.remove('text-success');
@@ -317,12 +350,12 @@
 
         q.options.forEach((opt, idx) => {
             const btn = document.createElement('button');
-            btn.className = `quiz-option-btn btn border border-secondary border-opacity-25 rounded-3 text-start p-3 d-flex align-items-center gap-3 bg-body-tertiary text-body w-100 transition-all`;
+            btn.className = `quiz-option-btn btn border border-secondary border-opacity-25 rounded-3 text-start p-2.5 p-md-3 d-flex align-items-center gap-3 bg-body-tertiary text-body w-100 transition-all`;
             btn.innerHTML = `
-                <div class="option-badge rounded-circle border border-secondary border-opacity-50 d-flex align-items-center justify-content-center flex-shrink-0 fw-bold" style="width: 32px; height: 32px; font-size: 0.85rem;">
+                <div class="option-badge rounded-circle border border-secondary border-opacity-50 d-flex align-items-center justify-content-center flex-shrink-0 fw-bold" style="width: 30px; height: 30px; font-size: 0.8rem;">
                     ${letters[idx]}
                 </div>
-                <span class="fs-6">${escapeHtml(opt)}</span>
+                <span class="fs-6" style="font-size: 0.9rem !important;">${escapeHtml(opt)}</span>
             `;
             btn.onclick = () => selectQuizOption(idx, btn);
             optionsContainer.appendChild(btn);
@@ -345,7 +378,6 @@
             selectedBtn.classList.add('bg-danger', 'bg-opacity-15', 'border-danger', 'text-danger', 'fw-semibold');
             selectedBtn.querySelector('.option-badge').classList.add('bg-danger', 'text-white', 'border-danger');
 
-            // Highlight correct answer
             const correctBtn = allBtns[q.correctIndex];
             correctBtn.classList.remove('bg-body-tertiary', 'border-secondary');
             correctBtn.classList.add('bg-success', 'bg-opacity-15', 'border-success', 'text-success');
@@ -372,7 +404,7 @@
         document.getElementById('quizScoreText').textContent = `You scored ${quizScore} out of ${quizData.length}`;
     }
 
-    /* Storage & Chat Code */
+    /* Storage & Chat Logic */
     function loadStorage() {
         const storedSessions = localStorage.getItem(SESSIONS_KEY);
         sessions = storedSessions ? JSON.parse(storedSessions) : [];
@@ -405,6 +437,9 @@
         saveStorage();
         renderSidebarHistory();
         if (switchTab) renderActiveSessionMessages();
+
+        // Close mobile drawer on selection
+        document.getElementById('sidebarBackdrop').click();
     }
 
     function deleteChat(sessionId, event) {
@@ -425,6 +460,9 @@
         saveStorage();
         renderSidebarHistory();
         renderActiveSessionMessages();
+
+        // Close mobile drawer on item pick
+        document.getElementById('sidebarBackdrop').click();
     }
 
     function renderSidebarHistory() {
@@ -485,8 +523,8 @@
     function renderUserBubble(text, shouldScroll = true) {
         const chatBox = document.getElementById('chatBox');
         const userHtml = `
-            <div class="d-flex justify-content-end mb-4 animate-fade-in pe-2">
-                <div class="user-bubble px-3 py-2 text-white bg-success rounded-4 shadow-sm" style="max-width: 75%; font-size: 0.95rem; word-break: break-word;">
+            <div class="d-flex justify-content-end mb-3 animate-fade-in pe-1 pe-md-2">
+                <div class="user-bubble px-3 py-2 text-white bg-success rounded-4 shadow-sm" style="max-width: 85%; font-size: 0.925rem; word-break: break-word;">
                     ${escapeHtml(text)}
                 </div>
             </div>
@@ -501,16 +539,16 @@
         const copyBtnId = 'copy-btn-' + Date.now();
 
         const aiCard = document.createElement('div');
-        aiCard.className = 'd-flex justify-content-start mb-4 animate-fade-in ps-2';
+        aiCard.className = 'd-flex justify-content-start mb-3 animate-fade-in ps-1 ps-md-2';
         aiCard.innerHTML = `
-            <div class="ai-card p-3 rounded-4 bg-body-tertiary border border-secondary border-opacity-25 shadow-sm" style="max-width: 85%; width: 100%;">
+            <div class="ai-card p-3 rounded-4 bg-body-tertiary border border-secondary border-opacity-25 shadow-sm" style="max-width: 92%; width: 100%;">
                 <div class="d-flex align-items-center gap-2 mb-2 pb-2 border-bottom border-secondary border-opacity-10">
                     <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-2 py-1 fs-7">
                         <i class="bi bi-robot me-1"></i>EcoTrade Assistant
                     </span>
                     <small class="text-secondary ms-auto" style="font-size: 0.7rem;">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</small>
                 </div>
-                <div id="${bubbleId}" class="ai-reply-content text-body" style="font-size: 0.95rem; line-height: 1.6;"></div>
+                <div id="${bubbleId}" class="ai-reply-content text-body" style="font-size: 0.925rem; line-height: 1.55;"></div>
                 <div class="d-flex align-items-center gap-2 mt-3 pt-2 border-top border-secondary border-opacity-10">
                     <button class="btn btn-sm btn-link text-secondary p-0 border-0" id="${copyBtnId}" title="Copy response">
                         <i class="bi bi-copy"></i>
@@ -577,8 +615,8 @@
         const loadingId = 'loading-' + Date.now();
         const chatBox = document.getElementById('chatBox');
         chatBox.insertAdjacentHTML('beforeend', `
-            <div id="${loadingId}" class="d-flex justify-content-start mb-4 ps-2">
-                <div class="bg-body-tertiary border border-secondary border-opacity-25 rounded-4 p-3 text-secondary" style="font-size: 0.9rem;">
+            <div id="${loadingId}" class="d-flex justify-content-start mb-3 ps-1 ps-md-2">
+                <div class="bg-body-tertiary border border-secondary border-opacity-25 rounded-4 p-3 text-secondary" style="font-size: 0.875rem;">
                     <span class="spinner-grow spinner-grow-sm text-success me-2" role="status"></span>
                     <span>EcoTrade Assistant is thinking...</span>
                 </div>
@@ -679,7 +717,7 @@
 </script>
 
 <style>
-    /* Full view container width */
+    /* Responsive full width container */
     .full-width-wrapper {
         width: 100vw;
         position: relative;
@@ -687,15 +725,69 @@
         right: 50%;
         margin-left: -50vw;
         margin-right: -50vw;
-        padding: 0 1.5rem;
+        padding: 0 1rem;
+        box-sizing: border-box;
     }
 
-    /* Fixed Height for dynamic canvas */
+    /* Fixed Height Container for viewports & dynamic scaling */
     .ai-dashboard-container {
-        height: calc(100vh - 130px);
-        min-height: 580px;
+        height: calc(100vh - 150px);
+        min-height: 540px;
         width: 100% !important;
         max-width: 100% !important;
+    }
+
+    /* DESKTOP SIDEBAR STYLING */
+    .ai-sidebar {
+        width: 280px;
+        min-width: 260px;
+        flex-shrink: 0;
+    }
+
+    /* MOBILE DRAWER STYLING (<768px) */
+    @media (max-width: 767.98px) {
+        .full-width-wrapper {
+            padding: 0 0.5rem 4rem 0.5rem; /* Additional bottom spacing prevents base navigation bar cutoff */
+        }
+
+        .ai-dashboard-container {
+            height: calc(100vh - 120px);
+            border-radius: 0.75rem !important;
+        }
+
+        .ai-sidebar {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 280px;
+            height: 100%;
+            z-index: 1050;
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 4px 0 15px rgba(0,0,0,0.15);
+        }
+
+        .ai-sidebar.show-drawer {
+            left: 0;
+        }
+
+        .sidebar-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(2px);
+            z-index: 1040;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .sidebar-backdrop.show {
+            opacity: 1;
+            visibility: visible;
+        }
     }
 
     .cursor-pointer { cursor: pointer; }
@@ -726,11 +818,11 @@
     }
 
     .animate-fade-in {
-        animation: fadeIn 0.25s ease-out forwards;
+        animation: fadeIn 0.2s ease-out forwards;
     }
 
     @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(8px); }
+        from { opacity: 0; transform: translateY(6px); }
         to { opacity: 1; transform: translateY(0); }
     }
 
