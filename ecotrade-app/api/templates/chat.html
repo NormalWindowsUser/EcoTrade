@@ -4,7 +4,7 @@
 <!-- Include Marked.js to render AI Markdown responses into HTML -->
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-<!-- Full Viewport Width Wrapper to bypass parent container restrictions -->
+<!-- Full Viewport Width Wrapper -->
 <div class="full-width-wrapper">
     <div class="ai-dashboard-container d-flex w-100 overflow-hidden rounded-4 border border-secondary border-opacity-25 shadow-sm bg-body">
 
@@ -30,7 +30,7 @@
                 <span>New Chat</span>
             </button>
 
-            <!-- Chat History List (Occupies full sidebar height) -->
+            <!-- Chat History List -->
             <div class="flex-grow-1 overflow-y-auto custom-scrollbar mb-3">
                 <label class="text-secondary fs-7 fw-bold mb-2 d-block text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Chat History</label>
                 <div id="historyList" class="d-flex flex-column gap-1 pe-1">
@@ -57,7 +57,7 @@
                     <h6 id="activeChatTitle" class="fw-bold mb-0 text-body">New Conversation</h6>
                 </div>
                 <div class="d-flex align-items-center gap-2">
-                    <button class="btn btn-sm btn-outline-success rounded-pill px-3 d-flex align-items-center gap-1 fw-medium" onclick="alert('Quiz feature coming soon!')">
+                    <button class="btn btn-sm btn-outline-success rounded-pill px-3 d-flex align-items-center gap-1 fw-medium" data-bs-toggle="modal" data-bs-target="#quizModal" onclick="startQuiz()">
                         <i class="bi bi-journal-check"></i>
                         <span>Take Sustainability Quiz</span>
                     </button>
@@ -89,27 +89,25 @@
                 </div>
             </div>
 
-            <!-- Bottom Input & Console Footer -->
-            <footer class="p-3 bg-body border-top border-secondary border-opacity-25 pb-5">
-                <div class="position-relative bg-body-tertiary rounded-4 border border-secondary border-opacity-50 p-2 shadow-sm focus-within-ring">
-                    <textarea id="chatInput" class="form-control border-0 bg-transparent shadow-none text-body p-2" rows="2" placeholder="Recycle your thoughts here..." style="resize: none;"></textarea>
+            <!-- COMPACT INPUT FOOTER -->
+            <footer class="p-2 px-3 bg-body border-top border-secondary border-opacity-25 pb-4">
+                <div class="position-relative bg-body-tertiary rounded-4 border border-secondary border-opacity-50 px-3 py-1.5 shadow-sm focus-within-ring d-flex align-items-center gap-2">
+                    <textarea id="chatInput" class="form-control border-0 bg-transparent shadow-none text-body p-1" rows="1" placeholder="Recycle your thoughts here..." style="resize: none; max-height: 100px; line-height: 1.4;"></textarea>
                     
-                    <div class="d-flex justify-content-between align-items-center px-2 pt-1">
+                    <div class="d-flex align-items-center gap-2 flex-shrink-0">
                         <button id="clearInputBtn" class="btn btn-link text-secondary p-0 border-0" title="Clear text">
                             <i class="bi bi-x-circle fs-5"></i>
                         </button>
-                        <div class="d-flex align-items-center gap-2">
-                            <i class="bi bi-leaf text-success opacity-75 fs-5"></i>
-                            <button id="sendBtn" class="btn btn-success rounded-circle p-0 d-flex align-items-center justify-content-center shadow-sm" style="width: 38px; height: 38px;">
-                                <i class="bi bi-send-fill fs-6 text-white"></i>
-                            </button>
-                        </div>
+                        <i class="bi bi-leaf text-success opacity-75 fs-5"></i>
+                        <button id="sendBtn" class="btn btn-success rounded-circle p-0 d-flex align-items-center justify-content-center shadow-sm" style="width: 36px; height: 36px;">
+                            <i class="bi bi-send-fill fs-6 text-white"></i>
+                        </button>
                     </div>
                 </div>
 
                 <!-- Dynamic Eco Ticker Footer -->
-                <div class="text-center mt-2">
-                    <small class="text-secondary" style="font-size: 0.75rem;">
+                <div class="text-center mt-1.5">
+                    <small class="text-secondary" style="font-size: 0.725rem;">
                         <i class="bi bi-heart-fill text-success me-1"></i>
                         <span id="ecoTipTicker">Electric vehicles emit 54% fewer carbon emissions on average than gasoline-powered cars.</span>
                     </small>
@@ -120,6 +118,58 @@
     </div>
 </div>
 
+<!-- SUSTAINABILITY QUIZ MODAL -->
+<div class="modal fade" id="quizModal" tabindex="-1" aria-labelledby="quizModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-body border border-secondary border-opacity-25 rounded-4 shadow-lg overflow-hidden">
+            
+            <!-- Quiz Header -->
+            <div class="modal-header border-bottom border-secondary border-opacity-25 px-4 py-3 bg-body-tertiary">
+                <div class="d-flex align-items-center justify-content-between w-100 me-2">
+                    <h5 class="modal-title fw-bold text-body m-0" id="quizModalLabel">General Sustainability Quiz</h5>
+                    <span id="quizCounter" class="badge bg-success bg-opacity-10 text-success fw-bold px-3 py-2 rounded-pill fs-7">1/5</span>
+                </div>
+            </div>
+
+            <!-- Quiz Progress Bar -->
+            <div class="progress rounded-0 bg-secondary bg-opacity-10" style="height: 4px;">
+                <div id="quizProgressBar" class="progress-bar bg-success transition-all" role="progressbar" style="width: 20%;"></div>
+            </div>
+
+            <!-- Quiz Body Container -->
+            <div class="modal-body p-4">
+                <div id="quizQuestionContainer">
+                    <h5 id="quizQuestionText" class="fw-bold text-body mb-4 lh-base">Loading question...</h5>
+
+                    <!-- Multiple Choice Options -->
+                    <div id="quizOptionsContainer" class="d-flex flex-column gap-3">
+                        <!-- Dynamic Options loaded via JS -->
+                    </div>
+                </div>
+
+                <!-- Score / Completion Screen -->
+                <div id="quizResultContainer" class="text-center py-4 d-none">
+                    <div class="bg-success bg-opacity-10 text-success rounded-circle d-inline-flex p-3 mb-3">
+                        <i class="bi bi-trophy fs-1"></i>
+                    </div>
+                    <h4 class="fw-bold mb-2">Quiz Completed!</h4>
+                    <p id="quizScoreText" class="text-secondary mb-4 fs-5">You scored 0 out of 5</p>
+                    <div class="d-flex justify-content-center gap-2">
+                        <button class="btn btn-outline-success rounded-pill px-4 py-2 fw-medium" onclick="startQuiz()">Try Again</button>
+                        <button class="btn btn-success rounded-pill px-4 py-2 fw-medium" data-bs-dismiss="modal">Return to Chat</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Footer -->
+            <div class="modal-footer border-top border-secondary border-opacity-25 px-4 py-3 bg-body-tertiary justify-content-between" id="quizFooter">
+                <button type="button" class="btn btn-outline-secondary rounded-3 px-3 py-1.5 btn-sm fw-medium" data-bs-dismiss="modal">Quit Quiz</button>
+                <button id="nextQuestionBtn" class="btn btn-success rounded-3 px-4 py-1.5 btn-sm fw-medium d-none" onclick="nextQuestion()">Next Question <i class="bi bi-arrow-right ms-1"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     const SESSIONS_KEY = 'eco_ai_chat_sessions_v3';
     const ACTIVE_SESSION_KEY = 'eco_ai_active_session_id';
@@ -127,6 +177,63 @@
     let sessions = [];
     let currentSessionId = null;
     let isGenerating = false;
+
+    // --- Sustainability Quiz Data ---
+    const quizData = [
+        {
+            question: "What does the term 'carbon footprint' refer to?",
+            options: [
+                "The mark left by carbon paper",
+                "The total amount of greenhouse gases produced by human activities",
+                "A measurement of carbon in soil",
+                "A footprint fossil containing carbon"
+            ],
+            correctIndex: 1
+        },
+        {
+            question: "Which material can be recycled endlessly without losing its quality?",
+            options: [
+                "Paper and Cardboard",
+                "Single-use Plastic",
+                "Glass",
+                "Styrofoam"
+            ],
+            correctIndex: 2
+        },
+        {
+            question: "What is the most effective way to practice waste reduction?",
+            options: [
+                "Incineration",
+                "Refusing single-use items and reducing consumption",
+                "Buying items in plastic packaging",
+                "Landfilling"
+            ],
+            correctIndex: 1
+        },
+        {
+            question: "What type of household item should NEVER be thrown in regular trash due to toxins?",
+            options: [
+                "Batteries and Electronic Waste",
+                "Cardboard boxes",
+                "Apple peels",
+                "Cotton t-shirts"
+            ],
+            correctIndex: 0
+        },
+        {
+            question: "Why should food containers be rinsed before being put into recycling bins?",
+            options: [
+                "To make them heavier",
+                "To prevent contamination of entire recycling batches",
+                "To change the color of the plastic",
+                "It is not necessary to rinse them"
+            ],
+            correctIndex: 1
+        }
+    ];
+
+    let currentQuizIndex = 0;
+    let quizScore = 0;
 
     const ecoTips = [
         "Recycling one aluminum can saves enough energy to run a TV for 3 hours.",
@@ -139,8 +246,133 @@
         loadStorage();
         setupEventListeners();
         cycleEcoTips();
+        autoResizeTextarea();
     });
 
+    // Toggle visual state for like / dislike buttons
+    function toggleFeedback(btn, type) {
+        const container = btn.closest('.d-flex');
+        const likeBtn = container.querySelector('.like-btn');
+        const dislikeBtn = container.querySelector('.dislike-btn');
+
+        if (type === 'like') {
+            if (likeBtn.classList.contains('text-success')) {
+                // Toggle off
+                likeBtn.classList.remove('text-success');
+                likeBtn.classList.add('text-secondary');
+            } else {
+                // Activate green like, deactivate red dislike
+                likeBtn.classList.remove('text-secondary');
+                likeBtn.classList.add('text-success');
+                dislikeBtn.classList.remove('text-danger');
+                dislikeBtn.classList.add('text-secondary');
+            }
+        } else if (type === 'dislike') {
+            if (dislikeBtn.classList.contains('text-danger')) {
+                // Toggle off
+                dislikeBtn.classList.remove('text-danger');
+                dislikeBtn.classList.add('text-secondary');
+            } else {
+                // Activate red dislike, deactivate green like
+                dislikeBtn.classList.remove('text-secondary');
+                dislikeBtn.classList.add('text-danger');
+                likeBtn.classList.remove('text-success');
+                likeBtn.classList.add('text-secondary');
+            }
+        }
+    }
+
+    // Auto resize input textarea
+    function autoResizeTextarea() {
+        const input = document.getElementById('chatInput');
+        input.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+    }
+
+    /* Quiz Logic */
+    function startQuiz() {
+        currentQuizIndex = 0;
+        quizScore = 0;
+        document.getElementById('quizQuestionContainer').classList.remove('d-none');
+        document.getElementById('quizResultContainer').classList.add('d-none');
+        document.getElementById('quizFooter').classList.remove('d-none');
+        renderQuestion();
+    }
+
+    function renderQuestion() {
+        const q = quizData[currentQuizIndex];
+        document.getElementById('quizCounter').textContent = `${currentQuizIndex + 1}/${quizData.length}`;
+        document.getElementById('quizProgressBar').style.width = `${((currentQuizIndex + 1) / quizData.length) * 100}%`;
+        document.getElementById('quizQuestionText').textContent = q.question;
+        
+        const optionsContainer = document.getElementById('quizOptionsContainer');
+        optionsContainer.innerHTML = '';
+        
+        const nextBtn = document.getElementById('nextQuestionBtn');
+        nextBtn.classList.add('d-none');
+
+        const letters = ['A', 'B', 'C', 'D'];
+
+        q.options.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.className = `quiz-option-btn btn border border-secondary border-opacity-25 rounded-3 text-start p-3 d-flex align-items-center gap-3 bg-body-tertiary text-body w-100 transition-all`;
+            btn.innerHTML = `
+                <div class="option-badge rounded-circle border border-secondary border-opacity-50 d-flex align-items-center justify-content-center flex-shrink-0 fw-bold" style="width: 32px; height: 32px; font-size: 0.85rem;">
+                    ${letters[idx]}
+                </div>
+                <span class="fs-6">${escapeHtml(opt)}</span>
+            `;
+            btn.onclick = () => selectQuizOption(idx, btn);
+            optionsContainer.appendChild(btn);
+        });
+    }
+
+    function selectQuizOption(selectedIndex, selectedBtn) {
+        const q = quizData[currentQuizIndex];
+        const allBtns = document.querySelectorAll('.quiz-option-btn');
+
+        allBtns.forEach(b => b.classList.add('disabled'));
+
+        if (selectedIndex === q.correctIndex) {
+            selectedBtn.classList.remove('bg-body-tertiary', 'border-secondary');
+            selectedBtn.classList.add('bg-success', 'bg-opacity-15', 'border-success', 'text-success', 'fw-semibold');
+            selectedBtn.querySelector('.option-badge').classList.add('bg-success', 'text-white', 'border-success');
+            quizScore++;
+        } else {
+            selectedBtn.classList.remove('bg-body-tertiary', 'border-secondary');
+            selectedBtn.classList.add('bg-danger', 'bg-opacity-15', 'border-danger', 'text-danger', 'fw-semibold');
+            selectedBtn.querySelector('.option-badge').classList.add('bg-danger', 'text-white', 'border-danger');
+
+            // Highlight correct answer
+            const correctBtn = allBtns[q.correctIndex];
+            correctBtn.classList.remove('bg-body-tertiary', 'border-secondary');
+            correctBtn.classList.add('bg-success', 'bg-opacity-15', 'border-success', 'text-success');
+            correctBtn.querySelector('.option-badge').classList.add('bg-success', 'text-white', 'border-success');
+        }
+
+        const nextBtn = document.getElementById('nextQuestionBtn');
+        nextBtn.classList.remove('d-none');
+    }
+
+    function nextQuestion() {
+        currentQuizIndex++;
+        if (currentQuizIndex < quizData.length) {
+            renderQuestion();
+        } else {
+            showQuizResults();
+        }
+    }
+
+    function showQuizResults() {
+        document.getElementById('quizQuestionContainer').classList.add('d-none');
+        document.getElementById('quizFooter').classList.add('d-none');
+        document.getElementById('quizResultContainer').classList.remove('d-none');
+        document.getElementById('quizScoreText').textContent = `You scored ${quizScore} out of ${quizData.length}`;
+    }
+
+    /* Storage & Chat Code */
     function loadStorage() {
         const storedSessions = localStorage.getItem(SESSIONS_KEY);
         sessions = storedSessions ? JSON.parse(storedSessions) : [];
@@ -283,10 +515,10 @@
                     <button class="btn btn-sm btn-link text-secondary p-0 border-0" id="${copyBtnId}" title="Copy response">
                         <i class="bi bi-copy"></i>
                     </button>
-                    <button class="btn btn-sm btn-link text-secondary p-0 border-0" onclick="this.classList.toggle('text-success')" title="Helpful">
+                    <button class="btn btn-sm btn-link text-secondary p-0 border-0 like-btn" onclick="toggleFeedback(this, 'like')" title="Helpful">
                         <i class="bi bi-hand-thumbs-up"></i>
                     </button>
-                    <button class="btn btn-sm btn-link text-secondary p-0 border-0" onclick="this.classList.toggle('text-danger')" title="Unhelpful">
+                    <button class="btn btn-sm btn-link text-secondary p-0 border-0 dislike-btn" onclick="toggleFeedback(this, 'dislike')" title="Unhelpful">
                         <i class="bi bi-hand-thumbs-down"></i>
                     </button>
                 </div>
@@ -339,6 +571,7 @@
         activeSession.messages.push({ role: 'user', content: userMsg });
         renderUserBubble(userMsg);
         input.value = '';
+        input.style.height = 'auto';
         setInputState(true);
 
         const loadingId = 'loading-' + Date.now();
@@ -389,7 +622,9 @@
         document.getElementById('newChatBtn').addEventListener('click', () => createNewChat(true));
 
         document.getElementById('clearInputBtn').addEventListener('click', () => {
-            document.getElementById('chatInput').value = '';
+            const input = document.getElementById('chatInput');
+            input.value = '';
+            input.style.height = 'auto';
         });
 
         bindPromptChips();
@@ -444,7 +679,7 @@
 </script>
 
 <style>
-    /* Break out of standard parent container width to span edge-to-edge */
+    /* Full view container width */
     .full-width-wrapper {
         width: 100vw;
         position: relative;
@@ -455,10 +690,10 @@
         padding: 0 1.5rem;
     }
 
-    /* Screen Filling Dashboard Box */
+    /* Fixed Height for dynamic canvas */
     .ai-dashboard-container {
-        height: calc(100vh - 150px);
-        min-height: 600px;
+        height: calc(100vh - 130px);
+        min-height: 580px;
         width: 100% !important;
         max-width: 100% !important;
     }
@@ -473,9 +708,14 @@
         color: var(--bs-danger) !important;
     }
 
+    .quiz-option-btn:hover:not(.disabled) {
+        background-color: rgba(16, 185, 129, 0.08) !important;
+        border-color: #10b981 !important;
+    }
+
     .focus-within-ring:focus-within {
         border-color: #10b981 !important;
-        box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.15) !important;
+        box-shadow: 0 0 0 0.2rem rgba(16, 185, 129, 0.15) !important;
     }
 
     .custom-scrollbar::-webkit-scrollbar { width: 5px; }
