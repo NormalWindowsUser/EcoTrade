@@ -7,8 +7,8 @@
 <!-- Full Page AI Layout Container -->
 <div class="ai-page-wrapper d-flex flex-column pb-3">
     
-    <!-- Header Controls -->
-    <div class="ai-header d-flex align-items-center justify-content-between pb-3 border-bottom border-secondary mb-2">
+    <!-- Top Header Controls (Hidden during empty state, visible during chat) -->
+    <div id="aiHeader" class="ai-header align-items-center justify-content-between pb-3 border-bottom border-secondary mb-2 d-none">
         <div class="d-flex align-items-center gap-2">
             <i class="bi bi-robot text-success fs-4"></i>
             <div>
@@ -23,27 +23,69 @@
         </button>
     </div>
     
-    <!-- Chat Stream (Main Container Body) -->
-    <div id="chatBox" class="ai-chat-stream flex-grow-1 custom-scrollbar pe-2 overflow-y-auto">
-        <div class="text-center my-auto py-5" id="defaultWelcome">
-            <div class="badge bg-secondary bg-opacity-10 text-body border px-3 py-2 rounded-pill mb-2">
-                👋 Welcome!
+    <!-- Empty State View (Centered Layout) -->
+    <div id="landingView" class="d-flex flex-column justify-content-center align-items-center flex-grow-1 w-100 my-auto py-4">
+        <div class="text-center mb-4">
+            <div class="d-inline-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success rounded-circle mb-3" style="width: 64px; height: 64px;">
+                <i class="bi bi-robot fs-1"></i>
             </div>
-            <p class="text-secondary small">Ask questions about material prices, preparation tips, or recycling impact!</p>
+            <h2 class="fw-bold text-body mb-1">Welcome to Eco Assistant</h2>
+            <p class="text-secondary mb-0">Your AI-powered recycling & sustainability guide</p>
+        </div>
+
+        <!-- Input Box inside Landing View -->
+        <div class="w-100" style="max-width: 680px;">
+            <div class="bg-body-tertiary border border-secondary rounded-4 p-3 shadow-sm position-relative custom-input-box mb-3">
+                <textarea id="landingChatInput" class="form-control border-0 shadow-none p-0 text-body custom-textarea-bg" rows="2" placeholder="Ask AI anything about recycling..."></textarea>
+                
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                    <button class="btn btn-body-tertiary rounded-circle p-0 text-secondary border-0 icon-hover-btn d-inline-flex align-items-center justify-content-center reset-input-btn" type="button" title="Clear input text" style="width: 36px; height: 36px;">
+                        <i class="bi bi-x-lg fs-6 lh-1"></i>
+                    </button>
+                    
+                    <button class="btn btn-success rounded-circle p-0 shadow-sm d-inline-flex align-items-center justify-content-center landing-send-btn" type="button" title="Send message" style="width: 40px; height: 40px;">
+                        <i class="bi bi-arrow-up-short fs-3 text-white lh-1"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Recycling Prompt Suggestion Chips -->
+            <div class="d-flex flex-wrap justify-content-center gap-2">
+                <button class="btn btn-outline-secondary rounded-pill btn-sm prompt-chip px-3 py-1.5 d-flex align-items-center gap-1.5" data-prompt="What are the current scrap market prices for metals and plastics?">
+                    <i class="bi bi-currency-dollar text-success"></i>
+                    <span>Material Prices</span>
+                </button>
+                <button class="btn btn-outline-secondary rounded-pill btn-sm prompt-chip px-3 py-1.5 d-flex align-items-center gap-1.5" data-prompt="How should I clean and prepare plastic and glass containers before recycling?">
+                    <i class="bi bi-box-seam text-info"></i>
+                    <span>Preparation Tips</span>
+                </button>
+                <button class="btn btn-outline-secondary rounded-pill btn-sm prompt-chip px-3 py-1.5 d-flex align-items-center gap-1.5" data-prompt="How much carbon emissions are saved by recycling 1kg of aluminum?">
+                    <i class="bi bi-tree text-success"></i>
+                    <span>Eco Impact</span>
+                </button>
+                <button class="btn btn-outline-secondary rounded-pill btn-sm prompt-chip px-3 py-1.5 d-flex align-items-center gap-1.5" data-prompt="Where can I safely dispose of e-waste and lithium batteries?">
+                    <i class="bi bi-geo-alt text-warning"></i>
+                    <span>Disposal Centers</span>
+                </button>
+            </div>
         </div>
     </div>
+
+    <!-- Active Chat Stream Container (Hidden initially when empty) -->
+    <div id="chatBox" class="ai-chat-stream flex-grow-1 custom-scrollbar pe-2 overflow-y-auto d-none">
+    </div>
     
-    <!-- Bottom Floating Input Console (Elevated above Bottom Nav) -->
-    <div class="ai-input-wrapper pt-2 mt-auto mb-2">
+    <!-- Floating Bottom Input Console (Active Chat Mode) -->
+    <div id="activeInputWrapper" class="ai-input-wrapper pt-2 mt-auto mb-2 d-none">
         <div class="bg-body-tertiary border border-secondary rounded-4 p-3 shadow-sm position-relative custom-input-box">
-            <textarea id="chatInput" class="form-control border-0 shadow-none p-0 text-body custom-textarea-bg" rows="2" placeholder="Ask AI anything about recycling..."></textarea>
+            <textarea id="activeChatInput" class="form-control border-0 shadow-none p-0 text-body custom-textarea-bg" rows="2" placeholder="Ask AI anything about recycling..."></textarea>
             
             <div class="d-flex justify-content-between align-items-center mt-2">
-                <button class="btn btn-body-tertiary rounded-circle p-0 text-secondary border-0 icon-hover-btn d-inline-flex align-items-center justify-content-center" id="resetInputBtn" type="button" title="Clear input text" style="width: 36px; height: 36px;">
+                <button class="btn btn-body-tertiary rounded-circle p-0 text-secondary border-0 icon-hover-btn d-inline-flex align-items-center justify-content-center reset-input-btn" type="button" title="Clear input text" style="width: 36px; height: 36px;">
                     <i class="bi bi-x-lg fs-6 lh-1"></i>
                 </button>
                 
-                <button class="btn btn-success rounded-circle p-0 shadow-sm d-inline-flex align-items-center justify-content-center" id="sendBtn" type="button" title="Send message" style="width: 40px; height: 40px;">
+                <button class="btn btn-success rounded-circle p-0 shadow-sm d-inline-flex align-items-center justify-content-center active-send-btn" type="button" title="Send message" style="width: 40px; height: 40px;">
                     <i class="bi bi-arrow-up-short fs-3 text-white lh-1"></i>
                 </button>
             </div>
@@ -58,6 +100,7 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         loadSavedHistory();
+        setupEventListeners();
     });
 
     function saveMessageToHistory(role, content) {
@@ -66,12 +109,34 @@
         localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
     }
 
+    function showChatView() {
+        document.getElementById('landingView').classList.add('d-none');
+        document.getElementById('landingView').classList.remove('d-flex');
+        
+        document.getElementById('aiHeader').classList.remove('d-none');
+        document.getElementById('aiHeader').classList.add('d-flex');
+        
+        document.getElementById('chatBox').classList.remove('d-none');
+        document.getElementById('activeInputWrapper').classList.remove('d-none');
+    }
+
+    function showLandingView() {
+        document.getElementById('landingView').classList.remove('d-none');
+        document.getElementById('landingView').classList.add('d-flex');
+        
+        document.getElementById('aiHeader').classList.add('d-none');
+        document.getElementById('aiHeader').classList.remove('d-flex');
+        
+        document.getElementById('chatBox').classList.add('d-none');
+        document.getElementById('activeInputWrapper').classList.add('d-none');
+        document.getElementById('chatBox').innerHTML = '';
+        document.getElementById('landingChatInput').value = '';
+    }
+
     function loadSavedHistory() {
         const history = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
         if (history.length > 0) {
-            const defaultWelcome = document.getElementById('defaultWelcome');
-            if (defaultWelcome) defaultWelcome.remove();
-            
+            showChatView();
             history.forEach(item => {
                 if (item.role === 'user') {
                     renderUserBubble(item.content);
@@ -80,24 +145,28 @@
                 }
             });
             scrollToBottom();
+        } else {
+            showLandingView();
         }
     }
 
     function setInputState(disabled) {
         isGenerating = disabled;
-        const sendBtn = document.getElementById('sendBtn');
-        const chatInput = document.getElementById('chatInput');
-        const resetBtn = document.getElementById('resetInputBtn');
+        const inputs = [document.getElementById('landingChatInput'), document.getElementById('activeChatInput')];
+        const buttons = document.querySelectorAll('.landing-send-btn, .active-send-btn, .reset-input-btn, .prompt-chip');
 
-        sendBtn.disabled = disabled;
-        chatInput.disabled = disabled;
-        resetBtn.disabled = disabled;
+        inputs.forEach(input => { if (input) input.disabled = disabled; });
+        buttons.forEach(btn => {
+            btn.disabled = disabled;
+            if (disabled) btn.classList.add('opacity-50');
+            else btn.classList.remove('opacity-50');
+        });
 
-        if (disabled) {
-            sendBtn.classList.add('opacity-50');
-        } else {
-            sendBtn.classList.remove('opacity-50');
-            chatInput.focus();
+        if (!disabled) {
+            const activeInput = document.getElementById('chatBox').classList.contains('d-none') 
+                ? document.getElementById('landingChatInput') 
+                : document.getElementById('activeChatInput');
+            activeInput?.focus();
         }
     }
 
@@ -175,26 +244,26 @@
         });
     }
 
-    async function sendMessage() {
+    async function sendMessage(customPrompt = null) {
         if (isGenerating) return;
 
-        const input = document.getElementById('chatInput');
-        const box = document.getElementById('chatBox');
-        if (!input.value.trim()) return;
+        const landingInput = document.getElementById('landingChatInput');
+        const activeInput = document.getElementById('activeChatInput');
+        const userMsg = customPrompt || (document.getElementById('chatBox').classList.contains('d-none') ? landingInput.value.trim() : activeInput.value.trim());
 
+        if (!userMsg) return;
+
+        showChatView();
         setInputState(true);
 
-        const defaultWelcome = document.getElementById('defaultWelcome');
-        if (defaultWelcome) defaultWelcome.remove();
-
-        const userMsg = input.value.trim();
-        
         renderUserBubble(userMsg);
         saveMessageToHistory('user', userMsg);
 
-        input.value = '';
+        landingInput.value = '';
+        activeInput.value = '';
         scrollToBottom();
 
+        const box = document.getElementById('chatBox');
         const loadingId = 'loading-' + Date.now();
         box.innerHTML += `
             <div id="${loadingId}" class="d-flex justify-content-start mb-4 animate-fade-in ps-2">
@@ -242,42 +311,50 @@
         scrollToBottom();
     }
 
+    function setupEventListeners() {
+        document.querySelectorAll('.landing-send-btn, .active-send-btn').forEach(btn => {
+            btn.addEventListener('click', () => sendMessage());
+        });
+
+        document.querySelectorAll('.prompt-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                const prompt = chip.getAttribute('data-prompt');
+                sendMessage(prompt);
+            });
+        });
+
+        document.querySelectorAll('.reset-input-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (isGenerating) return;
+                document.getElementById('landingChatInput').value = '';
+                document.getElementById('activeChatInput').value = '';
+            });
+        });
+
+        const handleEnterKey = (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        };
+
+        document.getElementById('landingChatInput').addEventListener('keydown', handleEnterKey);
+        document.getElementById('activeChatInput').addEventListener('keydown', handleEnterKey);
+
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            if (isGenerating) return;
+            localStorage.removeItem(STORAGE_KEY);
+            showLandingView();
+        });
+    }
+
     function escapeHtml(str) {
         return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
-
-    document.getElementById('sendBtn').addEventListener('click', sendMessage);
-
-    document.getElementById('resetInputBtn').addEventListener('click', () => {
-        if (isGenerating) return;
-        document.getElementById('chatInput').value = '';
-        document.getElementById('chatInput').focus();
-    });
-
-    document.getElementById('chatInput').addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            sendMessage();
-        }
-    });
-
-    document.getElementById('clearBtn').addEventListener('click', () => {
-        if (isGenerating) return;
-        localStorage.removeItem(STORAGE_KEY);
-        document.getElementById('chatBox').innerHTML = `
-            <div class="text-center my-auto py-5" id="defaultWelcome">
-                <div class="badge bg-secondary bg-opacity-10 text-body border px-3 py-2 rounded-pill mb-2">
-                    👋 Welcome!
-                </div>
-                <p class="text-secondary small">Ask questions about material prices, preparation tips, or recycling impact!</p>
-            </div>
-        `;
-    });
 </script>
 
 <style>
     .ai-page-wrapper {
-        /* Height adjusted to account for top navbar and bottom navbar clearance */
         height: calc(100vh - 140px);
         width: 100%;
     }
@@ -293,10 +370,25 @@
         border-color: #10b981 !important;
         box-shadow: 0 0 0 0.2rem rgba(16, 185, 129, 0.15) !important;
     }
-    #chatInput {
+
+    .prompt-chip {
+        font-size: 0.85rem;
+        transition: all 0.2s ease;
+        border-color: var(--bs-border-color);
+        background-color: var(--bs-body-bg);
+        color: var(--bs-body-color);
+    }
+    .prompt-chip:hover {
+        border-color: #10b981;
+        background-color: rgba(16, 185, 129, 0.08);
+        color: var(--bs-body-color);
+        transform: translateY(-1px);
+    }
+
+    #landingChatInput, #activeChatInput {
         resize: none;
     }
-    #chatInput::placeholder {
+    #landingChatInput::placeholder, #activeChatInput::placeholder {
         color: var(--bs-secondary-color);
     }
 
