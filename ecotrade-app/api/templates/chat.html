@@ -7,7 +7,7 @@
 <!-- Mobile Sidebar Backdrop Overlay -->
 <div id="sidebarBackdrop" class="sidebar-backdrop d-md-none"></div>
 
-<!-- Outer Wrapper (Wider layout centered cleanly without horizontal scrollbars) -->
+<!-- Outer Wrapper -->
 <div class="full-width-wrapper pb-4">
     <div class="ai-dashboard-container d-flex w-100 overflow-hidden rounded-4 border border-secondary border-opacity-25 shadow-sm bg-body position-relative">
 
@@ -101,7 +101,7 @@
                 </div>
             </div>
 
-            <!-- COMPACT INPUT FOOTER -->
+            <!-- COMPACT INPUT FOOTER WITH QUICK ACTION PILLS -->
             <footer class="p-2 px-3 bg-body border-top border-secondary border-opacity-25 pb-3">
                 <div class="position-relative bg-body-tertiary rounded-4 border border-secondary border-opacity-50 px-3 py-1.5 shadow-sm focus-within-ring d-flex align-items-center gap-2">
                     <textarea id="chatInput" class="form-control border-0 bg-transparent shadow-none text-body p-1" rows="1" placeholder="Recycle your thoughts here..." style="resize: none; max-height: 100px; line-height: 1.4;"></textarea>
@@ -115,6 +115,29 @@
                             <i class="bi bi-send-fill fs-6 text-white"></i>
                         </button>
                     </div>
+                </div>
+
+                <!-- QUICK ACTION PILLS BELOW CHAT INPUT -->
+                <div class="d-flex flex-wrap justify-content-center align-items-center gap-2 mt-2 px-1">
+                    <button class="btn btn-sm rounded-pill quick-action-pill d-flex align-items-center gap-1.5 px-3 py-1 bg-body text-body" data-prompt="What are the current buy-back and recycling market prices for scrap materials in Malaysia?">
+                        <i class="bi bi-currency-dollar text-success fw-bold"></i>
+                        <span>Material Prices</span>
+                    </button>
+                    
+                    <button class="btn btn-sm rounded-pill quick-action-pill d-flex align-items-center gap-1.5 px-3 py-1 bg-body text-body" data-prompt="How should I properly clean, sort, and prepare items before taking them to a recycling collection point?">
+                        <i class="bi bi-box-seam text-info"></i>
+                        <span>Preparation Tips</span>
+                    </button>
+                    
+                    <button class="btn btn-sm rounded-pill quick-action-pill d-flex align-items-center gap-1.5 px-3 py-1 bg-body text-body" data-prompt="What is the environmental and carbon reduction impact of recycling glass, metal, and plastic items?">
+                        <i class="bi bi-tree text-success"></i>
+                        <span>Eco Impact</span>
+                    </button>
+                    
+                    <button class="btn btn-sm rounded-pill quick-action-pill d-flex align-items-center gap-1.5 px-3 py-1 bg-body text-body" data-prompt="Where are the main recycling drop-off facilities and waste disposal centers in Malaysia?">
+                        <i class="bi bi-geo-alt text-warning"></i>
+                        <span>Disposal Centers</span>
+                    </button>
                 </div>
 
                 <!-- Dynamic Eco Ticker Footer -->
@@ -261,7 +284,21 @@
         setupMobileDrawer();
         cycleEcoTips();
         autoResizeTextarea();
+        bindQuickActionPills();
     });
+
+    // Quick Action Pills Handler (Triggers AI prompt immediately)
+    function bindQuickActionPills() {
+        document.querySelectorAll('.quick-action-pill').forEach(pill => {
+            pill.addEventListener('click', () => {
+                if (isGenerating) return;
+                const promptText = pill.getAttribute('data-prompt');
+                const chatInput = document.getElementById('chatInput');
+                chatInput.value = promptText;
+                sendMessage();
+            });
+        });
+    }
 
     // Quiz Modal Trigger
     function openQuizModal() {
@@ -750,13 +787,13 @@
 </script>
 
 <style>
-    /* Prevent root layout horizontal overflow */
+    /* Root horizontal overflow safety */
     html, body {
         max-width: 100%;
         overflow-x: hidden !important;
     }
 
-    /* Clean full-width breakout centered on screen (96vw expands box horizontally without overflow) */
+    /* Outer wrapper layout */
     .full-width-wrapper {
         width: 96vw;
         max-width: 1680px;
@@ -767,7 +804,7 @@
         box-sizing: border-box;
     }
 
-    /* Height scaling for optimal desktop & mobile viewports */
+    /* Container Height Setup */
     .ai-dashboard-container {
         height: calc(100vh - 150px);
         min-height: 520px;
@@ -780,6 +817,27 @@
         width: 280px;
         min-width: 260px;
         flex-shrink: 0;
+    }
+
+    /* QUICK ACTION PILLS STYLING */
+    .quick-action-pill {
+        border: 1px solid rgba(108, 117, 125, 0.25) !important;
+        font-size: 0.825rem;
+        font-weight: 500;
+        color: var(--bs-body-color);
+        transition: all 0.2s ease-in-out;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+
+    .quick-action-pill:hover {
+        border-color: rgba(16, 185, 129, 0.45) !important;
+        background-color: var(--bs-tertiary-bg) !important;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+
+    .quick-action-pill:active {
+        transform: translateY(0);
     }
 
     /* MOBILE DRAWER STYLING (<768px) */
