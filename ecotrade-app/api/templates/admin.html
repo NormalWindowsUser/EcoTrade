@@ -87,7 +87,7 @@
                             <thead>
                                 <tr class="text-secondary small border-secondary">
                                     <th>ID</th>
-                                    <th>User</th>
+                                    <th>User (ID)</th>
                                     <th>Material</th>
                                     <th>Hub</th>
                                     <th>Weight</th>
@@ -447,7 +447,9 @@
             const result = await res.json();
 
             if (result.status === "success" && result.data && result.data.length > 0) {
-                result.data.sort((a, b) => a.id - b.id);
+                // Sort descending by contribution ID (newest/highest ID first)
+                result.data.sort((a, b) => b.id - a.id);
+                
                 let rowsHtml = "";
                 result.data.forEach(item => {
                     let statusBadge = item.status === "approved" 
@@ -465,11 +467,16 @@
 
                     const weightVal = (parseFloat(item.weight) || 0).toFixed(2);
                     const payoutVal = (parseFloat(item.payout) || 0).toFixed(2);
+                    
+                    // Display User Name alongside User ID badge
+                    const userDisplay = item.user_id 
+                        ? `${item.user_name} <span class="badge bg-dark text-secondary border border-secondary ms-1">ID: #${item.user_id}</span>`
+                        : item.user_name;
 
                     rowsHtml += `
                         <tr class="border-secondary">
                             <td class="text-secondary small">#${item.id}</td>
-                            <td class="fw-bold text-light">${item.user_name}</td>
+                            <td class="fw-bold text-light">${userDisplay}</td>
                             <td class="text-light">${item.material}</td>
                             <td class="text-secondary small">${item.hub}</td>
                             <td class="fw-semibold text-light">${weightVal} kg</td>
@@ -560,7 +567,7 @@
                             </td>
                         </tr>
                     `;
-                    userOptions += `<option value="${user.id}">${user.full_name} (${user.email})</option>`;
+                    userOptions += `<option value="${user.id}">${user.full_name} (ID: #${user.id} - ${user.email})</option>`;
                 });
                 tableBody.innerHTML = rowsHtml;
                 if (selectBox) selectBox.innerHTML = userOptions;
