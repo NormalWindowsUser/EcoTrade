@@ -25,7 +25,8 @@
                     <div class="cf-turnstile" data-sitekey="1x00000000000000000000AA"></div>
                 </div>
 
-                <button type="submit" class="btn btn-success w-100 fw-bold py-2 mb-3">Log In</button>
+                <button type="submit" class="btn btn-success w-100 fw-bold py-2 mb-2">Log In</button>
+                <button type="button" id="guestLoginBtn" class="btn btn-outline-light w-100 fw-bold py-2 mb-3">Log in as Guest</button>
             </form>
 
             <div id="loginMsg"></div>
@@ -39,6 +40,13 @@
 </div>
 
 <script>
+    document.getElementById('guestLoginBtn').addEventListener('click', () => {
+        document.getElementById('loginEmail').value = 'guest@gmail.com';
+        document.getElementById('loginPassword').value = '123456';
+        
+        document.getElementById('loginForm').requestSubmit();
+    });
+
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const msgDiv = document.getElementById('loginMsg');
