@@ -102,7 +102,7 @@ def api_signup():
     full_name = data.get("full_name", "").strip()
     email = data.get("email", "").strip().lower()
     password = data.get("password", "")
-    role = "public"  # Hardcoded to prevent privilege escalation via request payload
+    role = "public"
     school_name = data.get("school_name", "").strip() or None
 
     if not full_name or not email or not password:
@@ -740,17 +740,17 @@ def get_materials():
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        join_conditions = ["c.material_id = m.id", "c.status = 'approved'"]
+        hub_conditions = []
         params = []
 
         if city:
-            join_conditions.append("h.city = %s")
+            hub_conditions.append("h.city = %s")
             params.append(city)
         if hub_id and hub_id.isdigit():
-            join_conditions.append("h.id = %s")
+            hub_conditions.append("h.id = %s")
             params.append(int(hub_id))
 
-        join_str = " AND ".join(join_conditions)
+        hub_filter_sql = (" AND " + " AND ".join(hub_conditions)) if hub_conditions else ""
 
         query = f"""
             SELECT 
@@ -763,8 +763,10 @@ def get_materials():
                 m.preparation_tips,
                 m.eco_impact_desc
             FROM materials m
-            LEFT JOIN contributions c ON {join_str}
-            LEFT JOIN recycling_hubs h ON c.hub_id = h.id
+            LEFT JOIN (
+                contributions c
+                JOIN recycling_hubs h ON c.hub_id = h.id
+            ) ON c.material_id = m.id AND c.status = 'approved'{hub_filter_sql}
             WHERE m.is_active = TRUE
             GROUP BY m.id, m.name, m.category, m.price_per_kg, m.preparation_tips, m.eco_impact_desc
             ORDER BY m.id ASC;
