@@ -137,12 +137,12 @@
 
         let html = '<option value="" disabled selected>Select a material...</option>';
         
-        // Generate optgroups and options dynamically
+        // Generate optgroups and options dynamically with fallbacks for price fields
         for (const category in groupedMaterials) {
             html += `<optgroup label="${category}">`;
             groupedMaterials[category].forEach(m => {
-                // Store the base_price in a data attribute
-                html += `<option value="${m.name}" data-price="${m.base_price}">${m.name}</option>`;
+                const price = m.base_price ?? m.price ?? m.rate ?? 0;
+                html += `<option value="${m.name}" data-price="${price}">${m.name}</option>`;
             });
             html += `</optgroup>`;
         }
@@ -153,11 +153,16 @@
     // Automatically calculate Total Payout when Material or Weight changes
     function updatePayout() {
         const materialSelect = document.getElementById('materialSelect');
+        if (materialSelect.selectedIndex < 0) return;
+
         const selectedOption = materialSelect.options[materialSelect.selectedIndex];
         const basePrice = parseFloat(selectedOption ? selectedOption.getAttribute('data-price') : 0) || 0;
         const weight = parseFloat(document.getElementById('weightInput').value) || 0;
         
-        document.getElementById('calculatedPayoutInput').value = (weight * basePrice).toFixed(2);
+        // Only automatically calculate when both valid weight and rate exist
+        if (weight > 0 && basePrice > 0) {
+            document.getElementById('calculatedPayoutInput').value = (weight * basePrice).toFixed(2);
+        }
     }
 
     document.getElementById('materialSelect').addEventListener('change', updatePayout);
@@ -180,6 +185,8 @@
             return;
         }
 
+        const payoutValue = parseFloat(document.getElementById('calculatedPayoutInput').value) || 0;
+
         try {
             const res = await fetch('/api/contribute', {
                 method: 'POST',
@@ -189,12 +196,13 @@
                     hub_id: parseInt(hubId),
                     material_name: document.getElementById('materialSelect').value,
                     weight: parseFloat(document.getElementById('weightInput').value),
-                    calculated_payout: parseFloat(document.getElementById('calculatedPayoutInput').value)
+                    calculated_payout: payoutValue
                 })
             });
             const data = await res.json();
             if (data.status === 'success') {
-                msgDiv.innerHTML = `<div class="alert alert-success py-2 small">Contribution recorded! Calculated Payout: <strong>RM ${data.payout.toFixed(2)}</strong></div>`;
+                const finalPayout = data.payout !== undefined ? data.payout : payoutValue;
+                msgDiv.innerHTML = `<div class="alert alert-success py-2 small">Contribution recorded! Calculated Payout: <strong>RM ${finalPayout.toFixed(2)}</strong></div>`;
                 document.getElementById('contribForm').reset();
                 document.getElementById('hubInfoCard').classList.add('d-none');
                 turnstile.reset();
@@ -211,7 +219,7 @@
     // --- INITIALIZATION ---
     document.addEventListener('DOMContentLoaded', () => {
         fetchHubs();
-        fetchMaterials(); // Fetch materials on load
+        fetchMaterials();
     });
 </script>
 {% endblock %}
