@@ -807,16 +807,21 @@ def add_contribution():
 
     try:
         weight = float(data.get("weight", 0))
-        price = float(data.get("price", 0))
+        if "calculated_payout" in data and data.get("calculated_payout") is not None:
+            payout = float(data.get("calculated_payout"))
+        elif "payout" in data and data.get("payout") is not None:
+            payout = float(data.get("payout"))
+        else:
+            price = float(data.get("price", 0))
+            payout = weight * price
     except (ValueError, TypeError):
-        return jsonify({"status": "error", "message": "Invalid weight or price format."}), 400
+        return jsonify({"status": "error", "message": "Invalid weight or payout format."}), 400
 
-    if weight <= 0 or price < 0:
+    if weight <= 0 or payout < 0:
         return jsonify({"status": "error", "message": "Weight must be greater than 0."}), 400
 
     material_name = data.get("material_name")
     hub_id = data.get("hub_id")
-    payout = weight * price
 
     conn = None
     cursor = None
