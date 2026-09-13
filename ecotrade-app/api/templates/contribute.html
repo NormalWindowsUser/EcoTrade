@@ -139,7 +139,7 @@
         for (const category in groupedMaterials) {
             html += `<optgroup label="${category}">`;
             groupedMaterials[category].forEach(m => {
-                const price = m.base_price ?? m.price ?? m.rate ?? m.avg_reported_rate ?? 0;
+                const price = m.base_price ?? m.price_per_kg ?? 0;
                 html += `<option value="${m.name}" data-price="${price}">${m.name}</option>`;
             });
             html += `</optgroup>`;
@@ -148,7 +148,7 @@
         select.innerHTML = html;
     }
 
-    // Automatically calculate Total Payout when Material or Weight changes
+    // Auto-calculate payout on material or weight selection (if user has not manually set a total payout)
     function updatePayout() {
         const materialSelect = document.getElementById('materialSelect');
         if (materialSelect.selectedIndex < 0) return;
@@ -156,9 +156,10 @@
         const selectedOption = materialSelect.options[materialSelect.selectedIndex];
         const basePrice = parseFloat(selectedOption ? selectedOption.getAttribute('data-price') : 0) || 0;
         const weight = parseFloat(document.getElementById('weightInput').value) || 0;
+        const payoutInput = document.getElementById('calculatedPayoutInput');
         
         if (weight > 0 && basePrice > 0) {
-            document.getElementById('calculatedPayoutInput').value = (weight * basePrice).toFixed(2);
+            payoutInput.value = (weight * basePrice).toFixed(2);
         }
     }
 
@@ -193,14 +194,12 @@
                     hub_id: parseInt(hubId),
                     material_name: document.getElementById('materialSelect').value,
                     weight: parseFloat(document.getElementById('weightInput').value),
-                    calculated_payout: payoutValue,
-                    price: payoutValue,
-                    payout: payoutValue
+                    calculated_payout: payoutValue
                 })
             });
             const data = await res.json();
             if (data.status === 'success') {
-                const finalPayout = (data.payout && data.payout > 0) ? data.payout : payoutValue;
+                const finalPayout = data.payout !== undefined ? data.payout : payoutValue;
                 msgDiv.innerHTML = `<div class="alert alert-success py-2 small">Contribution recorded! Calculated Payout: <strong>RM ${finalPayout.toFixed(2)}</strong></div>`;
                 document.getElementById('contribForm').reset();
                 document.getElementById('hubInfoCard').classList.add('d-none');
